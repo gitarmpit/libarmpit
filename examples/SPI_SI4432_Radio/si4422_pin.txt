@@ -1,0 +1,18 @@
+si4422
+
+old:
+GND GPIO MISO MOSI CLK SS IRQ SDN VCC
+
+old connector, copter f330/f440 project: 
+
+1       2       3     4     5
+GND    MISO   MOSI   CLK   SS
+VCC    SDN
+
+
+====================================
+
+
+new:
+GND  G0 G1 G2  VCC MISO MOSI SCLK SS IRQ  SDN GND 
+       

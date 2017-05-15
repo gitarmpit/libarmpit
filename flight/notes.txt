@@ -1,0 +1,65 @@
+timings: 
+
+
+           
+
+racef :   
+
+
+gyro: range: +/- 8192; +/- 2000 deg/sec   lpf smooting in gyro.c
+acc:  +/- 8G lpf smooting is done in imu
+
+System = 10Hz,   GyroPid:  8K or 1K, no gyro/pid denom, run together     Accel: 100Hz    Rx: 50Hz  mag: 10Hz   Baro: 20Hz   Sonar: 20Hz  Alt: 40Hz
+
+
+taskMainPidLoop: imuUpdateGyroAndAttitude, ->gyroUpdate, acc smoothing
+                 annexCode  : calc  dynPid adj, 
+                              calc rx->rc
+                              apply head free
+                              prevent arming if CPU too high, or angle too high  or calibrating
+                            
+                 updateMagHold
+                 applyAltHold
+                 appply throttle correction
+                 pidResetErrorGyro 
+                 pidController
+                 mixer
+                 write motors
+
+
+taskUpdateRxMain:   processRx: 
+                                read rx.pwm channels
+                                failsafe
+                                process sticks: arm/disarm, enable/disable box modes, start calib, apply trims
+
+                                updateAltHoldState, updateSonarAltHoldState  (enable/disable based on the BOX on/off)
+            
+================================================================
+betaf:
+
+gyro: 2000dps 8K  smoothing done in gyro.c, result is floating point scaled to dps 1/16.4  (32K / 2000 dps)
+acc:  16G    lpf smoothing done in acc.c at 1K
+
+System = 10Hz,   GyroPid:  8K or 1K,  run together but uses pid denom   
+                 Attitide: separate task at 100Hz
+                 Accel: 1000Hz    Rx: 50Hz  mag: 10Hz   Baro: 20Hz   Sonar: 14Hz  Alt: 40Hz
+    
+
+taskMainPidLoop     updateMagHold
+                    updateRcCommands (annex code) :  rx->rc
+                                                     apply head-free
+
+                    processRcCommand : nothing interesting                                                     
+                    applyAltHold
+                    appply throttle correction
+
+                    pidResetErrorGyroState
+                    adjust rc if rc_interpolation enabled
+                    calculateSetpointRate for PID
+
+                    gyroUpdate();
+                    pid
+                    mixer
+                    write motors
+
+taskUpdateRxMain  : processRx

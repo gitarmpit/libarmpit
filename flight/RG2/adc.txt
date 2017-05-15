@@ -1,0 +1,36 @@
+ADC_VREF value for STM32F407 at 168MHz : 1523-1536 
+
+Vref, V  for 3.3V reference VCC : 3.3 * ADC_VREF / 4095 =  3.3*1536/4095  = 1.2375
+
+========================================================
+
+To determine VCC based on known Vref = 1.2375 
+
+VCC = 4095 * Vref / ADC_VREF  = 4095 * 1.2375 / ADC_VREF
+
+For example if ADC_VREF = 1800,   VCC = 4095 * 1.2375 / 1800 = 2.815 
+
+========================================================
+
+To determine VBAT:   
+
+VBAT is divideved by 2  for STM32F407 
+
+VBAT = ADC_VBAT * 2 * VCC / 4095
+
+
+==============================================
+General formula to determine V, for example on a resistor voltage divider: 
+
+V = ADC conversion result * VCC / 4095
+
+==============================================
+
+V external battery connected to a voltage divider R1/R2: 
+
+Vext = Vcc/4095 * ADC_R2  * (R1+R2) / R2
+
+Example:  
+R1=2K  R2=4.87K
+
+3.77/4095*3131*6.87/4.87

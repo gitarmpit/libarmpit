@@ -1,0 +1,9 @@
+I2C2 PB10-PB11 (407 bottom right)   shared with HMC5883L
+      SCL  SDA
+
+Bottom view: 
+
+FSYNC  NCS   INT   AD0   ECL  ECA    SDA   SCL   GND    VCC
+N/C    N/C   E14   GND   N/C  N/C    B11   B10
+             45                       48   47
+                          

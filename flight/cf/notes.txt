@@ -1,0 +1,69 @@
+acc +8G  -32768,+32768   1G = 32768/8 = 4096  
+
+gyro +- 2000d/s   scale = 32768 / 2000 = 16.4 
+
+gyro max update rate is 8Khz (lpf defaults to 256Hz)   or 1Khz (lpf is set) 
+
+
+taskGyro and taskPid run at 8Khz  
+
+gyroConfig.gyro_sample_hz = 4000   aka sampleFrequencyHz
+
+gyroInit:   interrupt denominator =  8000 / 4000 = 2    means only process interrupt every other time
+
+
+const uint16_t pidPeriodUs = US_FROM_HZ(gyro.sampleFrequencyHz);  250us
+
+pid_process_denom = 2  (means run pid once for every 2 gyro reads) 
+pidSetTargetLooptime(pidPeriodUs * gyroConfig()->pid_process_denom);  500us
+
+
+targetPidLooptime =  500us used for filters dT, also used in mwrewrite to calc iTerm
+
+bool taskGyroCheck(uint32_t currentDeltaTime)
+{
+    if (gyroConfig()->gyro_sync) {
+        bool sync = gyroSyncIsDataReady(); //4Khz
+        return sync;
+    }
+
+    int32_t diff = currentTime - gyroUpdateAt;
+    bool timeout = (diff >= 0);
+
+    return timeout;
+}
+
+void taskGyro(void)
+{
+    gyroUpdate();
+    gyroUpdateAt += US_FROM_HZ(gyro.sampleFrequencyHz); //+= 250us
+    gyroReadyCounter++;
+}
+
+
+bool taskPidCheck(uint32_t currentDeltaTime)
+{
+    if (gyroReadyCounter == 0) {
+        return false;
+    }
+
+    bool shouldRunPid = false;
+    if (gyroConfig()->gyro_sync) {
+        shouldRunPid = gyroReadyCounter >= gyroConfig()->pid_process_denom;
+    }
+    shouldRunPid |= currentDeltaTime >= targetPidLooptime;
+
+    if (!shouldRunPid) {
+        return false;
+    }
+
+    return true;
+}
+
+//effectively runs at 2K (500us), at half of the gyro frequency
+void taskPid(void)
+{
+    gyroReadyCounter = 0;
+}
+
+

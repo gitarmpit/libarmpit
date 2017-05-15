@@ -1,0 +1,11 @@
+General motor output setup:
+Quad-X
+
+       M1 CW    M2 CCW
+        \        /
+          \.--./
+           |  |
+          /`--'\
+        /        \
+    M4 CCW       M3 CW
+

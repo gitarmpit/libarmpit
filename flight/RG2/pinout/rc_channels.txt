@@ -1,0 +1,19 @@
+Controller connector 
+
+. VCC GND
+6 .  GND
+5 .  GND
+4 .  GND
+3 .  GND   yellow throttle
+2 .  GND   green  pitch
+1 .  GND   white  roll
+
+Lower 6-pin male connector on board  
+
+1     2        3      4   5     6       
+Roll Pitch Throttle N/C  GND   VCC
+D2    D3      D4
+83    84      85   (top center)
+
+
+

@@ -1,0 +1,3 @@
+https://github.com/kriswiner/MPU-6050/wiki/Affordable-9-DoF-Sensor-Fusion
+
+

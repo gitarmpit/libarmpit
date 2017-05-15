@@ -1,0 +1,152 @@
+#include "RCC_Helper.h"
+#include "GPIO_Helper.h"
+#include "spi.h"
+#include "gpio_cpp.h"
+#include <stdio.h>
+#include "5110_2/lcd5110.h"
+#include "afio.h"
+#include "5110/Adafruit_PCD8544.h"
+
+
+//18K with just font.c
+//27.5K  font2 font4
+static void test2()
+{
+    RCC_Delay_ms(10);
+    GPIOA* portA = GPIOA::GetInstance();
+    GPIOB* portB = GPIOB::GetInstance();
+    portA->EnablePeripheralClock(true);
+    portB->EnablePeripheralClock(true);
+
+    SPI* spi = GPIO_Helper::SetupSPI1_MasterMode_PA_5_6_7(false, false, SPI_BAUD_RATE_2);
+
+    //RCC_EnableAFIO(true);
+    //AFIO_Remap_SWJ_CFG(false, true, false);
+    //AFIO_Remap_SPI1(true);
+
+    //GPIO_PIN* CLK_pin = portB->GetPin (GPIO_PIN3);
+    //GPIO_PIN* MOSI_pin = portB->GetPin (GPIO_PIN5);
+
+    //MOSI_pin->SetupGPIO_OutAltPP();
+    //CLK_pin->SetupGPIO_OutAltPP();
+
+//    bool isFullDuplex = true;
+//    bool isLSBFirst = false;
+//    bool isSetSSM = true;
+//    bool is16Bit = false;
+//
+//    SPI* spi = SPI1::GetInstance();
+//    spi->Initialize(true, isFullDuplex, SPI_BAUD_RATE_2,  false, false, isLSBFirst, isSetSSM, is16Bit);
+
+
+    //SPI* spi = GPIO_Helper::SetupSPI1_MasterMode_PB_3_4_5(false, false, SPI_BAUD_RATE_2);
+
+    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN1);
+    rstPin->SetupGPIO_OutPP();
+    rstPin->SetSpeedHigh();
+
+    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN0);
+    dcPin->SetupGPIO_OutPP();
+    dcPin->SetSpeedHigh();
+
+    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
+    ssPin->SetupGPIO_OutPP();
+    ssPin->SetSpeedHigh();
+    Adafruit_PCD8544 display(spi, dcPin, rstPin, ssPin);
+    display.write("test");
+    display.display();
+    display.drawString("test", 0, 0, 2);
+    display.display();
+    //display.drawString("test", 0, 0, 4);
+    //display.drawString("test", 0, 0, 6);
+
+    while(1);
+
+}
+
+//14K
+static void test()
+{
+    RCC_Delay_ms(10);
+    GPIOA* portA = GPIOA::GetInstance();
+    GPIOB* portB = GPIOB::GetInstance();
+    portA->EnablePeripheralClock(true);
+    portB->EnablePeripheralClock(true);
+
+    //SPI* spi = GPIO_Helper::SetupSPI1_MasterMode_PA_5_6_7(false, false, SPI_BAUD_RATE_2);
+//    RCC_EnableAFIO(true);
+//    AFIO_Remap_SWJ_CFG(false, true, false);
+//    AFIO_Remap_SPI1(true);
+//
+//    GPIO_PIN* CLK_pin = portB->GetPin (GPIO_PIN3);
+//    GPIO_PIN* MOSI_pin = portB->GetPin (GPIO_PIN5);
+//
+//    MOSI_pin->SetupGPIO_OutAltPP();
+//    CLK_pin->SetupGPIO_OutAltPP();
+//
+//    bool isFullDuplex = true;
+//    bool isLSBFirst = false;
+//    bool isSetSSM = true;
+//    bool is16Bit = false;
+//
+//    SPI* spi = SPI1::GetInstance();
+//    spi->Initialize(true, isFullDuplex, SPI_BAUD_RATE_2,  false, false, isLSBFirst, isSetSSM, is16Bit);
+
+
+    SPI* spi = GPIO_Helper::SetupSPI1_MasterMode_PA_5_6_7(false, false, SPI_BAUD_RATE_2);
+
+    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN1);
+    rstPin->SetupGPIO_OutPP();
+    rstPin->SetSpeedHigh();
+
+    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN0);
+    dcPin->SetupGPIO_OutPP();
+    dcPin->SetSpeedHigh();
+
+    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
+    ssPin->SetupGPIO_OutPP();
+    ssPin->SetSpeedHigh();
+
+
+    LCD5110 display(spi, dcPin, rstPin, ssPin, false);
+    display.Init();
+    display.Clear();
+
+//    display.WriteLine("12345");
+//    display.GotoXY(5, 1);
+//    display.WriteLine("12345");
+//    display.GotoXY(0, 1);
+//    display.WriteLine("1");
+//    display.GotoXY(1, 2);
+//    display.WriteLine("23");
+
+    uint32_t i = 0;
+    char buf[32] = {0};
+    while(6)
+    {
+        display.GotoXY(0, 0);
+        sprintf (buf, "%d", i++);
+        display.WriteLine(buf);
+        RCC_Delay_ms(10);
+    }
+
+    display.WriteLine("test1!");
+    display.GotoXY(0, 1);
+    display.WriteLine("test2!");
+    display.GotoXY(0, 2);
+    display.WriteLine("test3!");
+    display.GotoXY(0, 3);
+    display.WriteLine("1234567890 123456789");
+
+    while(1)
+        ;
+
+}
+
+int main()
+{
+    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+
+    test();
+
+}

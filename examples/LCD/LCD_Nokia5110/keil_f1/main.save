@@ -1,0 +1,81 @@
+#include "RCC_Helper.h"
+#include "GPIO_Helper.h"
+#include "spi.h"
+#include "gpio_cpp.h"
+#include <stdio.h>
+#include "5110_2/lcd5110.h"
+#include "afio.h"
+
+
+static void test()
+{
+    RCC_Delay_ms(10);
+    GPIOA* portA = GPIOA::GetInstance();
+    GPIOB* portB = GPIOB::GetInstance();
+    portA->EnablePeripheralClock(true);
+    portB->EnablePeripheralClock(true);
+
+    //Too fast won't work, check clock and baud rate
+    SPI* spi = GPIO_Helper::SetupSPI1_MasterMode_PA_5_6_7(false, false, SPI_BAUD_RATE_8);
+
+    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN2);
+    rstPin->SetupGPIO_OutPP();
+    rstPin->SetSpeedHigh();
+
+    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN1);
+    dcPin->SetupGPIO_OutPP();
+    dcPin->SetSpeedHigh();
+
+    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
+    ssPin->SetupGPIO_OutPP();
+    ssPin->SetSpeedHigh();
+
+
+    LCD5110 display(spi, dcPin, rstPin, ssPin, false);
+    display.Init();
+    display.Clear();
+
+//    display.WriteLine("12345");
+//    display.GotoXY(5, 1);
+//    display.WriteLine("12345");
+//    display.GotoXY(0, 1);
+//    display.WriteLine("1");
+//    display.GotoXY(1, 2);
+//    display.WriteLine("23");
+
+    uint32_t i = 0;
+    char buf[32] = {0};
+    while(6)
+    {
+        display.GotoXY(0, 0);
+        sprintf (buf, "%d", i++);
+        display.WriteLine(buf);
+        RCC_Delay_ms(10);
+    }
+
+    display.WriteLine("test1!");
+    display.GotoXY(0, 1);
+    display.WriteLine("test2!");
+    display.GotoXY(0, 2);
+    display.WriteLine("test3!");
+    display.GotoXY(0, 3);
+    display.WriteLine("1234567890 123456789");
+
+    while(1)
+        ;
+
+}
+
+int main()
+{
+    //Too fast won't work, check clock and baud rate
+    //64Mhz = baud rate div 8 max
+    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+	//FLASH_SetWaitState(2);
+	//RCC_EnableHSI(TRUE);
+	//RCC_EnablePLL(16);
+	//RCC_SetAPB1PrescalerDiv2();
+
+    test();
+
+}

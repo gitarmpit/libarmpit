@@ -1,0 +1,9 @@
+I2C2  (407 bottom right) shared with MPU9250
+Top View: 
+VCC         
+GND
+SCL        B10(47)
+SDA        B11(48)
+DRDY       C0(15) -- 407 left side
+
+

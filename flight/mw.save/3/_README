@@ -1,0 +1,15 @@
+3
+Get rid of RcOptions and "boxes", set modes directly
+remove PIDLEVEL setting since it is not used 
+
+
+2
+Delete GPS 
+Remove sensor code 
+Remove inflight calib
+Remove box activation by aux channel ranges
+Remove arming disarming via box 
+Remove inflight cal
+
+1
+Initial version

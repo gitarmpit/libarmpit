@@ -1,0 +1,25 @@
+acc:  +/- 2, 4, 8, or 16g   m/t^2
+gyro: +/- 250, 500, 1000, or 2000 deg/sec    (rotational velocity)
+
+scale: 
+[-32768, +32767]
+
+The scale of each depends on the sensitivity settings chosen, which can be one of  for the 
+and one of  for the gyroscope. 
+
+The accelerometer produces data in units of acceleration (distance over time2), 
+and the gyroscope produces data in units of rotational velocity (rotation distance over time).
+
+
+The output scale for any setting is  for each of the six axes. 
+The default setting in the I2Cdevlib class is +/- 2g for the accel and +/- 250 deg/sec for the gyro. 
+
+
+If the device is perfectly level and not moving, then:
+
+    X/Y accel axes should read 0
+    Z accel axis should read 1g, which is +16384 at a sensitivity of 2g
+    X/Y/Z gyro axes should read 0
+
+In reality, the accel axes won't read exactly 0 since it is difficult to be perfectly level and there is some noise/error, 
+and the gyros will also not read exactly 0 for the same reason (noise/error).

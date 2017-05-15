@@ -1,0 +1,1418 @@
+
+#include <stdint.h>
+#include "_rcc.h"
+#include "_gpio.h"
+
+
+
+#if 0
+
+#include "common.h"
+#include "debug.h"
+#include "gpio.h"
+#include <stdlib.h>
+#include <string.h>
+#include "flash.h"
+
+#define BLACK   0x0000
+#define BLUE    0x001F
+#define RED     0xF800
+#define GREEN   0x07E0
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0
+#define WHITE   0xFFFF
+
+#include "registers.h"
+#define TFTWIDTH   240
+#define TFTHEIGHT  320
+#define TFTLCD_DELAY 0xFF
+#include <stdio.h>
+
+#define LOAD_FONT2
+#define LOAD_FONT4
+#define LOAD_FONT6
+#define LOAD_FONT7
+
+#include "font.h"
+
+#ifdef LOAD_FONT2
+#include "Font16.h"
+#endif
+
+#ifdef LOAD_FONT4
+#include "Font32.h"
+#endif
+
+#ifdef LOAD_FONT6
+#include "Font64.h"
+#endif
+
+#ifdef LOAD_FONT7
+#include "Font7s.h"
+#endif
+
+
+#define swap(a, b) { int16_t t = a; a = b; b = t; }
+
+
+#define znew (z=36969*(z&65535)+(z>>16))
+#define wnew (w=18000*(w&65535)+(w>>16))
+#define MWC ((znew<<16)+wnew )
+#define SHR3 (jsr^=(jsr<<17), jsr^=(jsr>>13), jsr^=(jsr<<5))
+#define CONG (jcong=69069*jcong+1234567)
+//#define FIB ((b=a+b),(a=b-a))
+#define KISS ((MWC^CONG)+SHR3)
+//#define LFIB4 (c++,t[c]=t[c]+t[UC(c+58)]+t[UC(c+119)]+t[UC(c+178)])
+//#define SWB (c++,bro=(x<y),t[c]=(x=t[UC(c+34)])-(y=t[UC(c+19)]+bro))
+//#define UNI (KISS*2.328306e-10)
+//#define VNI ((long) KISS)*4.656613e-10
+//#define UC (unsigned char) /*a cast operation*/
+typedef volatile unsigned long UL;
+/* Global static variables: */
+static UL z=362436069, w=521288629, jsr=123456789, jcong=380116160;
+//static UL a=224466889, b=7584631;//, t[256];
+/* Use random seeds to reset z,w,jsr,jcong,a,b, and the table
+t[256]*/
+//static UL x=0,y=0,bro; static unsigned char c=0;
+/* Example procedure to set the table, using KISS: */
+//void settable(UL i1,UL i2,UL i3,UL i4,UL i5, UL i6)
+//{ int i; z=i1;w=i2,jsr=i3; jcong=i4; a=i5; b=i6;
+//for(i=0;i<256;i=i+1) t[i]=KISS;
+//}
+
+
+//////////////////////
+// GFX private vars:
+
+
+//////////////////////
+
+static const uint16_t ILI932x_regValues[]  = {
+  //ILI932X_START_OSC        , 0x0001, // Start oscillator
+  //TFTLCD_DELAY             , 100,//50,     // 50 millisecond delay
+  ILI932X_DRIV_OUT_CTRL    , 0x0100,
+  ILI932X_DRIV_WAV_CTRL    , 0x0700,
+  ILI932X_ENTRY_MOD        , 0x1030,
+  ILI932X_RESIZE_CTRL      , 0x0000,
+  ILI932X_DISP_CTRL2       , 0x0202,
+  ILI932X_DISP_CTRL3       , 0x0000,
+  ILI932X_DISP_CTRL4       , 0x0000,
+  ILI932X_RGB_DISP_IF_CTRL1, 0x0,
+  ILI932X_FRM_MARKER_POS   , 0x0,
+  ILI932X_RGB_DISP_IF_CTRL2, 0x0,
+  ILI932X_POW_CTRL1        , 0x0000,
+  ILI932X_POW_CTRL2        , 0x0007,
+  ILI932X_POW_CTRL3        , 0x0000,
+  ILI932X_POW_CTRL4        , 0x0000,
+  TFTLCD_DELAY             , 200,
+  ILI932X_POW_CTRL1        , 0x1690,
+  ILI932X_POW_CTRL2        , 0x0227,
+  TFTLCD_DELAY             , 100,//50,
+  ILI932X_POW_CTRL3        , 0x001A,
+  TFTLCD_DELAY             , 100,//50,
+  ILI932X_POW_CTRL4        , 0x1800,
+  ILI932X_POW_CTRL7        , 0x002A,
+  TFTLCD_DELAY             , 100,//50,
+  ILI932X_GAMMA_CTRL1      , 0x0000,
+  ILI932X_GAMMA_CTRL2      , 0x0000,
+  ILI932X_GAMMA_CTRL3      , 0x0000,
+  ILI932X_GAMMA_CTRL4      , 0x0206,
+  ILI932X_GAMMA_CTRL5      , 0x0808,
+  ILI932X_GAMMA_CTRL6      , 0x0007,
+  ILI932X_GAMMA_CTRL7      , 0x0201,
+  ILI932X_GAMMA_CTRL8      , 0x0000,
+  ILI932X_GAMMA_CTRL9      , 0x0000,
+  ILI932X_GAMMA_CTRL10     , 0x0000,
+  ILI932X_GRAM_HOR_AD      , 0x0000,
+  ILI932X_GRAM_VER_AD      , 0x0000,
+  ILI932X_HOR_START_AD     , 0x0000,
+  ILI932X_HOR_END_AD       , 0x00EF,
+  ILI932X_VER_START_AD     , 0X0000,
+  ILI932X_VER_END_AD       , 0x013F,
+  ILI932X_GATE_SCAN_CTRL1  , 0xA700, // Driver Output Control (R60h)
+  ILI932X_GATE_SCAN_CTRL2  , 0x0003, // Driver Output Control (R61h)
+  ILI932X_GATE_SCAN_CTRL3  , 0x0000, // Driver Output Control (R62h)
+  ILI932X_PANEL_IF_CTRL1   , 0X0010, // Panel Interface Control 1 (R90h)
+  ILI932X_PANEL_IF_CTRL2   , 0X0000,
+  ILI932X_PANEL_IF_CTRL3   , 0X0003,
+  ILI932X_PANEL_IF_CTRL4   , 0X1100,
+  ILI932X_PANEL_IF_CTRL5   , 0X0000,
+  ILI932X_PANEL_IF_CTRL6   , 0X0000,
+  ILI932X_DISP_CTRL1       , 0x0133, // Main screen turn on
+};
+
+//GPIO_PIN* _cs, *_rs, *_wr, *_rd, *_rst;
+//GPIO_PORT* _dataPort;
+
+uint32_t _odr_addr;
+uint32_t _data_cr_addr;
+uint32_t _ctrl_cr_addr;
+uint32_t _idr_addr;
+uint32_t _bsrr_addr; //set
+uint32_t _brr_addr; //reset
+
+uint16_t _csMask, _rsMask, _wrMask, _rdMask, _rstMask;
+
+//GFX
+const int16_t WIDTH = TFTWIDTH, HEIGHT = TFTHEIGHT; // This is the 'raw' display w/h - never changes
+int16_t _width, _height, // Display w/h as modified by current rotation
+cursor_x, cursor_y;
+uint16_t textcolor, textbgcolor;
+uint8_t textsize, rotation;
+BOOL wrap;   // If set, 'wrap' text at right edge of display
+BOOL _cp437; // If set, use correct CP437 charset (default is off)
+
+#define CS_LOW  *(uint32_t *)_brr_addr = _csMask
+#define CS_HIGH *(uint32_t *)_bsrr_addr = _csMask
+#define RS_LOW  *(uint32_t *)_brr_addr = _rsMask
+#define RS_HIGH *(uint32_t *)_bsrr_addr = _rsMask
+#define WR_LOW  *(uint32_t *)_brr_addr = _wrMask
+#define WR_HIGH *(uint32_t *)_bsrr_addr = _wrMask
+#define RD_LOW  *(uint32_t *)_brr_addr = _rdMask
+#define RD_HIGH *(uint32_t *)_bsrr_addr = _rdMask
+#define RST_LOW  *(uint32_t *)_brr_addr = _rstMask
+#define RST_HIGH *(uint32_t *)_bsrr_addr = _rstMask
+
+//"nop\n\t; nop\n\t; nop\n\t"
+//"nop\n\t; nop\n\t; nop\n\t"
+
+#define WRITE_8(d) \
+    __asm volatile( \
+            " str  %[data], [%[odr]]    \n\t" \
+            " str  %[wr],    [%[brr]]   \n\t" \
+            " str  %[wr],    [%[bsrr]]  \n\t" \
+            :: [brr]   "r" (_brr_addr),       \
+             [bsrr]     "r" (_bsrr_addr),     \
+             [odr]     "r" (_odr_addr),       \
+             [wr]       "r" (_wrMask),        \
+             [data]    "r" (d)                \
+    );
+
+
+#define WRITE_REG(addr, data)\
+    __asm volatile( \
+            " str  %[cs],    [%[brr]]    \n" \
+            " str  %[rs],    [%[brr]]    \n\t" \
+            " str  %[a_hi], [%[odr]]          \n\t" \
+            " str  %[wr],    [%[brr]]    \n\t"      \
+            " str  %[wr],    [%[bsrr]]      \n\t"   \
+            " str  %[a_lo], [%[odr]]          \n\t" \
+            " str  %[wr],    [%[brr]]    \n\t"      \
+            " str  %[wr],    [%[bsrr]]      \n\t"   \
+\
+\
+\
+            " str  %[rs],    [%[bsrr]]    \n\t"  \
+\
+\
+            " str  %[d_hi], [%[odr]]          \n\t" \
+            " str  %[wr],    [%[brr]]    \n\t"      \
+            " str  %[wr],    [%[bsrr]]      \n\t"   \
+\
+            " str  %[d_lo], [%[odr]]          \n\t" \
+            " str  %[wr],    [%[brr]]    \n\t"      \
+            " str  %[wr],    [%[bsrr]]      \n\t"   \
+\
+            " str  %[cs],    [%[bsrr]]    \n\t"     \
+\
+\
+            :: [brr]   "r" (_brr_addr),   \
+             [bsrr]     "r" (_bsrr_addr), \
+             [odr]     "r" (_odr_addr),   \
+             [cs]       "r" (_csMask),    \
+             [wr]       "r" (_wrMask),    \
+             [rs]       "r" (_rsMask),    \
+             [a_hi]    "r" (0),           \
+             [a_lo]    "r" (addr),        \
+             [d_hi]    "r" (data>>8),     \
+             [d_lo]    "r" (data)         \
+    );
+
+
+
+void reset();
+void drawPixel(int16_t x, int16_t y, uint16_t color);
+void setWriteDir();
+void setRotation(uint8_t x);
+void writeRegister16(uint16_t addr, uint16_t data);
+
+void init()
+{
+    _odr_addr = (uint32_t)&GPIOA_ODR;
+    _data_cr_addr = (uint32_t)&GPIOA_CR;
+    _idr_addr = (uint32_t)&GPIOA_IDR;
+    _bsrr_addr = (uint32_t)&GPIOB_BSRR;
+    _brr_addr = (uint32_t)&GPIOB_BRR;
+    _ctrl_cr_addr = (uint32_t)&GPIOB_CR;
+
+
+    _csMask = 1<<GPIO_PIN0;
+    _rsMask = 1<<GPIO_PIN1;
+    _wrMask = 1<<GPIO_PIN10;
+    _rdMask = 1<<GPIO_PIN2;
+    _rstMask = 1<<GPIO_PIN11;
+
+    *(uint64_t*)_ctrl_cr_addr = 0x3333333333333333;
+
+
+    CS_HIGH; // Set all control bits to idle state
+    WR_HIGH;
+    RD_HIGH;
+    RS_HIGH;
+
+    reset();
+
+    setWriteDir(); // Set up LCD data port(s) for WRITE operations
+
+
+    _width = WIDTH;
+    _height = HEIGHT;
+    rotation = 0;
+    cursor_y = cursor_x = 0;
+    textsize = 1;
+    textcolor = textbgcolor = 0xFFFF;
+    wrap = TRUE;
+    _cp437 = TRUE;
+
+
+    uint16_t a, d;
+
+    uint8_t i = 0;
+    while (i < sizeof(ILI932x_regValues) / sizeof(uint16_t))
+    {
+        a = ILI932x_regValues[i++];
+        d = ILI932x_regValues[i++];
+        if (a == TFTLCD_DELAY)
+        {
+            RCC_Delay_ms(d);
+        }
+        else
+            WRITE_REG(a, d);
+    }
+
+    setRotation(rotation);
+    //TODO duplicate call:
+    //setAddrWindow(0, 0, TFTWIDTH - 1, TFTHEIGHT - 1);
+}
+
+
+
+void GFX_setRotation(uint8_t x)
+{
+    rotation = (x & 3);
+    switch (rotation)
+    {
+    case 0:
+    case 2:
+        _width = WIDTH;
+        _height = HEIGHT;
+        break;
+    case 1:
+    case 3:
+        _width = HEIGHT;
+        _height = WIDTH;
+        break;
+    }
+}
+
+
+
+void setWriteDir()
+{
+    *(uint32_t*)_data_cr_addr &= ~(0xffffffff);
+    *(uint32_t*)_data_cr_addr |= 0x33333333;
+}
+
+void setReadDir()
+{
+    *(uint32_t*)_data_cr_addr &= ~(0xffffffff);
+    //floating
+    *(uint32_t*)_data_cr_addr |= 0x44444444;
+
+
+    //pulldown
+    //        *_dataPort->GetGPIO_CR() |= 0x88888888;
+    //        uint16_t out = _dataPort->GetOutput();
+    //        out &= ~0xff;
+
+}
+
+uint8_t read8()
+{
+    RD_LOW;
+    Debug_Delay_us(1);
+    uint8_t rc = (*(uint32_t*)_idr_addr) & 0xff;
+    RD_HIGH;
+    return rc;
+}
+
+
+//void write8(uint8_t d)
+//{
+//    __asm volatile(
+//
+//            " str  %[data], [%[odr]]          \n\t"
+//            " str  %[wr],    [%[brr]]    \n\t"
+//            //  "nop\n\t; nop\n\t; nop\n\t"
+//            " str  %[wr],    [%[bsrr]]      \n\t"
+//
+//            :: [brr]   "r" (_brr_addr),
+//             [bsrr]     "r" (_bsrr_addr),
+//             [odr]     "r" (_odr_addr),
+//             [wr]       "r" (_wrMask),
+//             [data]    "r" (d)
+//    );
+//}
+
+
+//void writeRegister16(uint16_t addr, uint16_t data)
+//{
+//    __asm volatile(
+//
+//            " str  %[cs],    [%[brr]]    \n"
+//
+//            " str  %[rs],    [%[brr]]    \n\t"
+//
+//            " str  %[a_hi], [%[odr]]          \n\t"
+//            " str  %[wr],    [%[brr]]    \n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            " str  %[wr],    [%[bsrr]]      \n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//
+//            " str  %[a_lo], [%[odr]]          \n\t"
+//            " str  %[wr],    [%[brr]]    \n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            " str  %[wr],    [%[bsrr]]      \n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//
+//
+//
+//            " str  %[rs],    [%[bsrr]]    \n\t"
+//
+//
+//            " str  %[d_hi], [%[odr]]          \n\t"
+//            " str  %[wr],    [%[brr]]    \n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            " str  %[wr],    [%[bsrr]]      \n\t"
+//           //"nop\n\t; nop\n\t; nop\n\t"
+//           //"nop\n\t; nop\n\t; nop\n\t"
+//
+//            " str  %[d_lo], [%[odr]]          \n\t"
+//            " str  %[wr],    [%[brr]]    \n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            " str  %[wr],    [%[bsrr]]      \n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//            //"nop\n\t; nop\n\t; nop\n\t"
+//
+//            " str  %[cs],    [%[bsrr]]    \n\t"
+//
+//
+//            :: [brr]   "r" (_brr_addr),
+//             [bsrr]     "r" (_bsrr_addr),
+//             [odr]     "r" (_odr_addr),
+//             [cs]       "r" (_csMask),
+//             [wr]       "r" (_wrMask),
+//             [rs]       "r" (_rsMask),
+//             [a_hi]    "r" (0),
+//             [a_lo]    "r" (addr),
+//             [d_hi]    "r" (data>>8),
+//             [d_lo]    "r" (data)
+//    );
+//}
+
+// Sets the LCD address window (and address counter, on 932X).
+// Relevant to rect/screen fills and H/V lines.  Input coordinates are
+// assumed pre-sorted (e.g. x2 >= x1).
+void setAddrWindow(int x1, int y1, int x2, int y2)
+{
+    // Values passed are in current (possibly rotated) coordinate
+    // system.  932X requires hardware-native coords regardless of
+    // MADCTL, so rotate inputs as needed.  The address counter is
+    // set to the top-left corner -- although fill operations can be
+    // done in any direction, the current screen rotation is applied
+    // because some users find it disconcerting when a fill does not
+    // occur top-to-bottom.
+    volatile int x, y, t;
+    switch (rotation)
+    {
+    default:
+        x = x1;
+        y = y1;
+        break;
+    case 1:
+        t = y1;
+        y1 = x1;
+        x1 = TFTWIDTH - 1 - y2;
+        y2 = x2;
+        x2 = TFTWIDTH - 1 - t;
+        x = x2;
+        y = y1;
+        break;
+    case 2:
+        t = x1;
+        x1 = TFTWIDTH - 1 - x2;
+        x2 = TFTWIDTH - 1 - t;
+        t = y1;
+        y1 = TFTHEIGHT - 1 - y2;
+        y2 = TFTHEIGHT - 1 - t;
+        x = x2;
+        y = y2;
+        break;
+    case 3:
+        t = x1;
+        x1 = y1;
+        y1 = TFTHEIGHT - 1 - x2;
+        x2 = y2;
+        y2 = TFTHEIGHT - 1 - t;
+        x = x1;
+        y = y2;
+        break;
+    }
+    WRITE_REG(0x0050, x1); // Set address window
+    WRITE_REG(0x0051, x2);
+    WRITE_REG(0x0052, y1);
+    WRITE_REG(0x0053, y2);
+    WRITE_REG(0x0020, x); // Set address counter to top left
+    WRITE_REG(0x0021, y);
+
+}
+
+// Fast block fill operation for fillScreen, fillRect, H/V line, etc.
+// Requires setAddrWindow() has previously been called to set the fill
+// bounds.  'len' is inclusive, MUST be >= 1.
+void flood(uint16_t color, uint32_t len)
+{
+    volatile uint16_t blocks;
+    volatile uint8_t i, hi = color >> 8, lo = color;
+
+
+    WRITE_REG (0x0022, color);
+
+    CS_LOW;
+
+    len--;
+
+    blocks = (uint16_t) (len / 64); // 64 pixels/block
+    if (hi == lo)
+    {
+        // High and low bytes are identical.  Leave prior data
+        // on the port(s) and just toggle the write strobe.
+        volatile int cnt = 0;
+        while (blocks--)
+        {
+            i = 16; // 64 pixels/block / 4 pixels/pass
+            do
+            {
+                for (uint8_t s = 0; s < 8; ++s)
+                {
+                    ++cnt;
+                    WR_LOW;
+                    //asm volatile ("nop");
+                    //asm volatile ("nop");
+                    WR_HIGH;
+                    //asm volatile ("nop");
+                    //asm volatile ("nop");
+                }
+            } while (--i);
+        }
+
+        (void*)cnt;
+
+        // Fill any remaining pixels (1 to 64)
+        for (i = (uint8_t) len & 63; i--;)
+        {
+            WR_LOW;
+            WR_HIGH;
+            WR_LOW;
+            WR_HIGH;
+        }
+    }
+    else
+    {
+        while (blocks--)
+        {
+            i = 16; // 64 pixels/block / 4 pixels/pass
+            do
+            {
+                WRITE_8(hi);
+                WRITE_8(lo);
+                WRITE_8(hi);
+                WRITE_8(lo);
+                WRITE_8(hi);
+                WRITE_8(lo);
+                WRITE_8(hi);
+                WRITE_8(lo);
+            } while (--i);
+        }
+        for (i = (uint8_t) len & 63; i--;)
+        {
+            WRITE_8(hi);
+            WRITE_8(lo);
+        }
+    }
+    CS_HIGH;
+}
+
+
+
+// Pass 8-bit (each) R,G,B, get back 16-bit packed color
+uint16_t color565(uint8_t r, uint8_t g, uint8_t b)
+{
+    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+}
+
+
+
+
+// Issues 'raw' an array of 16-bit color values to the LCD; used
+// externally by BMP examples.  Assumes that setWindowAddr() has
+// previously been set to define the bounds.  Max 255 pixels at
+// a time (BMP examples read in small chunks due to limited RAM).
+void pushColors(uint16_t *data, uint8_t len, BOOL first)
+{
+    uint16_t color;
+    uint8_t hi, lo;
+
+    CS_LOW;
+
+    if (first == TRUE)
+    { // Issue GRAM write command only on first call
+        RS_LOW;
+
+        WRITE_8(0x00);
+        WRITE_8(0x2C);
+    }
+
+    RS_HIGH;
+
+    while (len--)
+    {
+        color = *data++;
+        hi = color >> 8; // Don't simplify or merge these
+        lo = color;      // lines, there's macro shenanigans
+        WRITE_8(hi);         // going on.
+        WRITE_8(lo);
+    }
+    CS_HIGH;
+}
+
+
+
+
+uint16_t readID()
+{
+    setWriteDir();
+
+    CS_LOW;
+
+    RS_LOW;  //command
+
+    //RD_HIGH;
+    //WR_HIGH;
+
+    WRITE_8(0);
+    WRITE_8(0);
+
+    CS_HIGH;
+
+    /////read data
+    setReadDir();
+
+    CS_LOW;
+    //
+    RS_LOW;  //data
+
+
+    uint16_t  result = read8() << 8;
+    //  //RCC_Delay_us(10);
+    result |= read8();
+
+    CS_HIGH;
+    setWriteDir();
+
+    return result;
+
+}
+
+
+void reset() {
+
+    CS_HIGH;
+    //  _cd->Set();
+    WR_HIGH;
+    RD_HIGH;
+
+
+    RST_LOW;
+    RCC_Delay_ms(2);
+    RST_HIGH;
+
+    setWriteDir();
+    //        _rs->Set();  //data
+    //
+    //        CS_LOW;
+    //        WRITE_8(0);
+    //        WRITE_8(0);
+    //        CS_HIGH;
+    //
+    //        CS_LOW;
+    //        WRITE_8(0);
+    //        WRITE_8(0);
+
+    // Data transfer sync
+    CS_LOW;
+    RS_LOW;
+    WRITE_8(0x00);
+    // Three extra 0x00s
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        WR_LOW;
+        WR_HIGH;
+    }
+
+    CS_HIGH;
+    RCC_Delay_ms(200);
+
+}
+
+//GFX
+//void setTextColor(uint16_t c)
+//{
+//    // For 'transparent' background, we'll set the bg
+//    // to the same as fg instead of using a flag
+//    textcolor = textbgcolor = c;
+//}
+
+//GFX
+void setTextColor(uint16_t c, uint16_t b)
+{
+    textcolor = c;
+    textbgcolor = b;
+}
+
+void setRotation(uint8_t x)
+{
+
+    // Call parent rotation func first -- sets up rotation flags, etc.
+    GFX_setRotation(x);
+    // Then perform hardware-specific rotation operations...
+
+    //CS_LOW;
+
+    uint16_t t;
+    switch (rotation)
+    {
+    default:
+        t = 0x1030;
+        break;
+    case 1:
+        t = 0x1028;
+        break;
+    case 2:
+        t = 0x1000;
+        break;
+    case 3:
+        t = 0x1018;
+        break;
+    }
+    WRITE_REG(0x0003, t); // MADCTL
+    // For 932X, init default full-screen address window:
+    setAddrWindow(0, 0, _width - 1, _height - 1);
+}
+
+void cls (uint16_t color)
+{
+//    uint16_t x = 0, y = 0;
+//    switch (rotation)
+//    {
+//    default:
+//        x = 0;
+//        y = 0;
+//        break;
+//    case 1:
+//        x = TFTWIDTH - 1;
+//        y = 0;
+//        break;
+//    case 2:
+//        x = TFTWIDTH - 1;
+//        y = TFTHEIGHT - 1;
+//        break;
+//    case 3:
+//        x = 0;
+//        y = TFTHEIGHT - 1;
+//        break;
+//    }
+
+    WRITE_REG(0x0020, 0);
+    WRITE_REG(0x0021, 0);
+    WRITE_REG(0x0022, color);
+
+    CS_LOW;
+    volatile uint32_t cnt = _width * _height * 2 - 1;
+    //while (cnt--)
+    //{
+//        WR_LOW;
+//        asm ("nop");
+//        asm ("nop");
+//        WR_HIGH;
+//    }
+
+//    __asm volatile(
+//
+//            " str  %[wr],    [%[brr]]    \n\t"
+//            //  "nop\n\t; nop\n\t; nop\n\t"
+//            " str  %[wr],    [%[bsrr]]      \n\t"
+//
+//            :: [brr]   "r" (_brr_addr),
+//             [bsrr]     "r" (_bsrr_addr),
+//             [wr]       "r" (_wrMask)
+//    );
+
+            __asm volatile(
+
+                    "1: str  %[wr],    [%[brr]]    \n\t"
+                    //  "nop\n\t; nop\n\t; nop\n\t"
+                    " str  %[wr],    [%[bsrr]]      \n\t"
+                    "subs %[cnt], %[cnt], #1 \n\t"
+                    "bne 1b \n\t"
+                    :: [brr]   "r" (_brr_addr),
+                     [bsrr]     "r" (_bsrr_addr),
+                     [wr]       "r" (_wrMask),
+                     [cnt]      "r" (cnt)
+            );
+
+    //}
+
+//    __asm__ volatile ( "1: subs %[s], %0, #1 \n\t"
+//                     "bne 1b \n\t"
+//                     :: [s] "r"  (111));
+
+    CS_HIGH;
+
+}
+void fillScreen(uint16_t color)
+{
+
+    // For the 932X, a full-screen address window is already the default
+    // state, just need to set the address pointer to the top-left corner.
+    // Although we could fill in any direction, the code uses the current
+    // screen rotation because some users find it disconcerting when a
+    // fill does not occur top-to-bottom.
+    volatile uint16_t x, y;
+    switch (rotation)
+    {
+    default:
+        x = 0;
+        y = 0;
+        break;
+    case 1:
+        x = TFTWIDTH - 1;
+        y = 0;
+        break;
+    case 2:
+        x = TFTWIDTH - 1;
+        y = TFTHEIGHT - 1;
+        break;
+    case 3:
+        x = 0;
+        y = TFTHEIGHT - 1;
+        break;
+    }
+    //CS_LOW;
+    WRITE_REG(0x0020, x);
+    WRITE_REG(0x0021, y);
+    flood(color, (long) TFTWIDTH * (long) TFTHEIGHT);
+}
+
+void drawFastHLine(int16_t x, int16_t y, int16_t length, uint16_t color)
+{
+    int16_t x2;
+
+    // Initial off-screen clipping
+    if ((length <= 0) || (y < 0) || (y >= _height) || (x >= _width) || ((x2 = (x + length - 1)) < 0))
+        return;
+
+    if (x < 0)
+    {        // Clip left
+        length += x;
+        x = 0;
+    }
+    if (x2 >= _width)
+    { // Clip right
+        x2 = _width - 1;
+        length = x2 - x + 1;
+    }
+
+    setAddrWindow(x, y, x2, y);
+    flood(color, length);
+
+    setAddrWindow(0, 0, _width - 1, _height - 1);
+}
+
+void drawFastVLine(int16_t x, int16_t y, int16_t length, uint16_t color)
+{
+    int16_t y2;
+
+    // Initial off-screen clipping
+    if ((length <= 0) || (x < 0) || (x >= _width) || (y >= _height) || ((y2 = (y + length - 1)) < 0))
+        return;
+    if (y < 0)
+    {         // Clip top
+        length += y;
+        y = 0;
+    }
+    if (y2 >= _height)
+    { // Clip bottom
+        y2 = _height - 1;
+        length = y2 - y + 1;
+    }
+
+    setAddrWindow(x, y, x, y2);
+    flood(color, length);
+    setAddrWindow(0, 0, _width - 1, _height - 1);
+}
+
+//GFX
+void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
+{
+    int16_t steep = abs(y1 - y0) > abs(x1 - x0);
+    if (steep)
+    {
+        swap(x0, y0);
+        swap(x1, y1);
+    }
+
+    if (x0 > x1)
+    {
+        swap(x0, x1);
+        swap(y0, y1);
+    }
+
+    int16_t dx, dy;
+    dx = x1 - x0;
+    dy = abs(y1 - y0);
+
+    int16_t err = dx / 2;
+    int16_t ystep;
+
+    if (y0 < y1)
+    {
+        ystep = 1;
+    }
+    else
+    {
+        ystep = -1;
+    }
+
+    for (; x0 <= x1; x0++)
+    {
+        if (steep)
+        {
+            drawPixel(y0, x0, color);
+        }
+        else
+        {
+            drawPixel(x0, y0, color);
+        }
+        err -= dy;
+        if (err < 0)
+        {
+            y0 += ystep;
+            err += dx;
+        }
+    }
+}
+
+void drawPixel(int16_t x, int16_t y, uint16_t color)
+{
+    // Clip
+    if ((x < 0) || (y < 0) || (x >= _width) || (y >= _height))
+        return;
+
+
+    int16_t t;
+    switch (rotation)
+    {
+    case 1:
+        t = x;
+        x = TFTWIDTH - 1 - y;
+        y = t;
+        break;
+    case 2:
+        x = TFTWIDTH - 1 - x;
+        y = TFTHEIGHT - 1 - y;
+        break;
+    case 3:
+        t = x;
+        x = y;
+        y = TFTHEIGHT - 1 - t;
+        break;
+    }
+
+    WRITE_REG(0x0020, x);
+    WRITE_REG(0x0021, y);
+    WRITE_REG(0x0022, color);
+
+
+}
+
+void fillRect(int16_t x1, int16_t y1, int16_t w, int16_t h, uint16_t fillcolor)
+{
+    volatile int16_t x2, y2;
+
+    // Initial off-screen clipping
+    if ((w <= 0) || (h <= 0) || (x1 >= _width) || (y1 >= _height) || ((x2 = x1 + w - 1) < 0) || ((y2 = y1 + h - 1) < 0))
+        return;
+    if (x1 < 0)
+    { // Clip left
+        w += x1;
+        x1 = 0;
+    }
+    if (y1 < 0)
+    { // Clip top
+        h += y1;
+        y1 = 0;
+    }
+    if (x2 >= _width)
+    { // Clip right
+        x2 = _width - 1;
+        w = x2 - x1 + 1;
+    }
+    if (y2 >= _height)
+    { // Clip bottom
+        y2 = _height - 1;
+        h = y2 - y1 + 1;
+    }
+
+    setAddrWindow(x1, y1, x2, y2);
+    flood(fillcolor, (uint32_t) w * (uint32_t) h);
+    setAddrWindow(0, 0, _width - 1, _height - 1);
+}
+
+void setTextSize(uint8_t s)
+{
+    textsize = (s > 0) ? s : 1;
+}
+
+void setCursor(int16_t x, int16_t y)
+{
+    cursor_x = x;
+    cursor_y = y;
+}
+
+void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size)
+{
+
+    if ((x >= _width) || // Clip right
+            (y >= _height) || // Clip bottom
+            ((x + 6 * size - 1) < 0) || // Clip left
+            ((y + 8 * size - 1) < 0))   // Clip top
+        return;
+
+    if (!_cp437 && (c >= 176))
+        c++; // Handle 'classic' charset behavior
+
+    for (int8_t i = 0; i < 6; i++)
+    {
+        uint8_t line;
+        if (i == 5)
+            line = 0x0;
+        else
+            line = *(font + (c * 5) + i);
+
+        line = ~line;
+
+        for (int8_t j = 0; j < 8; j++)
+        {
+            if (line & 0x1)
+            {
+                if (size == 1) // default size
+                    drawPixel(x + i, y + j, color);
+                else
+                {  // big size
+                    fillRect(x + (i * size), y + (j * size), size, size, color);
+                }
+            }
+            else if (bg != color)
+            {
+                if (size == 1) // default size
+                    drawPixel(x + i, y + j, bg);
+                else
+                {  // big size
+                    fillRect(x + i * size, y + j * size, size, size, bg);
+                }
+            }
+            line >>= 1;
+        }
+    }
+}
+
+void write_char(uint8_t c)
+{
+    if (c == '\n')
+    {
+        cursor_y += textsize * 8;
+        cursor_x = 0;
+    }
+    else if (c == '\r')
+    {
+        // skip em
+    }
+    else
+    {
+        drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+        cursor_x += textsize * 6;
+        if (wrap && (cursor_x > (_width - textsize * 6)))
+        {
+            cursor_y += textsize * 8;
+            cursor_x = 0;
+        }
+    }
+}
+//
+
+void write(const char *str)
+{
+    if (str != NULL)
+    {
+        char c;
+        while (c = *str++)
+        {
+            write_char(c);
+        }
+    }
+}
+//
+//void write(const uint8_t *buffer, uint32_t size)
+//{
+//    while (size--)
+//    {
+//        write(*buffer++);
+//    }
+//
+//}
+
+//inline void write(const char *buffer, uint32_t size)
+//{
+//    write((const uint8_t *) buffer, size);
+//}
+
+int drawUnicode(unsigned int uniCode, int x, int y, int size)
+{
+
+    if (size)
+        uniCode -= 32;
+
+    volatile unsigned int width = 0;
+    volatile unsigned int height = 0;
+    //unsigned int flash_address = 0;
+    volatile char gap = 0;
+    volatile const unsigned char* flash_address = 0;
+
+#ifdef LOAD_FONT2
+    if (size == 2)
+    {
+        flash_address = chrtbl_f16[uniCode];
+        width = widtbl_f16[uniCode];
+        height = chr_hgt_f16;
+        gap = 1;
+    }
+#endif
+
+#ifdef LOAD_FONT4
+    if (size == 4)
+    {
+        flash_address = chrtbl_f32[uniCode];
+        width = widtbl_f32[uniCode];
+        height = chr_hgt_f32;
+        gap = -3;
+    }
+#endif
+
+#ifdef LOAD_FONT6
+    if (size == 6)
+    {
+        flash_address = chrtbl_f64[uniCode];
+        width = widtbl_f64[uniCode];
+        height = chr_hgt_f64;
+        gap = -3;
+    }
+#endif
+#ifdef LOAD_FONT7
+    if (size == 7)
+    {
+        flash_address = chrtbl_f7s[uniCode];
+        width = widtbl_f7s[uniCode];
+        height = chr_hgt_f7s;
+        gap = 2;
+    }
+#endif
+
+    if (flash_address == 0)
+    {
+        return 0;
+    }
+
+    int w = (width + 7) / 8;
+    int pX = 0;
+    int pY = y;
+    //int color = 0;
+    int8_t line = 0;
+
+    //fillRect(x,pY,width+gap,height,textbgcolor);
+
+    for (unsigned int i = 0; i < height; i++)
+    {
+        if (textcolor != textbgcolor)
+        {
+            if (textsize == 1)
+                drawFastHLine(x, pY, width + gap, textbgcolor);
+            else
+                fillRect(x, pY, (width + gap) * textsize, textsize, textbgcolor);
+        }
+        for (int k = 0; k < w; k++)
+        {
+            line = flash_address[w * i + k];
+
+            //line = ~line;
+
+            if (1)
+            {
+                if (textsize == 1)
+                {
+                    pX = x + k * 8;
+                    if (line & 0x80)
+                        drawPixel(pX, pY, textcolor);
+                    if (line & 0x40)
+                        drawPixel(pX + 1, pY, textcolor);
+                    if (line & 0x20)
+                        drawPixel(pX + 2, pY, textcolor);
+                    if (line & 0x10)
+                        drawPixel(pX + 3, pY, textcolor);
+                    if (line & 0x8)
+                        drawPixel(pX + 4, pY, textcolor);
+                    if (line & 0x4)
+                        drawPixel(pX + 5, pY, textcolor);
+                    if (line & 0x2)
+                        drawPixel(pX + 6, pY, textcolor);
+                    if (line & 0x1)
+                        drawPixel(pX + 7, pY, textcolor);
+                }
+                else
+                {
+                    pX = x + k * 8 * textsize;
+                    if (line & 0x80)
+                        fillRect(pX, pY, textsize, textsize, textcolor);
+                    if (line & 0x40)
+                        fillRect(pX + textsize, pY, textsize, textsize, textcolor);
+                    if (line & 0x20)
+                        fillRect(pX + 2 * textsize, pY, textsize, textsize, textcolor);
+                    if (line & 0x10)
+                        fillRect(pX + 3 * textsize, pY, textsize, textsize, textcolor);
+                    if (line & 0x8)
+                        fillRect(pX + 4 * textsize, pY, textsize, textsize, textcolor);
+                    if (line & 0x4)
+                        fillRect(pX + 5 * textsize, pY, textsize, textsize, textcolor);
+                    if (line & 0x2)
+                        fillRect(pX + 6 * textsize, pY, textsize, textsize, textcolor);
+                    if (line & 0x1)
+                        fillRect(pX + 7 * textsize, pY, textsize, textsize, textcolor);
+                }
+            }
+        }
+        pY += textsize;
+    }
+    return (width + gap) * textsize;        // x +
+}
+
+int drawString(char *string, int poX, int poY, int size)
+{
+    volatile int sumX = 0;
+
+    while (*string)
+    {
+        volatile int xPlus = drawUnicode(*string, poX, poY, size);
+        sumX += xPlus;
+        string++;
+        poX += xPlus; /* Move cursor right       */
+    }
+    return sumX;
+}
+
+/////////////////////////////////////////
+
+void test()
+{
+//    GPIOA* portA = GPIOA::GetInstance();
+//    GPIOB* portB = GPIOB::GetInstance();
+//    portA->EnablePeripheralClock(true);
+//    portB->EnablePeripheralClock(true);
+
+    RCC_EnableGPIOA(TRUE);
+    RCC_EnableGPIOB(TRUE);
+
+    Debug_EnableCYCCNT(TRUE);
+
+    RCC_Delay_ms(500);
+    init();
+    uint16_t id2 = readID();
+    id2 = readID();
+//    drawPixel(100, 100, BLACK);
+//    drawPixel(100, 101, BLACK);
+//    drawPixel(100, 102, BLACK);
+//    drawPixel(100, 103, BLACK);
+//    drawPixel(100, 104, BLACK);
+//    drawPixel(100, 105, BLACK);
+//    drawPixel(100, 106, BLACK);
+
+    volatile uint32_t cnt = 0;
+
+
+    setRotation(1);
+    char buf[32];
+    sprintf (buf, "%d", 4);
+    drawString(buf, 10, 10, 6);
+    while(1)
+        ;
+
+//    drawLine(0, 0, 200, 200, 0xe0e0);
+    //while(1)
+//
+//    while(1)
+//    {
+//        cls (0xe0e0);
+//        ++cnt;
+//    }
+
+//    while(1)
+//    {
+//        cls (0xe0e0);
+//        Debug_Delay_us(100000);
+//        cls (0x0000);
+//        Debug_Delay_us(100000);
+//        cls (0xffff);
+//        Debug_Delay_us(100000);
+//    }
+//
+//    fillScreen(0x0001);
+//    fillScreen(0xffff);
+//    fillScreen(0x1234);
+//    fillScreen(0xe0e0);
+
+    //fillRect(50, 50, 100, 100, RED);
+    uint32_t i = 0xffffffff;
+    char c = 48;
+    setTextColor(0xFFFF, 0xE0E0);
+
+//    while (1)
+//    {
+//
+//        drawLine(KISS % 320, KISS % 240, KISS % 320, KISS % 240, 0xe0e0);
+//
+////        drawLine(0, 0, 40, 40, RED);
+//        ++cnt;
+//        //RCC_Delay_ms(1);
+//    }
+
+    char* b[] = { "12121212121212121",
+                  "89898989898989898",
+                  "57302394855555555" };
+
+
+    //setTextSize(3);
+
+    while (1)
+    {
+        //drawChar(c, 100, 100, 7);
+        //sprintf (buf, "%10lu", i);
+        drawString(b [ i % 3], 10, 10, 4);
+        drawString(b [ i % 3], 10, 60, 4);
+        drawString(b [ i % 3], 10, 110, 4);
+        drawString(b [ i % 3], 10, 160, 4);
+        drawString(b [ i++ % 3], 10, 200, 4);
+
+//        drawString(b [ i % 3], 10, 10, 4);
+//        drawString(b [ i % 3], 10, 100, 4);
+//        drawString(b [ i++ % 3], 10, 200, 4);
+
+
+
+//        setCursor(10, 10);
+//        write(b [ i % 3]);
+//        setCursor(10, 60);
+//        write(b [ i % 3]);
+//        setCursor(10, 110);
+//        write(b [ i % 3]);
+//        setCursor(10, 160);
+//        write(b [ i % 3]);
+//        setCursor(10, 200);
+//        write(b [ i++ % 3]);
+    }
+    while(1)
+        ;
+
+}
+
+
+#endif
+
+uint32_t g_ar[] = { 1, 2, 3};
+void func()
+{
+    while(1);
+}
+
+int main()
+{
+    //FLASH_SetWaitState(2);
+    RCC_EnableHSI(TRUE);
+    RCC_EnablePLL(6);
+    uint8_t v1 = 1, v2 = 2, v3 = 3, v4 = 4;
+    char* buf = "  ";
+
+    RCC_EnablePWR(TRUE);
+    RCC_EnableBKP(TRUE);
+
+    volatile uint32_t rc;
+
+    rc = RCC_GetSystemClock();
+
+    RCC_SetAHBPrescaler(4);
+
+    rc = RCC_GetAHB_CLK();
+
+    RCC_SetAPB2Prescaler(2);
+
+    rc = RCC_GetAPB2_CLK();
+
+    //RCC_EnableGPIOA(TRUE);
+    GPIO_CFG gpio;
+    gpio_init (GPIOA, &gpio);
+
+//    *((uint64_t*)gpio.crl) = 0x3333333333333333llu;
+
+    uint8_t s = gpio_is_set (&gpio, GPIO_PIN0);
+    s = gpio_is_set (&gpio, GPIO_PIN8);
+
+    gpio_cfg_in_pulldown(&gpio, 0);
+    gpio_cfg_in_pullup(&gpio, 1);
+
+    gpio_set_output(&gpio, 0xffff);
+    gpio_set_output(&gpio, 0x00);
+    gpio_set_pin(&gpio, GPIO_PIN15);
+    gpio_reset_pin(&gpio, GPIO_PIN15);
+    gpio_set_pin(&gpio, GPIO_PIN15);
+    gpio_reset_pin(&gpio, GPIO_PIN15);
+
+
+
+   // test();
+
+}

@@ -1,0 +1,845 @@
+#include "fc.h"
+
+#include "scheduler.h"
+#include "common/filter.h"
+#include <math.h>
+
+#include "common/maths.h"
+#include "common/utils.h"
+#include "rx.h"
+#include "sensors/gyro.h"
+
+#include "config.h"
+#include "rate_profile.h"
+#include "rc_curves.h"
+#include "rc_controls.h"
+#include "runtime_config.h"
+
+#include "pid.h"
+#include "altitudehold.h"
+#include "mixer.h"
+#include "imu.h"
+#include "failsafe.h"
+
+#include "config/feature.h"
+#include "io/beeper.h"
+#include "rc_adjustments.h"
+
+#include "drivers/compass.h"
+#include "sensors/barometer.h"
+#include "sensors/sonar.h"
+
+#define GYRO_WATCHDOG_DELAY 100  // Watchdog for boards without interrupt for gyro
+
+//FIXME  get rid of externals
+//extern uint8_t dynP8[3], dynI8[3], dynD8[3];
+//extern uint8_t PIDweight[3];
+
+
+static uint32_t disarmAt;     // Time of automatic disarm when "Don't spin the motors when armed" is enabled and auto_disarm_delay is nonzero
+
+//TODO
+static AltHold* altHold;
+static RX* rx;
+static RC_Controls* rcControls;
+static Imu* imu;
+static Pid pid;
+static Mixer* mixer;
+static FailSafe* failSafe;
+static Rc_Adj* rc_adj;
+static Acceleration* acc;
+
+
+FC::FC()
+{
+    sched = Scheduler::GetInstance();
+    headFreeModeHold = 0;
+    magHold = 0;
+    isRXDataNew = false;
+    haveUpdatedRcCommandsOnce = false;
+
+}
+
+
+void FC::taskAccel()
+{
+    imu->imuUpdateAccelerometer();
+}
+
+void FC::taskAlt()
+{
+
+    if (false
+//#if defined(BARO)
+        || (sensors(SENSOR_BARO) && isBaroReady())
+//#endif
+//#if defined(SONAR)
+        || sensors(SENSOR_SONAR)
+//#endif
+        )
+    {
+        altHold->calculateEstimatedAltitude(sched->getCurrentTime());
+    }
+
+}
+void FC::taskBaro()
+{
+    if (sensors(SENSOR_BARO))
+    {
+        uint32_t newDeadline = baroUpdate();
+        sched->rescheduleTask(TASK_SELF, newDeadline);
+    }
+}
+
+//TODO
+///* VBAT monitoring interval (in microseconds) - 1s*/
+//#define VBATINTERVAL (6 * 3500)
+///* IBat monitoring interval (in microseconds) - 6 default looptimes */
+//#define IBATINTERVAL (6 * 3500)
+void FC::taskVbat()
+{
+    //    static uint32_t vbatLastServiced = 0;
+    //    static uint32_t ibatLastServiced = 0;
+    //
+    //    if (feature(FEATURE_VBAT)) {
+    //        if (cmp32(currentTime, vbatLastServiced) >= VBATINTERVAL) {
+    //            vbatLastServiced = currentTime;
+    //            updateBattery();
+    //        }
+    //    }
+    //
+    //    if (feature(FEATURE_CURRENT_METER)) {
+    //        int32_t ibatTimeSinceLastServiced = cmp32(currentTime, ibatLastServiced);
+    //
+    //        if (ibatTimeSinceLastServiced >= IBATINTERVAL) {
+    //            ibatLastServiced = currentTime;
+    //
+    //            throttleStatus_e throttleStatus = calculateThrottleStatus(&rxConfig, rcControls->getRcControlsConfig()->deadband3d_throttle);
+    //
+    //            switch(batteryConfig.currentMeterType) {
+    //                case CURRENT_SENSOR_ADC:
+    //                    updateCurrentMeter(ibatTimeSinceLastServiced);
+    //                    break;
+    //                case CURRENT_SENSOR_VIRTUAL:
+    //                    updateVirtualCurrentMeter(ibatTimeSinceLastServiced, throttleStatus);
+    //                    break;
+    //                default:
+    //                    break;
+    //            }
+    //        }
+    //    }
+}
+
+void FC::taskSonar()
+{
+    if (sensors(SENSOR_SONAR))
+    {
+        sonarUpdate();
+    }
+}
+
+void FC::taskMag()
+{
+    if (sensors(SENSOR_MAG))
+    {
+        updateCompass(&sensorTrims.magZero, sched->getCurrentTime());
+    }
+}
+
+void FC::taskGps()
+{
+#ifdef GPS
+    // if GPS feature is enabled, gpsThread() will be called at some intervals to check for stuck
+    // hardware, wrong baud rates, init GPS if needed, etc. Don't use SENSOR_GPS here as gpsThread() can and will
+    // change this based on available hardware
+    if (feature(FEATURE_GPS)) {
+        gpsThread();
+    }
+
+    if (sensors(SENSOR_GPS)) {
+        updateGpsIndicator(currentTime);
+    }
+#endif
+}
+
+//////////////////////////////////////
+
+void FC::taskGyroPid(void)
+{
+
+    // getTaskDeltaTime() returns delta time freezed at the moment of entering the scheduler. currentTime is freezed at the very same point.
+    // To make busy-waiting timeout work we need to account for time spent within busy-waiting loop
+    uint32_t currentDeltaTime = sched->getTaskDeltaTime(TASK_SELF);
+
+    if (imu->getImuConfig()->gyroSync)
+    {
+        while (1) {
+            if (gyroSyncCheckUpdate() || ((currentDeltaTime + (micros() - sched->getCurrentTime())) >= (targetLooptime + GYRO_WATCHDOG_DELAY))) {
+                break;
+            }
+        }
+    }
+
+    taskMainPidLoop();
+}
+
+
+
+
+void FC::taskMainPidLoop(void)
+{
+    static filterStatePt1_t filteredCycleTimeState;
+    static uint16_t cycleTime = 0;         // this is the number in micro second to achieve a full loop, it can differ a little and is taken into account in the PID loop
+
+    float dT;
+
+    cycleTime = sched->getTaskDeltaTime(TASK_SELF);
+    dT = (float)cycleTime * 0.000001f;
+
+    // Calculate average cycle time and average jitter
+    uint16_t filteredCycleTime = filterApplyPt1(cycleTime, &filteredCycleTimeState, 1, dT);
+
+#ifdef DEBUG_CYCLE_TIME
+    debug[0] = cycleTime;
+    debug[1] = cycleTime - filteredCycleTime;
+#endif
+
+    imu->imuUpdateGyroAndAttitude();
+
+    updateRcCommands(); // this must be called here since applyAltHold directly manipulates rcCommands[]
+
+
+    if (rx->rcSmoothing()) {
+        filterRc(filteredCycleTime);
+    }
+
+#if defined(BARO) || defined(SONAR)
+    haveUpdatedRcCommandsOnce = true;
+#endif
+
+    //TODO not needed for now
+//    if (gyro.temperature) {
+//      gyro.temperature(&telemTemperature1);
+//    }
+
+    if (sensors(SENSOR_MAG)) {
+        updateMagHold();
+    }
+
+
+#if defined(BARO) || defined(SONAR)
+        if (sensors(SENSOR_BARO) || sensors(SENSOR_SONAR)) {
+            if (FLIGHT_MODE(BARO_MODE) || FLIGHT_MODE(SONAR_MODE)) {
+                altHold->applyAltHold();
+            }
+        }
+#endif
+
+    // If we're armed, at minimum throttle, and we do arming via the
+    // sticks, do not process yaw input from the rx.  We do this so the
+    // motors do not spin up while we are trying to arm or disarm.
+    // Allow yaw control for tricopters if the user wants the servo to move even when unarmed.
+    if (rcControls->isUsingSticksForArming() && rx->getRcData()[THROTTLE] <= rx->minCheck()
+    ) {
+        rcControls->getRcCommand()[YAW] = 0;
+    }
+
+    if (imu->throttle_correction_value() && (FLIGHT_MODE(ANGLE_MODE) || FLIGHT_MODE(HORIZON_MODE))) {
+        rcControls->getRcCommand()[THROTTLE] += imu->calculateThrottleAngleCorrection();
+    }
+
+#ifdef GPS
+    if (sensors(SENSOR_GPS)) {
+        if ((FLIGHT_MODE(GPS_HOME_MODE) || FLIGHT_MODE(GPS_HOLD_MODE)) && STATE(GPS_FIX_HOME)) {
+            updateGpsStateForHomeAndHoldMode();
+        }
+    }
+#endif
+
+    pid.pidLuxFloat(currentControlRateProfile,
+                    imu->max_angle_inclination(),
+                    &acc->getAccelerometerConfig()->accelerometerTrims,
+                    rx->getRxConfig(),
+                    mixer->isMotoroLimitReached(),
+                    rcControls,
+                    imu->getAttitude(),
+                    dT);
+
+
+    mixer->mixTable(failSafe, rcControls, rx, pid.getAxisPID());
+    mixer->writeMotors();
+
+#ifdef USE_SDCARD
+        afatfs_poll();
+#endif
+
+#ifdef BLACKBOX
+    if (!cliMode && feature(FEATURE_BLACKBOX)) {
+        handleBlackbox();
+    }
+#endif
+}
+
+/*
+This function processes RX dependent coefficients when new RX commands are available
+Those are: TPA, throttle expo
+*/
+void FC::updateRcCommands(void)
+{
+
+    int32_t tmp, tmp2;
+    int32_t axis, prop1 = 0, prop2;
+    int16_t* rcData = rx->getRcData();
+
+    // PITCH & ROLL only dynamic PID adjustment,  depending on throttle value
+    if (rcData[THROTTLE] < currentControlRateProfile->tpa_breakpoint) {
+        prop2 = 100;
+    } else {
+        if (rcData[THROTTLE] < 2000) {
+            prop2 = 100 - (uint16_t)currentControlRateProfile->dynThrPID * (rcData[THROTTLE] - currentControlRateProfile->tpa_breakpoint) / (2000 - currentControlRateProfile->tpa_breakpoint);
+        } else {
+            prop2 = 100 - currentControlRateProfile->dynThrPID;
+        }
+    }
+
+    int16_t* rcCommand = rcControls->getRcCommand();
+
+    for (axis = 0; axis < 3; axis++) {
+        tmp = MIN(ABS(rcData[axis] - rx->getMidRc()), 500);
+        if (axis == ROLL || axis == PITCH) {
+            if (rcControls->getRcControlsConfig()->deadband) {
+                if (tmp > rcControls->getRcControlsConfig()->deadband) {
+                    tmp -= rcControls->getRcControlsConfig()->deadband;
+                } else {
+                    tmp = 0;
+                }
+            }
+
+            tmp2 = tmp / 100;
+            rcCommand[axis] = lookupPitchRollRC[tmp2] + (tmp - tmp2 * 100) * (lookupPitchRollRC[tmp2 + 1] - lookupPitchRollRC[tmp2]) / 100;
+            prop1 = 100 - (uint16_t)currentControlRateProfile->rates[axis] * tmp / 500;
+            prop1 = (uint16_t)prop1 * prop2 / 100;
+        } else if (axis == YAW) {
+            if (rcControls->getRcControlsConfig()->yaw_deadband) {
+                if (tmp > rcControls->getRcControlsConfig()->yaw_deadband) {
+                    tmp -= rcControls->getRcControlsConfig()->yaw_deadband;
+                } else {
+                    tmp = 0;
+                }
+            }
+            tmp2 = tmp / 100;
+            rcCommand[axis] = (lookupYawRC[tmp2] + (tmp - tmp2 * 100) * (lookupYawRC[tmp2 + 1] - lookupYawRC[tmp2]) / 100) * -rcControls->getRcControlsConfig()->yaw_control_direction;
+            prop1 = 100 - (uint16_t)currentControlRateProfile->rates[axis] * ABS(tmp) / 500;
+        }
+
+#ifndef SKIP_PID_MW23
+        pid.pidUpdateDyn(axis, prop1);
+#endif
+        // non coupled PID reduction scaler used in PID controller 1 and PID controller 2. YAW TPA disabled. 100 means 100% of the pids
+        if (axis == YAW) {
+            pid.getPidWeight()[axis] = 100;
+        }
+        else {
+            pid.getPidWeight()[axis] = prop2;
+        }
+
+        if (rcData[axis] < rx->getMidRc())
+            rcCommand[axis] = -rcCommand[axis];
+    }
+
+    tmp = constrain(rcData[THROTTLE], rx->minCheck(), PWM_RANGE_MAX);
+    tmp = (uint32_t)(tmp - rx->minCheck()) * PWM_RANGE_MIN / (PWM_RANGE_MAX - rx->minCheck());       // [MINCHECK;2000] -> [0;1000]
+    tmp2 = tmp / 100;
+    rcCommand[THROTTLE] = lookupThrottleRC[tmp2] + (tmp - tmp2 * 100) * (lookupThrottleRC[tmp2 + 1] - lookupThrottleRC[tmp2]) / 100;    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
+
+    if (FLIGHT_MODE(HEADFREE_MODE)) {
+        float radDiff = degreesToRadians(DECIDEGREES_TO_DEGREES(imu->getAttitude()->values.yaw) - headFreeModeHold);
+        float cosDiff = cos_approx(radDiff);
+        float sinDiff = sin_approx(radDiff);
+        int16_t rcCommand_PITCH = rcCommand[PITCH] * cosDiff + rcCommand[ROLL] * sinDiff;
+        rcCommand[ROLL] = rcCommand[ROLL] * cosDiff - rcCommand[PITCH] * sinDiff;
+        rcCommand[PITCH] = rcCommand_PITCH;
+    }
+}
+
+void FC::filterRc(uint16_t filteredCycleTime)
+{
+    static int16_t lastCommand[4] = { 0, 0, 0, 0 };
+    static int16_t deltaRC[4] = { 0, 0, 0, 0 };
+    static int16_t factor, rcInterpolationFactor;
+    uint16_t rxRefreshRate =  rx->getRxRefreshRate();
+    int16_t* rcCommand = rcControls->getRcCommand();
+
+
+    rcInterpolationFactor = rxRefreshRate / filteredCycleTime + 1;
+
+    if (isRXDataNew) {
+        for (int channel=0; channel < 4; channel++) {
+            deltaRC[channel] = rcCommand[channel] -  (lastCommand[channel] - deltaRC[channel] * factor / rcInterpolationFactor);
+            lastCommand[channel] = rcCommand[channel];
+        }
+
+        isRXDataNew = false;
+        factor = rcInterpolationFactor - 1;
+    } else {
+        factor--;
+    }
+
+    // Interpolate steps of rcCommand
+    if (factor > 0) {
+        for (int channel=0; channel < 4; channel++) {
+            rcCommand[channel] = lastCommand[channel] - deltaRC[channel] * factor/rcInterpolationFactor;
+         }
+    } else {
+        factor = 0;
+    }
+}
+
+
+void FC::updateMagHold(void)
+{
+    int16_t* rcCommand = rcControls->getRcCommand();
+
+    if (ABS(rcCommand[YAW]) < 15 && FLIGHT_MODE(MAG_MODE))
+    {
+        int16_t dif = DECIDEGREES_TO_DEGREES(imu->getAttitude()->values.yaw) - magHold;
+        if (dif <= -180)
+            dif += 360;
+        if (dif >= +180)
+            dif -= 360;
+        dif *= -rcControls->getRcControlsConfig()->yaw_control_direction;
+        if (STATE(SMALL_ANGLE))
+            rcCommand[YAW] -= dif * pid.getPidMag() / 30;    // 18 deg
+    }
+    else
+    {
+        magHold = DECIDEGREES_TO_DEGREES(imu->getAttitude()->values.yaw);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void FC::taskRx(void)
+{
+    processRx();
+    updateLEDs();
+
+    isRXDataNew = true;
+
+#ifdef BARO
+    // updateRcCommands() sets rcCommand[], updateAltHoldState depends on valid rcCommand[] data.
+    if (haveUpdatedRcCommandsOnce) {
+        if (sensors(SENSOR_BARO)) {
+            altHold->updateAltHoldState();
+        }
+    }
+#endif
+
+#ifdef SONAR
+    // updateRcCommands() sets rcCommand[], updateAltHoldState depends on valid rcCommand[] data.
+    if (haveUpdatedRcCommandsOnce) {
+        if (sensors(SENSOR_SONAR)) {
+            altHold->updateSonarAltHoldState();
+        }
+    }
+#endif
+
+}
+
+
+//TODO only needed here (for LEDs)
+//static bool isCalibrating(void)
+//{
+//#ifdef BARO
+//    if (sensors(SENSOR_BARO) && !isBaroCalibrationComplete()) {
+//        return true;
+//    }
+//#endif
+//
+//    // Note: compass calibration is handled completely differently, outside of the main loop, see f.CALIBRATE_MAG
+//
+//    return (!isAccelerationCalibrationComplete() && sensors(SENSOR_ACC)) || (!isGyroCalibrationComplete());
+//}
+
+
+//TODO
+
+void FC::updateLEDs(void)
+{
+//    if (ARMING_FLAG(ARMED)) {
+//        //LED0_ON;
+//    } else {
+//        if (rcControls->rcModeIsActive(BOXARM) == 0) {
+//            ENABLE_ARMING_FLAG(OK_TO_ARM);
+//        }
+//
+//        if (!imuIsAircraftArmable(armingConfig.max_arm_angle)) {
+//            DISABLE_ARMING_FLAG(OK_TO_ARM);
+//        }
+//
+//        if (isCalibrating() || sched->isSystemOverloaded()) {
+//            DISABLE_ARMING_FLAG(OK_TO_ARM);
+//        }
+//
+//        uint32_t nextBlinkMask = getArmingPreventionBlinkMask();
+//        warningLedSetBlinkMask(nextBlinkMask);
+//        warningLedUpdate();
+//    }
+}
+
+//TODO
+//typedef enum {
+//    ARM_PREV_NONE       = 0,
+//    ARM_PREV_CLI        = 0x00205, //         0b1000000101  2 flashes - CLI active in the configurator
+//    ARM_PREV_FAILSAFE   = 0x00815, //       0b100000010101  3 flashes - Failsafe mode
+//    ARM_PREV_ANGLE      = 0x02055, //     0b10000001010101  4 flashes - Maximum arming angle exceeded
+//    ARM_PREV_CALIB      = 0x08155, //   0b1000000101010101  5 flashes - Calibration active
+//    ARM_PREV_OVERLOAD   = 0x20555  // 0b100000010101010101  6 flashes - System overload
+//} armingPreventedReason_e;
+
+
+//armingPreventedReason_e FC::getArmingPreventionBlinkMask(void)
+//{
+//    if (isCalibrating()) {
+//        return ARM_PREV_CALIB;
+//    }
+//    if (rcControls->rcModeIsActive(BOXFAILSAFE) || failsafePhase() == FAILSAFE_LANDED) {
+//        return ARM_PREV_FAILSAFE;
+//    }
+//    if (!imuIsAircraftArmable(armingConfig.max_arm_angle)) {
+//        return ARM_PREV_ANGLE;
+//    }
+//
+//    if (sched->isSystemOverloaded()) {
+//        return ARM_PREV_OVERLOAD;
+//    }
+//    return ARM_PREV_NONE;
+//}
+
+
+void FC::processRx(void)
+{
+    static bool armedBeeperOn = false;
+
+    rx->calculateRxChannelsAndUpdateFailsafe(sched->getCurrentTime(), rcControls->rcModeIsActive(BOXFAILSAFE), failSafe);
+
+    //TODO
+    //updateRSSI(currentTime);
+
+    if (feature(FEATURE_FAILSAFE)) {
+
+        if (sched->getCurrentTime() > FAILSAFE_POWER_ON_DELAY_US && !failSafe->failsafeIsMonitoring()) {
+            failSafe->failsafeStartMonitoring();
+        }
+
+        failSafe->failsafeUpdateState();
+    }
+
+    throttleStatus_e throttleStatus = rcControls->calculateThrottleStatus();
+    rollPitchStatus_e rollPitchStatus =  rcControls->calculateRollPitchCenterStatus();
+
+    /* In airmode Iterm should be prevented to grow when Low thottle and Roll + Pitch Centered.
+     This is needed to prevent Iterm winding on the ground, but keep full stabilisation on 0 throttle while in air
+     Low Throttle + roll and Pitch centered is assuming the copter is on the ground. Done to prevent complex air/ground detections */
+    if (throttleStatus == THROTTLE_LOW) {
+        if (rcControls->rcModeIsActive(BOXAIRMODE) && !failSafe->failsafeIsActive() && ARMING_FLAG(ARMED)) {
+            if (rollPitchStatus == CENTERED) {
+                ENABLE_STATE(ANTI_WINDUP);
+            } else {
+                DISABLE_STATE(ANTI_WINDUP);
+            }
+        } else {
+#ifndef SKIP_PID_MW23
+            pid.pidResetITermAngle();
+#endif
+            pid.pidResetITerm();
+        }
+    } else {
+        DISABLE_STATE(ANTI_WINDUP);
+    }
+
+    // When armed and motors aren't spinning, do beeps and then disarm
+    // board after delay so users without buzzer won't lose fingers.
+    // mixTable constrains motor commands, so checking  throttleStatus is enough
+    if (ARMING_FLAG(ARMED)     && feature(FEATURE_MOTOR_STOP)  )
+    {
+        if (rcControls->isUsingSticksForArming())
+        {
+            armingConfig_t* armingConfig = rcControls->getArmingConfig();
+            if (throttleStatus == THROTTLE_LOW)
+            {
+                if (armingConfig->auto_disarm_delay != 0  && (int32_t)(disarmAt - millis()) < 0 )
+                {
+                    mwDisarm(); // auto-disarm configured and delay is over
+                    armedBeeperOn = false;
+                } else
+                {
+                    beeper(BEEPER_ARMED); // still armed; do warning beeps while armed
+                    armedBeeperOn = true;
+                }
+            }
+            else
+            {
+                // throttle is not low
+                if (armingConfig->auto_disarm_delay != 0)
+                {
+                    // extend disarm time
+                    disarmAt = millis() + armingConfig->auto_disarm_delay * 1000;
+                }
+
+                if (armedBeeperOn)
+                {
+                    beeperSilence();
+                    armedBeeperOn = false;
+                }
+            }
+
+        }
+        else
+        {
+            // arming is via AUX switch; beep while throttle low
+            if (throttleStatus == THROTTLE_LOW) {
+                beeper(BEEPER_ARMED);
+                armedBeeperOn = true;
+            } else if (armedBeeperOn) {
+                beeperSilence();
+                armedBeeperOn = false;
+            }
+        }
+    }
+
+    rcControls->processRcStickPositions(throttleStatus, acc);
+
+    if (feature(FEATURE_INFLIGHT_ACC_CAL)) {
+        updateInflightCalibrationState();
+    }
+
+    //active modes based on aux signal (range)
+    rcControls->rcModeUpdateActivated();
+
+
+    rc_adj->updateAdjustmentStates(rcControls);
+    rc_adj->processRcAdjustments(currentControlRateProfile, rx, pid.getPidProfile());
+
+    bool canUseHorizonMode = true;
+
+    if ((rcControls->rcModeIsActive(BOXANGLE) || (feature(FEATURE_FAILSAFE) && failSafe->failsafeIsActive())) && (sensors(SENSOR_ACC))) {
+        // bumpless transfer to Level mode
+        canUseHorizonMode = false;
+
+        if (!FLIGHT_MODE(ANGLE_MODE)) {
+#ifndef SKIP_PID_MW23
+            pid.pidResetITermAngle();
+#endif
+            ENABLE_FLIGHT_MODE(ANGLE_MODE);
+        }
+    } else {
+        DISABLE_FLIGHT_MODE(ANGLE_MODE); // failsafe support
+    }
+
+    if (rcControls->rcModeIsActive(BOXHORIZON) && canUseHorizonMode) {
+
+        DISABLE_FLIGHT_MODE(ANGLE_MODE);
+
+        if (!FLIGHT_MODE(HORIZON_MODE)) {
+#ifndef SKIP_PID_MW23
+            pid.pidResetITermAngle();
+#endif
+            ENABLE_FLIGHT_MODE(HORIZON_MODE);
+        }
+    } else {
+        DISABLE_FLIGHT_MODE(HORIZON_MODE);
+    }
+
+    //TODO
+    if (FLIGHT_MODE(ANGLE_MODE) || FLIGHT_MODE(HORIZON_MODE)) {
+        //LED1_ON;
+    } else {
+        //LED1_OFF;
+    }
+
+    if (sensors(SENSOR_ACC) || sensors(SENSOR_MAG)) {
+        if (rcControls->rcModeIsActive(BOXMAG)) {
+            if (!FLIGHT_MODE(MAG_MODE)) {
+                ENABLE_FLIGHT_MODE(MAG_MODE);
+                magHold = DECIDEGREES_TO_DEGREES(imu->getAttitude()->values.yaw);
+            }
+        } else {
+            DISABLE_FLIGHT_MODE(MAG_MODE);
+        }
+        if (rcControls->rcModeIsActive(BOXHEADFREE)) {
+            if (!FLIGHT_MODE(HEADFREE_MODE)) {
+                ENABLE_FLIGHT_MODE(HEADFREE_MODE);
+            }
+        } else {
+            DISABLE_FLIGHT_MODE(HEADFREE_MODE);
+        }
+        if (rcControls->rcModeIsActive(BOXHEADADJ)) {
+            headFreeModeHold = DECIDEGREES_TO_DEGREES(imu->getAttitude()->values.yaw); // acquire new heading
+        }
+    }
+
+#ifdef GPS
+    if (sensors(SENSOR_GPS)) {
+        updateGpsWaypointsAndMode();
+    }
+#endif
+
+    if (rcControls->rcModeIsActive(BOXPASSTHRU)) {
+        ENABLE_FLIGHT_MODE(PASSTHRU_MODE);
+    } else {
+        DISABLE_FLIGHT_MODE(PASSTHRU_MODE);
+    }
+
+
+#ifdef TELEMETRY
+    if (feature(FEATURE_TELEMETRY)) {
+        if ((!telemetryConfig()->telemetry_switch && ARMING_FLAG(ARMED))
+            || (telemetryConfig()->telemetry_switch && rcControls->rcModeIsActive(BOXTELEMETRY))) {
+            releaseSharedTelemetryPorts();
+        } else {
+            // the telemetry state must be checked immediately so that shared serial ports are released.
+            telemetryCheckState();
+            mspSerialAllocatePorts();
+        }
+    }
+#endif
+
+}
+
+//TODO
+void FC::updateInflightCalibrationState(void)
+{
+//    if (AccInflightCalibrationArmed && ARMING_FLAG(ARMED) && rcData[THROTTLE] > rx->minCheck() && !rcControls->rcModeIsActive(BOXARM)) {   // Copter is airborne and you are turning it off via boxarm : start measurement
+//        InflightcalibratingA = 50;
+//        AccInflightCalibrationArmed = false;
+//    }
+//    if (rcControls->rcModeIsActive(BOXCALIB)) {      // Use the Calib Option to activate : Calib = TRUE measurement started, Land and Calib = 0 measurement stored
+//        if (!AccInflightCalibrationActive && !AccInflightCalibrationMeasurementDone)
+//            InflightcalibratingA = 50;
+//        AccInflightCalibrationActive = true;
+//    } else if (AccInflightCalibrationMeasurementDone && !ARMING_FLAG(ARMED)) {
+//        AccInflightCalibrationMeasurementDone = false;
+//        AccInflightCalibrationSavetoEEProm = true;
+//    }
+}
+
+
+//TODO  do we need this?
+//extern "C" bool taskUpdateRxCheck(uint32_t currentDeltaTime)
+//{
+//    UNUSED(currentDeltaTime);
+//    updateRx(currentTime);
+//    return shouldProcessRx(currentTime);
+//}
+
+
+////////////////////////////////
+// common methods
+
+
+
+
+
+#define TELEMETRY_FUNCTION_MASK (FUNCTION_TELEMETRY_FRSKY | FUNCTION_TELEMETRY_HOTT | FUNCTION_TELEMETRY_SMARTPORT | FUNCTION_TELEMETRY_LTM | FUNCTION_TELEMETRY_MAVLINK)
+
+
+
+void FC::mwArm(void)
+{
+    if (ARMING_FLAG(OK_TO_ARM)) {
+        if (ARMING_FLAG(ARMED)) {
+            return;
+        }
+        if (rcControls->rcModeIsActive(BOXFAILSAFE)) {
+            return;
+        }
+        if (!ARMING_FLAG(PREVENT_ARMING)) {
+            ENABLE_ARMING_FLAG(ARMED);
+            headFreeModeHold = DECIDEGREES_TO_DEGREES(imu->getAttitude()->values.yaw);
+
+#ifdef BLACKBOX
+            if (feature(FEATURE_BLACKBOX)) {
+                serialPort_t *sharedBlackboxAndMspPort = findSharedSerialPort(FUNCTION_BLACKBOX, FUNCTION_MSP_SERVER);
+                if (sharedBlackboxAndMspPort) {
+                    mspSerialReleasePortIfAllocated(sharedBlackboxAndMspPort);
+                }
+                startBlackbox();
+            }
+#endif
+            disarmAt = millis() + rcControls->getArmingConfig()->auto_disarm_delay * 1000;   // start disarm timeout, will be extended when throttle is nonzero
+
+            //beep to indicate arming
+#ifdef GPS
+            if (feature(FEATURE_GPS) && STATE(GPS_FIX) && GPS_numSat >= 5)
+                beeper(BEEPER_ARMING_GPS_FIX);
+            else
+                beeper(BEEPER_ARMING);
+#else
+            beeper(BEEPER_ARMING);
+#endif
+
+            return;
+        }
+    }
+
+    if (!ARMING_FLAG(ARMED)) {
+        beeperConfirmationBeeps(1);
+    }
+}
+
+void FC::mwDisarm(void)
+{
+    if (ARMING_FLAG(ARMED)) {
+        DISABLE_ARMING_FLAG(ARMED);
+
+#ifdef BLACKBOX
+        if (feature(FEATURE_BLACKBOX)) {
+            finishBlackbox();
+        }
+#endif
+
+        beeper(BEEPER_DISARMING);      // emit disarm tone
+    }
+}
+
+
+
+
+//TODO
+// Automatic ACC Offset Calibration
+//bool AccInflightCalibrationArmed = false;
+//bool AccInflightCalibrationMeasurementDone = false;
+//bool AccInflightCalibrationSavetoEEProm = false;
+//bool AccInflightCalibrationActive = false;
+//uint16_t InflightcalibratingA = 0;
+//
+//void handleInflightCalibrationStickPosition(void)
+//{
+//    if (AccInflightCalibrationMeasurementDone) {
+//        // trigger saving into eeprom after landing
+//        AccInflightCalibrationMeasurementDone = false;
+//        AccInflightCalibrationSavetoEEProm = true;
+//    } else {
+//        AccInflightCalibrationArmed = !AccInflightCalibrationArmed;
+//        if (AccInflightCalibrationArmed) {
+//            beeper(BEEPER_ACC_CALIBRATION);
+//        } else {
+//            beeper(BEEPER_ACC_CALIBRATION_FAIL);
+//        }
+//    }
+//}
+//
+
+
+//enum {
+//    ALIGN_GYRO = 0,
+//    ALIGN_ACCEL = 1,
+//    ALIGN_MAG = 2
+//};
+
+
+
+
+

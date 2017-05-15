@@ -1,0 +1,26 @@
+/********                          Failsafe settings                 ********************/
+/* Failsafe check pulses on four main control channels CH1-CH4. If the pulse is missing or bellow 985us (on any of these four channels)
+ the failsafe procedure is initiated. After FAILSAFE_DELAY time from failsafe detection, the level mode is on (if ACC is avaliable),
+ PITCH, ROLL and YAW is centered and THROTTLE is set to FAILSAFE_THROTTLE value. You must set this value to descending about 1m/s or so
+ for best results. This value is depended from your configuration, AUW and some other params.  Next, after FAILSAFE_OFF_DELAY the copter is disarmed,
+ and motors is stopped. If RC pulse coming back before reached FAILSAFE_OFF_DELAY time, after the small quard time the RC control is returned to normal. */
+//#define FAILSAFE                                // uncomment  to activate the failsafe function
+#define FAILSAFE_DELAY     10                     // Guard time for failsafe activation after signal lost. 1 step = 0.1sec - 1sec in example
+#define FAILSAFE_OFF_DELAY 200                    // Time for Landing before motors stop in 0.1sec. 1 step = 0.1sec - 20sec in example
+#define FAILSAFE_THROTTLE  (MINTHROTTLE + 200)    // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
+
+#define FAILSAFE_DETECT_TRESHOLD  985
+
+
+
+/*** HEADFREE : the copter can be controled by an absolute stick orientation, whatever the yaw orientation ***/
+/*************************        Advanced Headfree Mode             ********************/
+/* In Advanced Headfree mode when the copter is farther than ADV_HEADFREE_RANGE meters then
+ the  bearing between home and copter position will become the control direction
+ IF copter come closer than ADV_HEADFREE_RANGE meters, then the control direction freezed to the
+ bearing between home and copter at the point where it crosses the ADV_HEADFREE_RANGE meter distance
+ first implementation by HAdrian, mods by EOSBandi
+ */
+
+//#define ADVANCED_HEADFREE      //Advanced headfree mode is enabled when this is uncommented
+//#define ADV_HEADFREE_RANGE 15  //Range where advanced headfree mode activated

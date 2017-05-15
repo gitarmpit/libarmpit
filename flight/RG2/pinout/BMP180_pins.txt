@@ -1,0 +1,8 @@
+I2C1 (407 top left)  PB8-PB9 
+
+
+Top View: 
+
+SDA   SCL    GND    VCC
+B9    B8 
+96    95

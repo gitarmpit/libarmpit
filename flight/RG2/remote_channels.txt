@@ -1,0 +1,15 @@
+Controller connector 
+
+. VCC GND
+6 .  GND
+5 .  GND
+4 .  GND
+3 .  GND   yellow A2 throttle
+2 .  GND   green  A1 pitch
+1 .  GND   white  A0 roll
+
+Board connector 
+A0 A1 A2 A3 GND VCC
+A3 not used
+
+

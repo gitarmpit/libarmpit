@@ -1,0 +1,7 @@
+Upper 6-pin male connector on board  
+
+VCC  GND   CLK  MISO  SS   MOSI
+
+SPI4 (top right corner)  :  CLK  C10(78),  MISO C11(79), MOSI C12(80), SS D5(86)
+
+

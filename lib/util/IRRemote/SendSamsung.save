@@ -1,0 +1,27 @@
+#if 0
+void IRsend::sendSAMSUNG(unsigned long data, int nbits)
+{
+// Set IR carrier frequency
+	enableIROut(38);
+// Header
+	mark (SAMSUNG_HDR_MARK);
+	space (SAMSUNG_HDR_SPACE);
+// Data
+	for (unsigned long mask = 1UL << (nbits - 1); mask; mask >>= 1)
+	{
+		if (data & mask)
+		{
+			mark (SAMSUNG_BIT_MARK);
+			space (SAMSUNG_ONE_SPACE);
+		}
+		else
+		{
+			mark (SAMSUNG_BIT_MARK);
+			space (SAMSUNG_ZERO_SPACE);
+		}
+	}
+// Footer
+	mark (SAMSUNG_BIT_MARK);
+	space(0); // Always end with the LED off
+}
+#endif

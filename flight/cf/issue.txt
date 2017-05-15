@@ -1,0 +1,1 @@
+https://github.com/cleanflight/cleanflight/issues/2494

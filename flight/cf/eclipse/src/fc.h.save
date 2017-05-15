@@ -1,0 +1,61 @@
+#ifndef _FC_H
+#define _FC_H
+#include <stdint.h>
+
+class Scheduler;
+
+class FC
+{
+private:
+	Scheduler* sched;
+
+	int16_t headFreeModeHold;
+	int16_t magHold;
+	bool isRXDataNew;
+	bool haveUpdatedRcCommandsOnce;
+
+
+    FC();
+    FC(const FC&);
+
+    //Gyro & Pid
+	void taskMainPidLoop(void);
+	void filterRc(uint16_t filteredCycleTime);
+	void updateMagHold(void);
+	void updateRcCommands(void);
+
+
+	//RX
+	void processRx(void);
+	void updateLEDs(void);
+	static void updateInflightCalibrationState(void);
+
+
+
+public:
+
+    static FC* GetInstance()
+    {
+        static FC instance;
+        return &instance;
+    }
+
+    void taskGyroPid();
+    void taskRx();
+
+    void taskAccel();
+    void taskAlt();
+    void taskBaro();
+    void taskVbat();
+    void taskSonar();
+    void taskMag();
+    void taskGps();
+
+    void mwArm(void);
+    void mwDisarm(void);
+
+};
+
+
+
+#endif

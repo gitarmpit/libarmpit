@@ -1,0 +1,12 @@
+old:
+GND GPIO MISO MOSI CLK SS IRQ SDN VCC
+
+new:
+GND  G0 G1 G2  VCC MISO MOSI SCLK SS IRQ  SDN GND 
+
+old connector, copter f330 project: 
+
+1       2       3          4       5
+GND   16 MISO  17 MOSI   15 CLK   14 SS
+VCC   18 PB0
+       SDN

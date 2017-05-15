@@ -1,0 +1,12 @@
+si4422
+
+GND GPIO MISO MOSI CLK SS IRQ SDN VCC
+
+Female board connector
+
+1       2       3     4     5
+GND    MISO   MOSI   CLK   SS
+VCC    SDN    IRQ
+
+
+SPI1 PA4 - PA7  SS=PA4  SDN=PC4       

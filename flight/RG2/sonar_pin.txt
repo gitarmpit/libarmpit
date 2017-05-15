@@ -1,0 +1,5 @@
+6-pin male connector on board
+
+VCC  GND   CLK  MISO  x   MOSI
+                      ^ 
+need to add SS------- |
