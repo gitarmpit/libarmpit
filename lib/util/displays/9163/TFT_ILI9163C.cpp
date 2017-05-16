@@ -58,6 +58,7 @@ void TFT_ILI9163C::writedata16(uint16_t data)
     _ssPin->Set();
 }
 
+//called from ctor
 void TFT_ILI9163C::begin(void)
 {
     sleep = 0;
@@ -104,6 +105,7 @@ uint8_t TFT_ILI9163C::errorCode(void)
     return _initError;
 }
 
+//called from begin()
 void TFT_ILI9163C::init()
 {
     uint8_t i;
@@ -283,17 +285,6 @@ void TFT_ILI9163C::scroll(uint16_t adrs)
     }
 }
 
-//corrected! v3
-//void TFT_ILI9163C::_clearScreen(uint16_t color)
-//{
-//    int px;
-//    setAddr(0x00, 0x00, _GRAMWIDTH, _GRAMHEIGH); //go home
-//    for (px = 0; px < _GRAMSIZE; px++)
-//    {
-//        writedata16(color);
-//    }
-//}
-
 
 #ifdef __GNUC__
 #pragma GCC push_options
@@ -385,36 +376,14 @@ void TFT_ILI9163C::display()
 #pragma GCC pop_options
 #endif
 
-
-
-
 void TFT_ILI9163C::clearScreen()
 {
-//    memset (_frameBuffer, 0, sizeof(_frameBuffer));
-//    for (uint16_t i = 0; i < _GRAMSIZE; ++i)
-//    {
-//        _frameBuffer[i] = 0;
-//    }
     for (uint32_t i = 0; i < _GRAMSIZE/4; ++i)
     {
         ((uint64_t*)_frameBuffer)[i] = 0;
     }
-    //setAddrWindow(0x00, 0x00, _GRAMWIDTH, _GRAMHEIGH); //go home
 }
 
-//void TFT_ILI9163C::startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-//	setAddr(x0,y0,x1,y1);
-//}
-//
-//void TFT_ILI9163C::pushData(uint16_t color) {
-//		writedata16(color);
-//}
-//
-//
-//
-//void TFT_ILI9163C::pushColor(uint16_t color) {
-//		writedata16(color);
-//}
 
 void TFT_ILI9163C::writeScreen24(const uint32_t *bitmap, uint16_t size)
 {
@@ -450,8 +419,7 @@ void TFT_ILI9163C::drawPixel(int16_t x, int16_t y, uint16_t color)
         return;
     if ((x < 0) || (y < 0))
         return;
-//    setAddr(x, y, x + 1, y + 1);
-//    writedata16(color);
+
     _frameBuffer[y*_GRAMWIDTH + x] = color;
 }
 
@@ -519,10 +487,6 @@ void TFT_ILI9163C::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t
     }
 }
 
-void TFT_ILI9163C::setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
-{
-    setAddrWindow(x0, y0, x1, y1);
-}
 
 void TFT_ILI9163C::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
@@ -588,17 +552,6 @@ void TFT_ILI9163C::setRotation(uint8_t m)
     writedata(_Mactrl_Data);
 }
 
-void TFT_ILI9163C::drawPixel2(int16_t x, int16_t y, uint16_t color)
-{
-    if ((x >= _width) || (y >= _height))
-       return;
-
-    if ((x < 0) || (y < 0))
-        return;
-//    setAddr(x, y, x + 1, y + 1);
-//    writedata16(color);
-    _frameBuffer[y*_GRAMWIDTH + x] = color;
-}
 
 void TFT_ILI9163C::drawBmp2(int16_t x, int16_t y, const uint8_t *bmp)
 {

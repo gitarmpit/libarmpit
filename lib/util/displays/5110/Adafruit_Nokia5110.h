@@ -72,7 +72,7 @@ public:
   void clearDisplay(void);
   void display();
   
-  void drawPixel(int16_t x, int16_t y, uint16_t color);
+  virtual void drawPixel(int16_t x, int16_t y, uint16_t color);
   uint8_t getPixel(int8_t x, int8_t y);
 
 

@@ -128,39 +128,40 @@ class TFT_ILI9163C: public Adafruit_GFX
 
 private:
 
-     SPI* _spi;
-     GPIO_PIN* _dcPin;
-     GPIO_PIN* _rstPin;
-     GPIO_PIN* _ssPin;
-     volatile uint32_t* DR;
-     volatile uint32_t* SR;
-     uint16_t _frameBuffer[_GRAMSIZE];
-
-    void colorSpace(uint8_t cspace);
-    void setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+    SPI* _spi;
+    GPIO_PIN* _dcPin;
+    GPIO_PIN* _rstPin;
+    GPIO_PIN* _ssPin;
+    volatile uint32_t* DR;
+    volatile uint32_t* SR;
+    uint16_t _frameBuffer[_GRAMSIZE];
     uint8_t sleep;
+    uint8_t _initError;
+
+    void begin(void);
     void init();
     bool boundaryCheck(int16_t x, int16_t y);
     void homeAddress();
-    uint8_t _initError;
+    void colorSpace(uint8_t cspace);
 
 public:
 
     TFT_ILI9163C(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin);
 
-    void begin(void);
     void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1); //graphic Addressing
     //void setCursor(int16_t x, int16_t y); //char addressing
-    void pushColor(uint16_t color);
+
+    //void pushColor(uint16_t color);  called directly now
+
     void fillScreen(uint16_t color = 0x0000);
     void clearScreen();
     virtual void drawPixel(int16_t x, int16_t y, uint16_t color);
     virtual void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
     virtual void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
-    virtual void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+    virtual void fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
+            uint16_t color);
     void setRotation(uint8_t r);
     void invertDisplay(bool i);
-    void drawPixel2(int16_t x, int16_t y, uint16_t color);
 
     void display();
     void displayFast(); // fast but glitchy
@@ -173,10 +174,14 @@ public:
     void startPushData(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
     void pushData(uint16_t color);
     void endPushData();
-    void writeScreen24(const uint32_t *bitmap, uint16_t size = _TFTWIDTH * _TFTHEIGHT);
+
+    void writeScreen24(const uint32_t *bitmap,
+            uint16_t size = _TFTWIDTH * _TFTHEIGHT);
+
     inline uint16_t Color24To565(int32_t color_)
     {
-        return ((((color_ >> 16) & 0xFF) / 8) << 11) | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) & 0xFF) / 8);
+        return ((((color_ >> 16) & 0xFF) / 8) << 11)
+                | ((((color_ >> 8) & 0xFF) / 4) << 5) | (((color_) & 0xFF) / 8);
     }
     void setBitrate(uint32_t n);
 

@@ -249,14 +249,14 @@ private:
     void setWriteDir()
     {
        *_dataPort->GetGPIO_CR() &= ~(0xffffffff);
-       *_dataPort->GetGPIO_CR() |= 0x33333333;
+       *_dataPort->GetGPIO_CR() |= 0x33333333; //CNF=0(out PP) MODE=3(fast)
     }
 
     void setReadDir()
     {
         *_dataPort->GetGPIO_CR() &= ~(0xffffffff);
         //floating
-        *_dataPort->GetGPIO_CR() |= 0x44444444;
+        *_dataPort->GetGPIO_CR() |= 0x44444444; //CNF=1(Floating Input) MODE = 0 (input)
 
 
         //pulldown

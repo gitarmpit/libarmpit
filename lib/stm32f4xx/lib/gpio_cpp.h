@@ -76,6 +76,7 @@ public:
     void PullUp();
     void PullDown();
     void SetAF(GPIO_AF afno);
+    GPIO_PIN_N GetPinNumber() { return pin; }
 
 };
 
@@ -147,7 +148,10 @@ public:
 
     void SetAF(GPIO_AF afno, GPIO_PIN_N pin); 
 
-    volatile uint32_t* getBSRRAddr() { return _pGPIO_BSRR; }
+
+    volatile uint32_t* GetGPIO_BSRR() { return _pGPIO_BSRR; }
+    volatile uint32_t* GetGPIO_ODR() { return _pGPIO_ODR; }
+
 };
 
 class GPIOA : public GPIO_PORT 
