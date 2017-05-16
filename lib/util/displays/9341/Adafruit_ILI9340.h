@@ -91,10 +91,10 @@
 */
 
 // Color definitions
-#define	ILI9340_BLACK   0x0000
-#define	ILI9340_BLUE    0x001F
-#define	ILI9340_RED     0xF800
-#define	ILI9340_GREEN   0x07E0
+#define ILI9340_BLACK   0x0000
+#define ILI9340_BLUE    0x001F
+#define ILI9340_RED     0xF800
+#define ILI9340_GREEN   0x07E0
 #define ILI9340_CYAN    0x07FF
 #define ILI9340_MAGENTA 0xF81F
 #define ILI9340_YELLOW  0xFFE0  
@@ -117,8 +117,7 @@ class Adafruit_ILI9340 : public Adafruit_GFX {
 
   Adafruit_ILI9340(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin);
 
-  void  begin(void);
-  void 	setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+  void  setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
   void  pushColor(uint16_t color);
   void  fillScreen(uint16_t color);
   void  drawPixel(int16_t x, int16_t y, uint16_t color);

@@ -2,9 +2,23 @@
 #include "GPIO_Helper.h"
 #include "gpio_cpp.h"
 #include <stdio.h>
-#include "9341/Adafruit_ILI9340.h"
+#include "9341/Adafruit_ILI9341.h"
 #include "debug.h"
 #include "system_time.h"
+
+static void speed_test(Adafruit_ILI9341* display)
+{
+    systick_enable(TRUE);
+    uint32_t t0 = millis();
+    for (int i = 0; i < 16; ++i)
+    {
+        display->fillScreen(ILI9341_CYAN);
+    }
+    display->printf (0, 0, 4, "millis: %d\n", millis() - t0);
+    while(1)
+        ;
+
+}
 
 void test()
 {
@@ -24,13 +38,12 @@ void test()
     ssPin->SetupGPIO_OutPP();
     ssPin->SetSpeedHigh();
 
-    Adafruit_ILI9340 display(spi, dcPin, rstPin, ssPin);
-
-    systick_enable(TRUE);
+    Adafruit_ILI9341 display(spi, dcPin, rstPin, ssPin);
 
 
-    display.setBgColor(ILI9340_CYAN);
-    display.setTextColor(ILI9340_BLACK);
+    display.fillScreen(ILI9341_CYAN);
+    display.setBgColor(ILI9341_CYAN);
+    display.setTextColor(ILI9341_BLACK);
     display.setRotation(1);
     display.setTextSize(2);
     //display.setTextColor(ILI9340_BLACK, ILI9340_WHITE);
@@ -42,14 +55,6 @@ void test()
 
     //display.write("Hello ILI9341 world!");
 
-    uint32_t t0 = millis();
-    for (int i = 0; i < 16; ++i)
-    {
-    	display.fillScreen(ILI9340_CYAN);
-    }
-    display.printf (0, 0, 4, "millis: %d\n", millis() - t0);
-    while(1)
-    	;
 
     display.printf (0, 0, 4, "Test %f\n", 1.2345);
 

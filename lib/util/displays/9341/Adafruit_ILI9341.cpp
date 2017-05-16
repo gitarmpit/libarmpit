@@ -23,7 +23,7 @@ Adafruit_ILI9341::Adafruit_ILI9341(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, 
     _dcPin = dcPin;
     _rstPin = rstPin;
     _ssPin = ssPin;
-    Init();
+    init();
 }
 
 void Adafruit_ILI9341::writecommand(uint8_t cmd)
@@ -56,7 +56,7 @@ uint8_t Adafruit_ILI9341::readdata()
 //#define DELAY 0x80
 
 
-void Adafruit_ILI9341::Init(void)
+void Adafruit_ILI9341::init(void)
 {
     if (_rstPin != 0)
     {
