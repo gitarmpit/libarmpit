@@ -10,12 +10,12 @@
 #include "RF22/si4432.h"
 
 #include "_pins.h"
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "motionapp_reader.h"
 #include "debug.h"
 
 
-Adafruit_PCD8544* get_LCD()
+Adafruit_Nokia5110* get_LCD()
 {
     SPI* lcdSPI = GPIO_Helper::SetupSPI(LCD_RADIO_SPI, true, false, false, SPI_BAUD_RATE_16);
 
@@ -28,7 +28,7 @@ Adafruit_PCD8544* get_LCD()
     GPIO_PIN* lcd_ssPin = GPIO_Helper::GetPin(LCD_SS_PIN);
     lcd_ssPin->SetupGPIO_OutPP();
 
-    Adafruit_PCD8544* lcd =  new Adafruit_PCD8544(lcdSPI, dcPin, rstPin, lcd_ssPin);
+    Adafruit_Nokia5110* lcd =  new Adafruit_Nokia5110(lcdSPI, dcPin, rstPin, lcd_ssPin);
     lcd->Init(0xbc);
     lcd->setRotation(2);
     lcd->clearDisplay();
@@ -51,9 +51,9 @@ static void test_LCD()
 //    GPIO_PIN* lcd_ssPin = GPIO_Helper::GetPin(LCD_SS_PIN);
 //    lcd_ssPin->SetupGPIO_OutPP();
 //
-//    Adafruit_PCD8544 lcd(lcdSPI, dcPin, rstPin, lcd_ssPin);
+//    Adafruit_Nokia5110 lcd(lcdSPI, dcPin, rstPin, lcd_ssPin);
 
-    Adafruit_PCD8544* lcd = get_LCD();
+    Adafruit_Nokia5110* lcd = get_LCD();
 
     lcd->Init(0xbc);
     lcd->setRotation(2);
@@ -203,7 +203,7 @@ static void test_pwm_out()
 
 static void test_rc_pwm_in()
 {
-    Adafruit_PCD8544* lcd = get_LCD();
+    Adafruit_Nokia5110* lcd = get_LCD();
 
 
     uint16_t thr;
@@ -227,7 +227,7 @@ static void test_rc_pwm_in()
 
 static void test_pwm_capture()
 {
-    Adafruit_PCD8544* lcd = get_LCD();
+    Adafruit_Nokia5110* lcd = get_LCD();
     TIMER_With_Channels* timer_in = (TIMER_With_Channels*)TIMER::Get_Instance(PWM_CAPTURE_TIMER);
     PWM_Capture_EXTI handler (timer_in, PWM_INPUT_THROTTLE, 0);
     volatile uint32_t period, duty;
@@ -254,7 +254,7 @@ static void* I2C_Error (void* arg)
 
 static void test_motionapp()
 {
-    Adafruit_PCD8544* lcd = get_LCD();
+    Adafruit_Nokia5110* lcd = get_LCD();
 
     uint32_t i2cClockSpeed = 100000;
     static I2C* i2c = GPIO_Helper::SetupI2C(MPU6050_I2C, i2cClockSpeed);

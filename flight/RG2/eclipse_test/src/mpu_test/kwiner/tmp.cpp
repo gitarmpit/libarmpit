@@ -29,7 +29,7 @@
 #include <SPI.h>
 #include <Wire.h>   
 #include <Adafruit_GFX.h>
-#include <Adafruit_PCD8544.h>
+#include <Adafruit_Nokia5110.h>
 
 // Using NOKIA 5110 monochrome 84 x 48 pixel display
 // pin 9 - Serial clock out (SCLK)
@@ -37,7 +37,7 @@
 // pin 7 - Data/Command select (D/C)
 // pin 5 - LCD chip select (CS)
 // pin 6 - LCD reset (RST)
-Adafruit_PCD8544 display = Adafruit_PCD8544(9, 8, 7, 5, 6);
+Adafruit_Nokia5110 display = Adafruit_Nokia5110(9, 8, 7, 5, 6);
 
 // See also MPU-9250 Register Map and Descriptions, Revision 4.0, RM-MPU-9250A-00, Rev. 1.4, 9/9/2013 for registers not listed in 
 // above document; the MPU9250 and MPU9150 are virtually identical but the latter has a different register map

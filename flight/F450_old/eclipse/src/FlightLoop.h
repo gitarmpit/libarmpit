@@ -10,7 +10,7 @@
 #include "usart_cpp.h"
 #include "GPIO_Helper.h"
 #include "spi_cpp.h"
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "RF22/si4432.h"
 #include "LED_Indicators.h"
 #include "RC_PWM_Reader.h"
@@ -21,54 +21,54 @@ class FlightLoop
 
 private:
 
-	MotionAppReader _motionApp;
+    MotionAppReader _motionApp;
 
-	uint32_t  _maxThrottle;
-	uint32_t  _minThrottle;
-	uint32_t  _maxPitch;
-	uint32_t  _minPitch;
-	uint32_t  _maxRoll;
-	uint32_t  _minRoll;
+    uint32_t  _maxThrottle;
+    uint32_t  _minThrottle;
+    uint32_t  _maxPitch;
+    uint32_t  _minPitch;
+    uint32_t  _maxRoll;
+    uint32_t  _minRoll;
 
-	uint32_t _pwmProximity = 0;
+    uint32_t _pwmProximity = 0;
 
-	uint32_t _lastThrottle = 0;
-	uint32_t _lastHeight = 0;
+    uint32_t _lastThrottle = 0;
+    uint32_t _lastHeight = 0;
 
-	bool _autoHover;
+    bool _autoHover;
 
-	unsigned long sampleIntervall = 0;
+    unsigned long sampleIntervall = 0;
 
 
-	ESC_PWM_Control* _esc;
+    ESC_PWM_Control* _esc;
 
-	RC_PWM_Reader* _pwmReader;
+    RC_PWM_Reader* _pwmReader;
 
-	Adafruit_PCD8544* _lcd;
-	Si4432* _radio;
+    Adafruit_Nokia5110* _lcd;
+    Si4432* _radio;
 
-	PidController _pidRoll, _pidYaw, _pidPitch, _pidZ;
+    PidController _pidRoll, _pidYaw, _pidPitch, _pidZ;
 
-	LED_Indicators* _progress;
+    LED_Indicators* _progress;
 
-	SPI* _proximitySPI;
+    SPI* _proximitySPI;
 
-	void process(uint32_t pwmThrottle, uint32_t pwmRoll, uint32_t pwmPitch);
+    void process(uint32_t pwmThrottle, uint32_t pwmRoll, uint32_t pwmPitch);
 
-	float LimitCorrect(float value);
+    float LimitCorrect(float value);
 
-	void Init();
+    void Init();
 
 
 public:
 
-	FlightLoop(I2C* i2c, SPI* proximitySPI, ESC_PWM_Control* esc, RC_PWM_Reader* pwmReader, Adafruit_PCD8544* lcd, Si4432* radio);
+    FlightLoop(I2C* i2c, SPI* proximitySPI, ESC_PWM_Control* esc, RC_PWM_Reader* pwmReader, Adafruit_Nokia5110* lcd, Si4432* radio);
 
-	void Run();
+    void Run();
 
 
 
-	virtual ~FlightLoop() {}
+    virtual ~FlightLoop() {}
 
 
 

@@ -2,7 +2,7 @@
 #include "GPIO_Helper.h"
 #include "gpio_cpp.h"
 #include <stdio.h>
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "exti_cpp.h"
 #include "debug.h"
 #include "PWM_Capture/PWM_Capture_EXTI.h"
@@ -31,7 +31,7 @@ static void run()
     ssPin->SetSpeedHigh();
 
 
-    Adafruit_PCD8544 display(spi, dcPin, rstPin, ssPin);
+    Adafruit_Nokia5110 display(spi, dcPin, rstPin, ssPin);
     display.Init(0xbc);
     display.clearDisplay();
     display.display();

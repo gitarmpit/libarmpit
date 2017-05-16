@@ -4,7 +4,7 @@
 #include "gpio_cpp.h"
 #include <stdio.h>
 #include "spi_cpp.h"
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "debug.h"
 
 
@@ -32,7 +32,7 @@ static void run_spi_master()
     ssPin->SetSpeedHigh();
 
 
-    Adafruit_PCD8544 display(spi, dcPin, rstPin, ssPin);
+    Adafruit_Nokia5110 display(spi, dcPin, rstPin, ssPin);
     display.Init(0xbc);
     display.setRotation(2);
 

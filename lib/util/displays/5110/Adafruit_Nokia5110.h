@@ -51,7 +51,7 @@ All text above, and the splash screen must be included in any redistribution
 #include "spi_cpp.h"
 #include "../Adafruit_GFX.h"
 
-class Adafruit_PCD8544 : public Adafruit_GFX {
+class Adafruit_Nokia5110 : public Adafruit_GFX {
 
 
 private:
@@ -62,7 +62,7 @@ private:
 
 
 public:
-  Adafruit_PCD8544(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin);
+  Adafruit_Nokia5110(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin);
   void Init(uint8_t contrast = 0xb5, uint8_t bias = 0x14);
   
   void command(uint8_t c);

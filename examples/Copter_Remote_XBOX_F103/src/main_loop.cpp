@@ -48,7 +48,7 @@ void MainLoop::Intro()
 
 }
 
-MainLoop::MainLoop(Si4432* radio, Adafruit_PCD8544* display, TIMER_Channel* lcdBL,
+MainLoop::MainLoop(Si4432* radio, Adafruit_Nokia5110* display, TIMER_Channel* lcdBL,
         TIMER_Channel* sound, TIMER_Channel* redLED, TIMER_Channel* greenLED) :
 ButtonHandler (TIM4::GetInstance(), false)
 {
@@ -90,7 +90,7 @@ void MainLoop::Run()
 
     while (1)
     {
-    	_display->printf(0, 0, 2, "Thr: %5lu", _adc_reader.getThrottle());
+        _display->printf(0, 0, 2, "Thr: %5lu", _adc_reader.getThrottle());
         //_display->Clear();
         _display->display();
         delay(20);

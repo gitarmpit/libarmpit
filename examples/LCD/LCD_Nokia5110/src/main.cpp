@@ -3,7 +3,7 @@
 #include "spi.h"
 #include "gpio_cpp.h"
 #include <stdio.h>
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "adc_cpp.h"
 #include "fp.h"
 #include "fp2.h"
@@ -49,7 +49,7 @@ public:
 };
 
 
-static void bat(Adafruit_PCD8544* display)
+static void bat(Adafruit_Nokia5110* display)
 {
     GPIOA* gpioA = GPIOA::GetInstance();
     gpioA->EnablePeripheralClock(true);
@@ -115,7 +115,7 @@ static void test_proximity()
     ssPin->SetSpeedHigh();
 
 
-    Adafruit_PCD8544 lcd(lcdSpi, dcPin, rstPin, ssPin);
+    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
     lcd.Init(0xbc);
     lcd.clearDisplay();
     lcd.display();
@@ -239,7 +239,7 @@ static void test_display()
     ssPin->SetSpeedHigh();
 
 
-    Adafruit_PCD8544 lcd(lcdSpi, dcPin, rstPin, ssPin);
+    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
     lcd.Init(0xbc);
     lcd.clearDisplay();
     lcd.setRotation(2);
@@ -276,7 +276,7 @@ static void test_uart2()
     ssPin->SetSpeedHigh();
 
 
-    Adafruit_PCD8544 lcd(lcdSpi, dcPin, rstPin, ssPin);
+    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
     lcd.Init(0xbc);
     //bat(&display);
 

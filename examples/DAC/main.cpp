@@ -13,7 +13,7 @@
 
 
 
-//#include "5110/Adafruit_PCD8544.h"
+//#include "5110/Adafruit_Nokia5110.h"
 
 //84Mhz timer: 90 steps: 10us (100K) at reload=8-9
 //84Mhz timer: 70 steps: 8us (125K) at reload=6

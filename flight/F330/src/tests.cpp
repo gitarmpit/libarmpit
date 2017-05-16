@@ -208,7 +208,7 @@ static void* i2c_callback (void* arg)
 
 static void test_motionapp()
 {
-//    Adafruit_PCD8544* lcd = get_LCD();
+//    Adafruit_Nokia5110* lcd = get_LCD();
 //
     uint32_t i2cClockSpeed = 100000;
     static I2C* i2c = GPIO_Helper::SetupI2C(MPU6050_I2C, i2cClockSpeed);

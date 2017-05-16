@@ -28,7 +28,7 @@ public:
 FlightLoop::FlightLoop(I2C* i2c, SPI* proximitySPI,
                       ESC_PWM_Control* esc,
                       RC_PWM_Reader* pwmReader,
-                      Adafruit_PCD8544* lcd,
+                      Adafruit_Nokia5110* lcd,
                       Si4432* radio) :
         _motionApp(i2c)
 {

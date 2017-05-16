@@ -9,7 +9,7 @@
 #include "flash.h"
 //#include "lcd5110.h"
 #include "GPIO_Helper.h"
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "main_loop.h"
 #include "spi_lcd_setup.h"
 #include "timer_ch_setup.h"
@@ -44,7 +44,7 @@ static void start()
 
     SPI_LCD_Setup lcdSetup;
 
-    Adafruit_PCD8544 display(lcdSetup.GetSPI(), lcdSetup.GetDcPin(), lcdSetup.GetRstPin(), lcdSetup.GetSsPin());
+    Adafruit_Nokia5110 display(lcdSetup.GetSPI(), lcdSetup.GetDcPin(), lcdSetup.GetRstPin(), lcdSetup.GetSsPin());
 
     //bool reverse = true;
     //LCD5110 display(spiLCD, dcPin, rstPin, ssPin, reverse);
@@ -67,18 +67,18 @@ static void start()
 
     //Radio 22 25 26 27 28
     //25 26 27 28 : SPI2 radio
-	SPI* spiRadio = GPIO_Helper::SetupSPI(SPI2_PB_13_14_15, true, false, false, SPI_BAUD_RATE_32);
-	GPIOB::GetInstance()->EnablePeripheralClock(true);
-	GPIO_PIN* ssPinRadio = GPIOB::GetInstance()->GetPin(GPIO_PIN12);
-	GPIO_PIN* sdnPin = GPIOB::GetInstance()->GetPin(GPIO_PIN11);
-	Si4432 radio(spiRadio, ssPinRadio, sdnPin, 0);
-	radio.init();
-	radio.setBaudRate(70);
-	radio.setFrequency(433);
-	radio.readAll();
+    SPI* spiRadio = GPIO_Helper::SetupSPI(SPI2_PB_13_14_15, true, false, false, SPI_BAUD_RATE_32);
+    GPIOB::GetInstance()->EnablePeripheralClock(true);
+    GPIO_PIN* ssPinRadio = GPIOB::GetInstance()->GetPin(GPIO_PIN12);
+    GPIO_PIN* sdnPin = GPIOB::GetInstance()->GetPin(GPIO_PIN11);
+    Si4432 radio(spiRadio, ssPinRadio, sdnPin, 0);
+    radio.init();
+    radio.setBaudRate(70);
+    radio.setFrequency(433);
+    radio.readAll();
 //
-	//20 Photo
-	//21 Infra LED
+    //20 Photo
+    //21 Infra LED
     MainLoop mainLoop (&radio, &display, t_ch.Get_BL(), t_ch.Get_Sound(), t_ch.Get_Red(), t_ch.Get_Green());
     mainLoop.Run();
 
@@ -92,7 +92,7 @@ int main()
 #ifdef SEMIHOSTING
     initialise_monitor_handles();
 #endif
-	//RCC_EnableHSI_64Mhz_AHB_32Mhz_APB1_16MHz_APB2_16MHz();
+    //RCC_EnableHSI_64Mhz_AHB_32Mhz_APB1_16MHz_APB2_16MHz();
 
     FLASH_SetWaitState(2);
 

@@ -19,7 +19,7 @@ All text above, and the splash screen below must be included in any redistributi
 #include <stdlib.h>
 #include <string.h>
 #include "../Adafruit_GFX.h"
-#include "Adafruit_PCD8544.h"
+#include "Adafruit_Nokia5110.h"
 #include "debug.h"
 
 // the memory buffer for the LCD
@@ -45,7 +45,7 @@ static void updateBoundingBox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t 
 #endif
 }
 
-Adafruit_PCD8544::Adafruit_PCD8544(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin)
+Adafruit_Nokia5110::Adafruit_Nokia5110(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin)
 : Adafruit_GFX(LCDWIDTH, LCDHEIGHT)
 {
     _spi = spi;
@@ -59,7 +59,7 @@ Adafruit_PCD8544::Adafruit_PCD8544(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, 
 
 
 // the most basic function, set a single pixel
-void Adafruit_PCD8544::drawPixel(int16_t x, int16_t y, uint16_t color) {
+void Adafruit_Nokia5110::drawPixel(int16_t x, int16_t y, uint16_t color) {
   if ((x < 0) || (x >= _width) || (y < 0) || (y >= _height))
     return;
 
@@ -95,7 +95,7 @@ void Adafruit_PCD8544::drawPixel(int16_t x, int16_t y, uint16_t color) {
 
 
 // the most basic function, get a single pixel
-uint8_t Adafruit_PCD8544::getPixel(int8_t x, int8_t y) {
+uint8_t Adafruit_Nokia5110::getPixel(int8_t x, int8_t y) {
   if ((x < 0) || (x >= LCDWIDTH) || (y < 0) || (y >= LCDHEIGHT))
     return 0;
 
@@ -103,7 +103,7 @@ uint8_t Adafruit_PCD8544::getPixel(int8_t x, int8_t y) {
 }
 
 
-void Adafruit_PCD8544::Init(uint8_t contrast, uint8_t bias) {
+void Adafruit_Nokia5110::Init(uint8_t contrast, uint8_t bias) {
 
 
     _rstPin->Reset();
@@ -122,21 +122,21 @@ void Adafruit_PCD8544::Init(uint8_t contrast, uint8_t bias) {
 }
 
 
-void Adafruit_PCD8544::command(uint8_t data) {
+void Adafruit_Nokia5110::command(uint8_t data) {
     _dcPin->Reset();
     _ssPin->Reset();
     _spi->TransmitByte(data);
     _ssPin->Set();
 }
 
-void Adafruit_PCD8544::data(uint8_t data) {
+void Adafruit_Nokia5110::data(uint8_t data) {
     _dcPin->Set();
     _ssPin->Reset();
     _spi->TransmitByte(data);
     _ssPin->Set();
 }
 
-void Adafruit_PCD8544::setContrast(uint8_t val) {
+void Adafruit_Nokia5110::setContrast(uint8_t val) {
   if (val > 0x7f) {
     val = 0x7f;
   }
@@ -148,7 +148,7 @@ void Adafruit_PCD8544::setContrast(uint8_t val) {
 
 
 
-void Adafruit_PCD8544::display(void) {
+void Adafruit_Nokia5110::display(void) {
   uint8_t col, maxcol, p;
   
   for(p = 0; p < 6; p++) {
@@ -196,7 +196,7 @@ void Adafruit_PCD8544::display(void) {
 }
 
 // clear everything
-void Adafruit_PCD8544::clearDisplay(void) {
+void Adafruit_Nokia5110::clearDisplay(void) {
   memset(pcd8544_buffer, 0, LCDWIDTH*LCDHEIGHT/8);
   updateBoundingBox(0, 0, LCDWIDTH-1, LCDHEIGHT-1);
   cursor_y = cursor_x = 0;
@@ -204,7 +204,7 @@ void Adafruit_PCD8544::clearDisplay(void) {
 
 /*
 // this doesnt touch the buffer, just clears the display RAM - might be handy
-void Adafruit_PCD8544::clearDisplay(void) {
+void Adafruit_Nokia5110::clearDisplay(void) {
   
   uint8_t p, c;
   

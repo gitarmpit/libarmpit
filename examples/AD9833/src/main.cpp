@@ -2,7 +2,7 @@
 #include "RCC_Helper.h"
 #include "ad9833.h"
 #include "debug.h"
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "afio.h"
 
 static void test_lcd()
@@ -26,7 +26,7 @@ static void test_lcd()
     ssPin->SetSpeedHigh();
 
 
-    Adafruit_PCD8544 display(spi, dcPin, rstPin, ssPin);
+    Adafruit_Nokia5110 display(spi, dcPin, rstPin, ssPin);
     display.Init(0xbc);
     //display.setRotation(2);
 
@@ -58,5 +58,5 @@ int main()
     ad9833.Reset();
     //ad9833.SetWaveform(REG0, TRIANGLE_WAVE);
     while(1)
-    	;
+        ;
 }

@@ -1,7 +1,7 @@
 #include "i2c_cpp.h"
 #include "rcc.h"
 #include <math.h>
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "fp2.h"
 #include "system_time.h"
 #include "invensense/inv_mpu.h"
@@ -916,7 +916,7 @@ void MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, fl
 }
 
 
-static void loop(Adafruit_PCD8544* lcd)
+static void loop(Adafruit_Nokia5110* lcd)
 {
     // If intPin goes high, all data registers have new data
     if (readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01)
@@ -1055,7 +1055,7 @@ static long  qq[4];
 static uint32_t ts;
 static unsigned char more;
 
-static void loop2(Adafruit_PCD8544* lcd)
+static void loop2(Adafruit_Nokia5110* lcd)
 {
     // If intPin goes high, all data registers have new data
     if (readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01)
@@ -1135,7 +1135,7 @@ static void loop2(Adafruit_PCD8544* lcd)
 
 
 
-void basic_AHRS2(Adafruit_PCD8544* lcd)
+void basic_AHRS2(Adafruit_Nokia5110* lcd)
 {
     //volatile uint8_t c = readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250); // Read WHO_AM_I register for MPU-9250
 
@@ -1158,7 +1158,7 @@ void basic_AHRS2(Adafruit_PCD8544* lcd)
 }
 
 
-void basic_AHRS(Adafruit_PCD8544* lcd)
+void basic_AHRS(Adafruit_Nokia5110* lcd)
 {
     volatile uint8_t c = readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250); // Read WHO_AM_I register for MPU-9250
 

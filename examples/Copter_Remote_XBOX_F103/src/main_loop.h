@@ -3,7 +3,7 @@
 
 #include "button_handler.h"
 #include "adc_reader.h"
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include "RF22/si4432.h"
 #include "backlight_handler.h"
 
@@ -13,7 +13,7 @@ private:
 
     uint8_t _clicks;
     ADC_Reader _adc_reader;
-    Adafruit_PCD8544*   _display;
+    Adafruit_Nokia5110*   _display;
     //LCD5110*  _display;
     Si4432*    _radio;
     TIMER_Channel*  _lcdBL;
@@ -31,7 +31,7 @@ private:
 
 public:
 
-    MainLoop(Si4432* radio, Adafruit_PCD8544* display, TIMER_Channel* lcdBL,
+    MainLoop(Si4432* radio, Adafruit_Nokia5110* display, TIMER_Channel* lcdBL,
             TIMER_Channel* sound, TIMER_Channel* redLED, TIMER_Channel* greenLED);
 
     void Run();

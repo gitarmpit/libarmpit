@@ -47,7 +47,7 @@ static void run(uint32_t i2cClockSpeed, uint16_t radioRateKbit, uint32_t radioFr
     GPIO_PIN* lcd_ssPin = GPIO_Helper::GetPin(LCD_SS_PIN);
     lcd_ssPin->SetupGPIO_OutPP();
 
-    Adafruit_PCD8544 lcd(lcdSPI, dcPin, rstPin, lcd_ssPin);
+    Adafruit_Nokia5110 lcd(lcdSPI, dcPin, rstPin, lcd_ssPin);
     lcd.Init(0xbc);
     lcd.setRotation(2);
     lcd.clearDisplay();

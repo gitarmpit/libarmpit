@@ -3,7 +3,7 @@
 #include "i2c_cpp.h"
 #include "_pins.h"
 #include "LED_Indicators.h"
-#include "5110/Adafruit_PCD8544.h"
+#include "5110/Adafruit_Nokia5110.h"
 #include <stdio.h>
 #include "fp2.h"
 #include <math.h>
@@ -36,7 +36,7 @@ static void* I2C_Error (void* arg)
 }
 
 
-static Adafruit_PCD8544 get_lcd(SPI* spi)
+static Adafruit_Nokia5110 get_lcd(SPI* spi)
 {
     delay(10);
     GPIOA* portA = GPIOA::GetInstance();
@@ -57,7 +57,7 @@ static Adafruit_PCD8544 get_lcd(SPI* spi)
     ssPin->SetupGPIO_OutPP();
     ssPin->SetSpeedHigh();
 
-    Adafruit_PCD8544 lcd(spi, dcPin, rstPin, ssPin);
+    Adafruit_Nokia5110 lcd(spi, dcPin, rstPin, ssPin);
     lcd.Init(0xbc);
     lcd.setRotation(2);
     lcd.clearDisplay();
@@ -72,7 +72,7 @@ static void test()
     LED_Indicators::GetInstance()->MotorLedOff();
 
     SPI* spi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_16);
-    Adafruit_PCD8544 lcd = get_lcd(spi);
+    Adafruit_Nokia5110 lcd = get_lcd(spi);
     lcd.write ("MotionApps2");
     lcd.display();
     delay(1500);
