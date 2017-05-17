@@ -42,6 +42,7 @@ void test()
 
 
     display.fillScreen(ILI9341_CYAN);
+    display.display();
     display.setBgColor(ILI9341_CYAN);
     display.setTextColor(ILI9341_BLACK);
     display.setRotation(1);
@@ -57,6 +58,7 @@ void test()
 
 
     display.printf (0, 0, 4, "Test %f\n", 1.2345);
+    display.display();
 
 
         //display.write("test", 0, 0, 2);

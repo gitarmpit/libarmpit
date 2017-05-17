@@ -100,14 +100,22 @@
 #define ILI9341_GREENYELLOW 0xAFE5      /* 173, 255,  47 */
 #define ILI9341_PINK        0xF81F
 
+
+#define _GRAMSIZE       ILI9341_TFTWIDTH * ILI9341_TFTHEIGHT
+
 class Adafruit_ILI9341 : public Adafruit_GFX
 {
  private:
+
+    uint16_t _frameBuffer[32000];
+
   uint8_t  tabcolor;
   SPI* _spi;
   GPIO_PIN* _dcPin;
   GPIO_PIN* _rstPin;
   GPIO_PIN* _ssPin;
+  volatile uint32_t* DR;
+  volatile uint32_t* SR;
 
   void  init();
   void  begin(void);
@@ -116,8 +124,10 @@ class Adafruit_ILI9341 : public Adafruit_GFX
 
   Adafruit_ILI9341(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin);
 
+  void display();
   void  setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-  void  pushColor(uint16_t color);
+  //void  pushColor(uint16_t color);
+  void clearScreen();
   void  fillScreen(uint16_t color);
   void  drawPixel(int16_t x, int16_t y, uint16_t color);
   void  drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);

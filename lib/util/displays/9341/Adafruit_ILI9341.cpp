@@ -15,6 +15,7 @@
 
 #include "Adafruit_ILI9341.h"
 #include "debug.h"
+#include <string.h>
 
 Adafruit_ILI9341::Adafruit_ILI9341(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin)
 : Adafruit_GFX(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT)
@@ -23,6 +24,11 @@ Adafruit_ILI9341::Adafruit_ILI9341(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, 
     _dcPin = dcPin;
     _rstPin = rstPin;
     _ssPin = ssPin;
+
+    memset (_frameBuffer, 0, sizeof(_frameBuffer));
+    DR = _spi->GetDRAddr();
+    SR = _spi->GetSRAddr();
+
     init();
 }
 
@@ -30,7 +36,7 @@ void Adafruit_ILI9341::writecommand(uint8_t cmd)
 {
     _dcPin->Reset();
     _ssPin->Reset();
-    volatile uint8_t tmp = _spi->TransmitByte(cmd);
+    _spi->TransmitByte(cmd);
     _ssPin->Set();
 
 }
@@ -201,16 +207,61 @@ void Adafruit_ILI9341::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint
     writecommand(ILI9341_RAMWR); // write to RAM
 }
 
-void Adafruit_ILI9341::pushColor(uint16_t color)
+//void Adafruit_ILI9341::pushColor(uint16_t color)
+//{
+//    _dcPin->Set();
+//    _ssPin->Reset();
+//
+//    _spi->TransmitByte(color >> 8);
+//    _spi->TransmitByte(color);
+//
+//    _ssPin->Set();
+//}
+
+
+
+#ifdef __GNUC__
+#pragma GCC push_options
+#pragma GCC optimize ("O3")
+#endif
+void Adafruit_ILI9341::display()
 {
+    setAddrWindow(0x00, 0x00, ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT); //go home
     _dcPin->Set();
+
     _ssPin->Reset();
+    volatile uint16_t tmp;
+    for (int px = 0; px < _GRAMSIZE; px++)
+    {
+        //_spi->TransmitByte(_frameBuffer[px]>>8);
+        while (!(*SR & SPI_SR_TXE))
+            ;
+        *DR = _frameBuffer[px]>>8;
 
-    _spi->TransmitByte(color >> 8);
-    _spi->TransmitByte(color);
+        while(!(*SR & SPI_SR_RXNE))
+            ;
 
+        tmp  = *DR;
+
+        while (!(*SR & SPI_SR_TXE))
+            ;
+        *DR = _frameBuffer[px];
+
+        while(!(*SR & SPI_SR_RXNE))
+            ;
+        tmp  = *DR;
+
+
+        //_spi->TransmitByte(_frameBuffer[px]);
+    }
     _ssPin->Set();
+
+
 }
+#ifdef __GNUC__
+#pragma GCC pop_options
+#endif
+
 
 void Adafruit_ILI9341::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
@@ -218,9 +269,12 @@ void Adafruit_ILI9341::drawPixel(int16_t x, int16_t y, uint16_t color)
     if ((x < 0) || (x >= _width) || (y < 0) || (y >= _height))
         return;
 
-    setAddrWindow(x, y, x + 1, y + 1);
+//    setAddrWindow(x, y, x + 1, y + 1);
+//
+//    pushColor(color);
 
-    pushColor(color);
+    _frameBuffer[y*ILI9341_TFTWIDTH + x] = color;
+
 
 }
 
@@ -234,19 +288,24 @@ void Adafruit_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t c
     if ((y + h - 1) >= _height)
         h = _height - y;
 
-    setAddrWindow(x, y, x, y + h - 1);
-
-    uint8_t hi = color >> 8, lo = color;
-
-    _dcPin->Set();
-    _ssPin->Reset();
-
-    while (h--)
+//    setAddrWindow(x, y, x, y + h - 1);
+//
+//    uint8_t hi = color >> 8, lo = color;
+//
+//    _dcPin->Set();
+//    _ssPin->Reset();
+//
+//    while (h--)
+//    {
+//        _spi->TransmitByte(hi);
+//        _spi->TransmitByte(lo);
+//    }
+//    _ssPin->Set();
+    for (int16_t i = 0; i < h; ++i)
     {
-        _spi->TransmitByte(hi);
-        _spi->TransmitByte(lo);
+        _frameBuffer[(y+i)*ILI9341_TFTWIDTH + x] = color;
     }
-    _ssPin->Set();
+
 
 }
 
@@ -259,24 +318,43 @@ void Adafruit_ILI9341::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t c
     if ((x + w - 1) >= _width)
         w = _width - x;
 
-    setAddrWindow(x, y, x + w - 1, y);
+//    setAddrWindow(x, y, x + w - 1, y);
+//
+//    uint8_t hi = color >> 8, lo = color;
+//
+//    _dcPin->Set();
+//    _ssPin->Reset();
+//
+//    while (w--)
+//    {
+//        _spi->TransmitByte(hi);
+//        _spi->TransmitByte(lo);
+//    }
+//    _ssPin->Set();
 
-    uint8_t hi = color >> 8, lo = color;
-
-    _dcPin->Set();
-    _ssPin->Reset();
-
-    while (w--)
+    for (int16_t i = 0; i < w; ++i)
     {
-        _spi->TransmitByte(hi);
-        _spi->TransmitByte(lo);
+        _frameBuffer[y * ILI9341_TFTWIDTH + x + i] = color;
     }
-    _ssPin->Set();
+
+}
+
+void Adafruit_ILI9341::clearScreen()
+{
+    for (uint32_t i = 0; i < _GRAMSIZE/4; ++i)
+    {
+        ((uint64_t*)_frameBuffer)[i] = 0;
+    }
 }
 
 void Adafruit_ILI9341::fillScreen(uint16_t color)
 {
-    fillRect(0, 0, _width, _height, color);
+    //fillRect(0, 0, _width, _height, color);
+    for (uint16_t i = 0; i < _GRAMSIZE; ++i)
+    {
+        _frameBuffer[i] = color;
+    }
+
 }
 
 // fill a rectangle
@@ -291,22 +369,31 @@ void Adafruit_ILI9341::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint
     if ((y + h - 1) >= _height)
         h = _height - y;
 
-    setAddrWindow(x, y, x + w - 1, y + h - 1);
+//    setAddrWindow(x, y, x + w - 1, y + h - 1);
+//
+//    uint8_t hi = color >> 8, lo = color;
+//
+//    _dcPin->Set();
+//    _ssPin->Reset();
+//
+//    for (y = h; y > 0; y--)
+//    {
+//        for (x = w; x > 0; x--)
+//        {
+//            _spi->TransmitByte(hi);
+//            _spi->TransmitByte(lo);
+//        }
+//    }
+//    _ssPin->Set();
 
-    uint8_t hi = color >> 8, lo = color;
-
-    _dcPin->Set();
-    _ssPin->Reset();
-
-    for (y = h; y > 0; y--)
+    for (int16_t j = 0; j < h; ++j)
     {
-        for (x = w; x > 0; x--)
+        for (int16_t i = 0; i < w; ++i)
         {
-            _spi->TransmitByte(hi);
-            _spi->TransmitByte(lo);
+            _frameBuffer[(y+j) * ILI9341_TFTWIDTH + x + i] = color;
         }
     }
-    _ssPin->Set();
+
 }
 
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color
