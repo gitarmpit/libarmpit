@@ -10,13 +10,54 @@ static void speed_test(Adafruit_ILI9341* display)
 {
     systick_enable(TRUE);
     uint32_t t0 = millis();
-    for (int i = 0; i < 16; ++i)
+    for (int i = 0; i < 10; ++i)
     {
         display->fillScreen(ILI9341_CYAN);
+        //display->display();
     }
+    volatile uint32_t d = millis() - t0;
+    ++d;
+
     display->printf (0, 0, 4, "millis: %d\n", millis() - t0);
     while(1)
         ;
+
+}
+static void speed_test2(Adafruit_ILI9341* display)
+{
+    //systick_enable(TRUE);
+    //uint32_t t0 = millis();
+    display->setRotation(1);
+    display->setBgColor(ILI9341_CYAN);
+    display->setTextColor(ILI9341_BLACK);
+    display->fillScreen(ILI9341_CYAN);
+    display->setTextSize(4);
+
+    float f = 6.3;
+    while (1)
+    {
+        display->printf (1, 0, 4, "test1 %7.4f", f);
+        display->printf (" %7.4f", f);
+
+        display->printf (1, 1, 4, "test2 %7.4f", f);
+        display->printf (" %7.4f", f);
+        display->printf (1, 2, 4, "test3 %7.4f", f);
+        display->printf (" %7.4f", f);
+        display->printf (1, 3, 4, "test4 %7.4f", f);
+        display->printf (" %7.4f", f);
+        display->printf (1, 4, 4, "test5 %7.4f", f);
+        display->printf (" %7.4f", f);
+        display->printf (1, 5, 4, "test6 %7.4f", f);
+        display->printf (" %7.4f", f);
+        display->printf (1, 6, 4, "test7 %7.4f", f);
+        display->printf (" %7.4f", f);
+        display->printf (1, 7, 4, "test8 %7.4f", f);
+        display->printf (" %7.4f", f);
+        display->printf (1, 8, 4, "test9 %7.4f", f);
+        display->printf (" %7.4f", f);
+        f += 0.01;
+        delay(300);
+    }
 
 }
 
@@ -40,9 +81,12 @@ void test()
 
     Adafruit_ILI9341 display(spi, dcPin, rstPin, ssPin);
 
-
-    display.fillScreen(ILI9341_CYAN);
+    //display.fillScreen(ILI9341_CYAN);
+    //display.clearScreen();
+    speed_test2(&display);
     display.display();
+    while(1);
+
     display.setBgColor(ILI9341_CYAN);
     display.setTextColor(ILI9341_BLACK);
     display.setRotation(1);
