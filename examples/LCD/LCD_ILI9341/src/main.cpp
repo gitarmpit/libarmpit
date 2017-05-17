@@ -8,12 +8,15 @@
 
 static void speed_test(Adafruit_ILI9341* display)
 {
+    display->setRotation(1);
+    display->setBgColor(ILI9341_CYAN);
+    display->setTextColor(ILI9341_BLACK);
+
     systick_enable(TRUE);
     uint32_t t0 = millis();
     for (int i = 0; i < 10; ++i)
     {
         display->fillScreen(ILI9341_CYAN);
-        //display->display();
     }
     volatile uint32_t d = millis() - t0;
     ++d;
@@ -25,20 +28,18 @@ static void speed_test(Adafruit_ILI9341* display)
 }
 static void speed_test2(Adafruit_ILI9341* display)
 {
-    //systick_enable(TRUE);
-    //uint32_t t0 = millis();
+    systick_enable(TRUE);
     display->setRotation(1);
     display->setBgColor(ILI9341_CYAN);
     display->setTextColor(ILI9341_BLACK);
-    display->fillScreen(ILI9341_CYAN);
     display->setTextSize(4);
 
     float f = 6.3;
     while (1)
     {
+        uint32_t t0 = millis();
         display->printf (1, 0, 4, "test1 %7.4f", f);
         display->printf (" %7.4f", f);
-
         display->printf (1, 1, 4, "test2 %7.4f", f);
         display->printf (" %7.4f", f);
         display->printf (1, 2, 4, "test3 %7.4f", f);
@@ -56,8 +57,24 @@ static void speed_test2(Adafruit_ILI9341* display)
         display->printf (1, 8, 4, "test9 %7.4f", f);
         display->printf (" %7.4f", f);
         f += 0.01;
+        volatile uint32_t d = millis() - t0;
+        ++d; //138 ms with fast SPI and O2
         delay(300);
     }
+
+}
+
+static void speed_test3(Adafruit_ILI9341* display)
+{
+    display->setRotation(1);
+    while(1)
+    {
+        display->fillScreen(ILI9341_CYAN);
+        delay(500);
+        display->fillScreen(ILI9341_BLACK);
+        delay(500);
+    }
+
 
 }
 
@@ -83,14 +100,17 @@ void test()
 
     //display.fillScreen(ILI9341_CYAN);
     //display.clearScreen();
-    speed_test2(&display);
-    display.display();
-    while(1);
+    //speed_test2(&display);
+    //display.display();
+    //while(1);
 
-    display.setBgColor(ILI9341_CYAN);
+    display.setBgColor(ILI9341_RED);
     display.setTextColor(ILI9341_BLACK);
     display.setRotation(1);
-    display.setTextSize(2);
+    display.setTextSize(4);
+    display.write("ABCabc-123.O");
+    while(1);
+
     //display.setTextColor(ILI9340_BLACK, ILI9340_WHITE);
 
     //display.invertDisplay(true);

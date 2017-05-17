@@ -396,6 +396,7 @@ void Adafruit_ILI9341::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint
     setAddrWindow(x, y, x + w - 1, y + h - 1);
 
     uint8_t hi = color >> 8, lo = color;
+    volatile uint8_t tmp;
 
     _dcPin->Set();
     _ssPin->Reset();
@@ -411,18 +412,17 @@ void Adafruit_ILI9341::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint
                 ;
             *DR = hi; //_frameBuffer[px]>>8;
 
-    //        while(!(*SR & SPI_SR_RXNE))
-    //            ;
-
-            //tmp  = *DR;
+//            while(!(*SR & SPI_SR_RXNE))
+//                ;
+//            tmp  = *DR;
 
             while (!(*SR & SPI_SR_TXE))
                 ;
             *DR = lo; //_frameBuffer[px];
 
-    //        while(!(*SR & SPI_SR_RXNE))
-    //            ;
-            //tmp  = *DR;
+//            while(!(*SR & SPI_SR_RXNE))
+//                ;
+//            tmp  = *DR;
 
         }
     }

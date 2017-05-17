@@ -610,18 +610,17 @@ uint8_t Adafruit_GFX::write(const char *str, int16_t x, int16_t y, uint8_t size)
                 cursor_y = y*8;
             }
         }
+        uint8_t len = 0;
         if (str != NULL)
         {
-            if (str != NULL)
+            size_t size = strlen(str);
+            while (size--)
             {
-                size_t size = strlen(str);
-                while (size--)
-                {
-                    write(*str++);
-                }
+                write(*str++);
             }
+            len = strlen(str);
         }
-        return strlen(str);
+        return len;
     }
 
 }
@@ -1112,10 +1111,10 @@ void Adafruit_GFX::drawBmp(int16_t x, int16_t y, const uint8_t *bmp)
 
     if (hdr2->BitsPerPixel != 4 &&
         hdr2->BitsPerPixel != 8 &&
-		hdr2->BitsPerPixel != 16)
+        hdr2->BitsPerPixel != 16)
     {
-    	printf (0, 0, "Not supported color depth: %d", hdr2->BitsPerPixel);
-    	return;
+        printf (0, 0, "Not supported color depth: %d", hdr2->BitsPerPixel);
+        return;
     }
 
     const uint16_t* bitmap16 = (uint16_t*)&bmp[hdr1->BitmapOffset];
@@ -1129,50 +1128,50 @@ void Adafruit_GFX::drawBmp(int16_t x, int16_t y, const uint8_t *bmp)
         wread = (hdr2->Width / 2 + 1) * 2;
     }
 
-	if (hdr2->BitsPerPixel == 4)
-	{
-		wread /= 2;
-	}
+    if (hdr2->BitsPerPixel == 4)
+    {
+        wread /= 2;
+    }
 
 
     uint16_t c = 0;
     for (uint32_t j = 0; j < h; ++j)
     {
-    	uint32_t wtotal = 0;
+        uint32_t wtotal = 0;
         for (uint32_t i = 0; i < wread; ++i)
         {
-        	if (hdr2->BitsPerPixel == 4)
-        	{
-    			c = bitmap8[(hdr2->Height-j-1)*wread + i];
-        		uint16_t c1 = c>>4;
-        		uint16_t c2 = c&0xf;
+            if (hdr2->BitsPerPixel == 4)
+            {
+                c = bitmap8[(hdr2->Height-j-1)*wread + i];
+                uint16_t c1 = c>>4;
+                uint16_t c2 = c&0xf;
 
-        		if (wtotal <= hdr2->Width)
-        		{
-        			drawPixel(x + wtotal++, y + j, pal16[c1]);
-        		}
-        		if (wtotal <= hdr2->Width)
-        		{
-        			drawPixel(x + wtotal++, y + j, pal16[c2]);
-        		}
-        	}
-        	else
-        	{
-        		if (hdr2->BitsPerPixel == 16)
-        		{
-        			c = bitmap16[(hdr2->Height-j-1)*wread + i];
-        		}
-        		else if (hdr2->BitsPerPixel == 8)
-        		{
-        			c = bitmap8[(hdr2->Height-j-1)*wread + i];
-        			c = pal256[c];
-        		}
+                if (wtotal <= hdr2->Width)
+                {
+                    drawPixel(x + wtotal++, y + j, pal16[c1]);
+                }
+                if (wtotal <= hdr2->Width)
+                {
+                    drawPixel(x + wtotal++, y + j, pal16[c2]);
+                }
+            }
+            else
+            {
+                if (hdr2->BitsPerPixel == 16)
+                {
+                    c = bitmap16[(hdr2->Height-j-1)*wread + i];
+                }
+                else if (hdr2->BitsPerPixel == 8)
+                {
+                    c = bitmap8[(hdr2->Height-j-1)*wread + i];
+                    c = pal256[c];
+                }
 
-        		if (i < hdr2->Width)
-        		{
-        			drawPixel(x + i, y + j, c);
-        		}
-        	}
+                if (i < hdr2->Width)
+                {
+                    drawPixel(x + i, y + j, c);
+                }
+            }
         }
     }
 
