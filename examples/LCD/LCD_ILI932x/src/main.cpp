@@ -20,7 +20,7 @@
 #define WHITE   0xFFFF
 
 //#include "Adafruit_GFX.h"
-#include "ST7781/registers.h"
+#include "932x/registers.h"
 #define TFTWIDTH   240
 #define TFTHEIGHT  320
 #define TFTLCD_DELAY 0xFF
