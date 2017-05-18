@@ -5,12 +5,37 @@
 #include "Adafruit_ILI9341.h"
 #include "debug.h"
 #include "system_time.h"
-#include "fonts/FreeMono24pt7b.h"
-#include "fonts/FreeMonoBold18pt7b.h"
-#include "fonts/FreeSans18pt7b.h"
-#include "fonts/FreeMonoBoldOblique18pt7b.h"  //italic
-#include "fonts/Org_01.h"
-#include "fonts/FreeSerif24pt7b.h"
+//#include "fonts/FreeMono24pt7b.h"
+//#include "fonts/FreeMonoBold18pt7b.h"
+//#include "fonts/FreeSans18pt7b.h"
+//#include "fonts/FreeMonoBoldOblique18pt7b.h"  //italic
+//#include "fonts/Org_01.h"
+//#include "fonts/FreeSerif24pt7b.h"
+#include "fonts/7seg_9.h"
+
+static void test4(Adafruit_ILI9341* display)
+{
+    systick_enable(TRUE);
+    //display->setTextSize(4);
+
+    uint32_t t0 = millis();
+
+    for (int i = 0; i < 10; ++i)
+    {
+        display->setCursor(0, 24);
+        display->write("Job2d724e6a-7680-4a38-bc93-477280c5bc9e.xml");
+    }
+
+    volatile uint32_t t = millis() - t0;
+
+    ++t;
+
+
+    while(1)
+        ;
+
+}
+
 void test()
 {
     delay(10);
@@ -37,10 +62,12 @@ void test()
     //while(1);
 
     //display.setBgColor();
-    display.setTextColor(ILI9341_BLACK, ILI9341_RED);
+    display.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
     display.setRotation(1);
     display.setTextSize(1);
-    display.fillScreen(ILI9341_RED);
+    display.fillScreen(ILI9341_BLACK);
+    //display.setFont(&consola_ttf);
+    //test4 (&display);
 
     //display.setTextColor(ILI9340_BLACK, ILI9340_WHITE);
 
@@ -54,10 +81,17 @@ void test()
 
     //display.write("ABCabc-12345");
     display.setCursor(0, 24);
-    //display.setFont(&FreeSans18pt7b);
-    //display.setFont(&FreeSerif24pt7b);
-    display.setFont(&FreeMonoBold18pt7b);
-    display.write("ABCabc-123.O");
+    //display.setFont(&DSEG7ModernMini_BoldItalic_ttf);
+    display.setFont(&digital_7_monoitalic_ttf);
+    display.setCursor(50, 120);
+    display.write ("11:32");
+
+    //display.write("ABCabc-123.O");
+    //display.write(L"ÆÏÐÇ");
+    //display.write(1046);
+    //display.write(371);
+    //display.write(421);
+    //display.write(521);
     //display.drawChar(0, 30, 'A', ILI9341_RED, 0, 1);
 
     //display.display();

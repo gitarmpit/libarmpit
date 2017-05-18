@@ -90,7 +90,7 @@ class Adafruit_GFX
       int16_t w, int16_t h),
     drawRGBBitmap(int16_t x, int16_t y,
       uint16_t *bitmap, uint8_t *mask, int16_t w, int16_t h),
-    drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color,
+    drawChar(int16_t x, int16_t y, uint16_t c, uint16_t color,
       uint16_t bg, uint8_t size),
     setCursor(int16_t x, int16_t y),
     setTextColor(uint16_t c),
@@ -104,8 +104,9 @@ class Adafruit_GFX
 //    getTextBounds(const __FlashStringHelper *s, int16_t x, int16_t y,
 //      int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h);
 
-  virtual void   write(uint8_t);
+  virtual void   writeChar(uint16_t);
   uint8_t write(const char *str);
+  uint8_t write(const wchar_t *str);
 
   int16_t height(void) const;
   int16_t width(void) const;

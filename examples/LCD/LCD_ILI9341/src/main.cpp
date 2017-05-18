@@ -77,6 +77,33 @@ static void speed_test3(Adafruit_ILI9341* display)
 
 
 }
+static void speed_test4(Adafruit_ILI9341* display)
+{
+    systick_enable(TRUE);
+    display->setRotation(1);
+    display->setBgColor(ILI9341_CYAN);
+    display->setTextColor(ILI9341_BLACK);
+    display->setTextSize(4);
+
+    uint32_t t0 = millis();
+
+    for (int i = 0; i < 10; ++i)
+    {
+        display->setCursor(0, 0);
+        display->write("ABCDEFGH1234");
+    }
+
+    volatile uint32_t t = millis() - t0;
+
+    ++t;
+
+
+    while(1)
+        ;
+
+}
+
+
 
 void test()
 {
@@ -100,7 +127,9 @@ void test()
 
     //display.fillScreen(ILI9341_CYAN);
     //display.clearScreen();
-    //speed_test2(&display);
+
+    speed_test4(&display);
+
     //display.display();
     //while(1);
 

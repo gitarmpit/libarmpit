@@ -35,6 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "glcdfont.c"
 #include <string.h>
 #include <stdlib.h>
+#include <wchar.h>
 
 // Many (but maybe not all) non-AVR board installs define macros
 // for compatibility with existing PROGMEM-reading AVR code.
@@ -704,7 +705,7 @@ void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
 // TEXT- AND CHARACTER-HANDLING FUNCTIONS ----------------------------------
 
 // Draw a character
-void Adafruit_GFX::drawChar(int16_t x, int16_t y, unsigned char c,
+void Adafruit_GFX::drawChar(int16_t x, int16_t y, uint16_t c,
   uint16_t color, uint16_t bg, uint8_t size) {
 
     if(!gfxFont) { // 'Classic' built-in font
@@ -804,7 +805,7 @@ void Adafruit_GFX::drawChar(int16_t x, int16_t y, unsigned char c,
     } // End classic vs custom font
 }
 
-void Adafruit_GFX::write(uint8_t c) {
+void Adafruit_GFX::writeChar(uint16_t c) {
     if(!gfxFont) { // 'Classic' built-in font
 
         if(c == '\n') {                        // Newline?
@@ -826,8 +827,8 @@ void Adafruit_GFX::write(uint8_t c) {
             cursor_y += (int16_t)textsize *
                         (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
         } else if(c != '\r') {
-            uint8_t first = pgm_read_byte(&gfxFont->first);
-            if((c >= first) && (c <= (uint8_t)pgm_read_byte(&gfxFont->last))) {
+            uint16_t first = gfxFont->first;
+            if((c >= first) && (c <= gfxFont->last)) {
                 GFXglyph *glyph = &(((GFXglyph *)pgm_read_pointer(
                   &gfxFont->glyph))[c - first]);
                 uint8_t   w     = pgm_read_byte(&glyph->width),
@@ -856,13 +857,30 @@ uint8_t Adafruit_GFX::write(const char *str)
         size_t size = strlen(str);
         while (size--)
         {
-            write(*str++);
+            writeChar(*str++);
         }
         len = strlen(str);
     }
     return len;
 
 }
+
+uint8_t Adafruit_GFX::write(const wchar_t *str)
+{
+    uint8_t len = 0;
+    if (str != 0)
+    {
+        size_t size = wcslen(str);
+        while (size--)
+        {
+            writeChar(*str++);
+        }
+        len = wcslen(str);
+    }
+    return len;
+
+}
+
 
 void Adafruit_GFX::setCursor(int16_t x, int16_t y) {
     cursor_x = x;
@@ -953,7 +971,7 @@ void Adafruit_GFX::charBounds(char c, int16_t *x, int16_t *y,
             *x  = 0;    // Reset x to zero, advance y by one line
             *y += textsize * (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
         } else if(c != '\r') { // Not a carriage return; is normal char
-            uint8_t first = pgm_read_byte(&gfxFont->first),
+            uint16_t first = pgm_read_byte(&gfxFont->first),
                     last  = pgm_read_byte(&gfxFont->last);
             if((c >= first) && (c <= last)) { // Char present in this font?
                 GFXglyph *glyph = &(((GFXglyph *)pgm_read_pointer(
