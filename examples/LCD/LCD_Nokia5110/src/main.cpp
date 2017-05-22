@@ -10,8 +10,11 @@
 #include "spi_cpp.h"
 #include "usart_cpp.h"
 #include "debug.h"
-
-
+#include "fonts/consola6.h"
+#include "fonts/TomThumb.h"
+#include "fonts/calibri6.h"
+#include "fonts/cour4.h"
+#include "fonts/tahoma6.h"
 
 //Vref = 3.3 * adc_res / 4095;  3.3*1480/4095= 1.193
 
@@ -49,210 +52,143 @@ public:
 };
 
 
-static void bat(Adafruit_Nokia5110* display)
-{
-    GPIOA* gpioA = GPIOA::GetInstance();
-    gpioA->EnablePeripheralClock(true);
-    gpioA->SetupGPIO_InAnalog(GPIO_PIN2);
-    ADC1* adc1 = ADC1::GetInstance();
-    adc1->Enable(true);
-    adc1->EnableTempVref(true);
-    adc1->AddJConversion (ADC_VREFINT, ADC_SMP_SLOWEST);
-    adc1->AddJConversion (ADC_IN2, ADC_SMP_SLOWEST);
-    char buf[8];
-    volatile uint32_t adc_vref, adc_r1;
-
-    float schottky_drop = 0.326;
-    while (1)
-    {
-        display->clearDisplay();
-        adc1->SingleJConversion();
-        adc_r1 = adc1->GetJData2();
-        adc_vref = adc1->GetJData1();
-
-        //volatile float v = 1.196 / adc_res * 4095;
-        //fix16_to_str (fix16_from_float(v), buf, 3);
-
-        //display->drawString(buf, 0, 0, 2);
-        //display->display();
-        delay(100);
-    }
-
-
-}
-
-static uint8_t avg (uint8_t* buf, uint8_t cnt)
-{
-    uint32_t total = 0;
-    for (uint8_t i = 0; i < cnt; ++i)
-    {
-        total += buf[i];
-    }
-    return total / cnt;
-}
-
-static void test_proximity()
-{
-    delay(10);
-    GPIOA* portA = GPIOA::GetInstance();
-    GPIOB* portB = GPIOB::GetInstance();
-    portA->EnablePeripheralClock(true);
-    portB->EnablePeripheralClock(true);
-
-    //Too fast won't work, check clock and baud rate
-    SPI* lcdSpi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_8);
-
-    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN2);
-    rstPin->SetupGPIO_OutPP();
-    rstPin->SetSpeedHigh();
-
-    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN1);
-    dcPin->SetupGPIO_OutPP();
-    dcPin->SetSpeedHigh();
-
-    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
-    ssPin->SetupGPIO_OutPP();
-    ssPin->SetSpeedHigh();
-
-
-    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
-    lcd.Init(0xbc);
-    lcd.clearDisplay();
-    lcd.display();
-
-    GPIOB::GetInstance()->EnablePeripheralClock(true);
-
-
-    SPI* sonarSpi = GPIO_Helper::SetupSPI(SPI2_PB_13_14_15, true, false, false, SPI_BAUD_RATE_16);
-
-    lcd.write ("Warming up...", 0, 0);
-    lcd.display();
-    delay(3000);
-    sonarSpi->TransmitByte(0x1);
-    sonarSpi->TransmitByte(0x4);
-    sonarSpi->TransmitByte(0x5);
-
-    char buf[64];
-    uint8_t fifo[100];
-    uint8_t i = 0;
-    volatile uint8_t rec;
-
-//    for (uint8_t i = 0; i < 100; ++i)
+//static void bat(Adafruit_Nokia5110* display)
+//{
+//    GPIOA* gpioA = GPIOA::GetInstance();
+//    gpioA->EnablePeripheralClock(true);
+//    gpioA->SetupGPIO_InAnalog(GPIO_PIN2);
+//    ADC1* adc1 = ADC1::GetInstance();
+//    adc1->Enable(true);
+//    adc1->EnableTempVref(true);
+//    adc1->AddJConversion (ADC_VREFINT, ADC_SMP_SLOWEST);
+//    adc1->AddJConversion (ADC_IN2, ADC_SMP_SLOWEST);
+//    char buf[8];
+//    volatile uint32_t adc_vref, adc_r1;
+//
+//    float schottky_drop = 0.326;
+//    while (1)
 //    {
-//        fifo[i] = spi2->TransmitByte(0x0);
-//        delay(50);
+//        display->clearDisplay();
+//        adc1->SingleJConversion();
+//        adc_r1 = adc1->GetJData2();
+//        adc_vref = adc1->GetJData1();
+//
+//        //volatile float v = 1.196 / adc_res * 4095;
+//        //fix16_to_str (fix16_from_float(v), buf, 3);
+//
+//        //display->drawString(buf, 0, 0, 2);
+//        //display->display();
+//        delay(100);
 //    }
-
-    while(1)
-    {
-        lcd.clearDisplay();
-        //sprintf (buf, "Master tx: %d", b);
-        //display.write(0, 1, buf);
-
-        //fifo [i++ % 100] = spi2->TransmitByte(0x0);
-        //rec = avg(fifo, 100);
-        rec = sonarSpi->TransmitByte(0x0);
-        lcd.printf(1, 0, 4, "%d", buf);
-        //++b;
-        lcd.display();
-        //delay(10);
-    }
-
-
-
-    while(1)
-        ;
-}
-
-static void test_uart()
-{
-    uint32_t clockSpeed = 9600;
-    USART* usart = GPIO_Helper::SetupUSART(USART1_PA_9_10, clockSpeed);
-
-    while(1)
-    {
-        while (!usart->IsRXNE())
-            ;
-
-        {
-            if (usart->Receive() == 23)
-            {
-                usart->SendByte(47);
-            }
-        }
-
-    }
-
-}
+//
+//
+//}
+//
+//static uint8_t avg (uint8_t* buf, uint8_t cnt)
+//{
+//    uint32_t total = 0;
+//    for (uint8_t i = 0; i < cnt; ++i)
+//    {
+//        total += buf[i];
+//    }
+//    return total / cnt;
+//}
+//
+//static void test_proximity()
+//{
+//    delay(10);
+//    GPIOA* portA = GPIOA::GetInstance();
+//    GPIOB* portB = GPIOB::GetInstance();
+//    portA->EnablePeripheralClock(true);
+//    portB->EnablePeripheralClock(true);
+//
+//    //Too fast won't work, check clock and baud rate
+//    SPI* lcdSpi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_8);
+//
+//    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN2);
+//    rstPin->SetupGPIO_OutPP();
+//    rstPin->SetSpeedHigh();
+//
+//    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN1);
+//    dcPin->SetupGPIO_OutPP();
+//    dcPin->SetSpeedHigh();
+//
+//    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
+//    ssPin->SetupGPIO_OutPP();
+//    ssPin->SetSpeedHigh();
+//
+//
+//    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
+//    lcd.Init(0xbc);
+//    lcd.clearDisplay();
+//    lcd.display();
+//
+//    GPIOB::GetInstance()->EnablePeripheralClock(true);
+//
+//
+//    SPI* sonarSpi = GPIO_Helper::SetupSPI(SPI2_PB_13_14_15, true, false, false, SPI_BAUD_RATE_16);
+//
+//    lcd.write ("Warming up...", 0, 0);
+//    lcd.display();
+//    delay(3000);
+//    sonarSpi->TransmitByte(0x1);
+//    sonarSpi->TransmitByte(0x4);
+//    sonarSpi->TransmitByte(0x5);
+//
+//    char buf[64];
+//    uint8_t fifo[100];
+//    uint8_t i = 0;
+//    volatile uint8_t rec;
+//
+////    for (uint8_t i = 0; i < 100; ++i)
+////    {
+////        fifo[i] = spi2->TransmitByte(0x0);
+////        delay(50);
+////    }
+//
+//    while(1)
+//    {
+//        lcd.clearDisplay();
+//        //sprintf (buf, "Master tx: %d", b);
+//        //display.write(0, 1, buf);
+//
+//        //fifo [i++ % 100] = spi2->TransmitByte(0x0);
+//        //rec = avg(fifo, 100);
+//        rec = sonarSpi->TransmitByte(0x0);
+//        lcd.printf(1, 0, 4, "%d", buf);
+//        //++b;
+//        lcd.display();
+//        //delay(10);
+//    }
+//
+//
+//
+//    while(1)
+//        ;
+//}
+//
+//static void test_uart()
+//{
+//    uint32_t clockSpeed = 9600;
+//    USART* usart = GPIO_Helper::SetupUSART(USART1_PA_9_10, clockSpeed);
+//
+//    while(1)
+//    {
+//        while (!usart->IsRXNE())
+//            ;
+//
+//        {
+//            if (usart->Receive() == 23)
+//            {
+//                usart->SendByte(47);
+//            }
+//        }
+//
+//    }
+//
+//}
 
 static void test_display()
-{
-    delay(10);
-    GPIOA* portA = GPIOA::GetInstance();
-    GPIOB* portB = GPIOB::GetInstance();
-    portA->EnablePeripheralClock(true);
-    portB->EnablePeripheralClock(true);
-
-    //Too fast won't work, check clock and baud rate
-    SPI* lcdSpi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_2);
-
-    volatile uint32_t* DR;
-    volatile uint32_t* SR;
-
-    DR = lcdSpi->GetDRAddr();
-    SR = lcdSpi->GetSRAddr();
-    volatile uint8_t b;
-    while(1)
-    {
-        while (!(*SR & SPI_SR_TXE))
-            ;
-
-        *DR = 0x18;
-
-//        while(!(*SR & SPI_SR_RXNE))
-//            ;
-
-        //b = *DR;
-
-    }
-
-///////////////////////////
-    while(1)
-    {
-        lcdSpi->TransmitByte(0x18);
-    }
-
-
-//////////////////////////////
-
-
-    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN2);
-    rstPin->SetupGPIO_OutPP();
-    rstPin->SetSpeedHigh();
-
-    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN1);
-    dcPin->SetupGPIO_OutPP();
-    dcPin->SetSpeedHigh();
-
-    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
-    ssPin->SetupGPIO_OutPP();
-    ssPin->SetSpeedHigh();
-
-
-    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
-    lcd.Init(0xbc);
-    lcd.clearDisplay();
-    lcd.setRotation(2);
-    lcd.write ("test", 0, 0);
-
-    while(1)
-    {
-        lcd.display();
-    }
-
-}
-
-static void test_uart2()
 {
     delay(10);
     GPIOA* portA = GPIOA::GetInstance();
@@ -278,50 +214,91 @@ static void test_uart2()
 
     Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
     lcd.Init(0xbc);
-    //bat(&display);
-
-    lcd.write("123", 0, 0, 6);
-    lcd.write("123", 1, 1, 6);
+    lcd.clearDisplay();
+    //lcd.setRotation(2); //upside down
+    lcd.setTextSize(2);
+    lcd.write("testOAWtestM\n\n");
+    //lcd.setFont(&cour4);
+    lcd.setCursor(0, 2);
+    //lcd.write("testOAWtestM");
     lcd.display();
-
-    uint32_t clockSpeed = 9600;
-    USART* usart = GPIO_Helper::SetupUSART(USART1_PA_9_10, clockSpeed);
 
     while(1)
     {
-        while (!usart->IsRXNE())
-            ;
-
-        {
-            if (usart->Receive() == 23)
-            {
-                usart->SendByte(47);
-                lcd.clearDisplay();
-                lcd.write("Rx", 1, 1, 4);
-                lcd.display();
-            }
-        }
-
     }
-
-
-
-    while(1)
-        ;
-
-    //0xb4, 0x14 default
-    //0xb1 - lighter 0xbf - darker
-    
-    //red ones
-    //display.Init(0xac);
-    
-    //display.Init();
-
-    //new blue
-    //display.Init(0xbc);
 
 }
 
+//static void test_uart2()
+//{
+//    delay(10);
+//    GPIOA* portA = GPIOA::GetInstance();
+//    GPIOB* portB = GPIOB::GetInstance();
+//    portA->EnablePeripheralClock(true);
+//    portB->EnablePeripheralClock(true);
+//
+//    //Too fast won't work, check clock and baud rate
+//    SPI* lcdSpi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_16);
+//
+//    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN2);
+//    rstPin->SetupGPIO_OutPP();
+//    rstPin->SetSpeedHigh();
+//
+//    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN1);
+//    dcPin->SetupGPIO_OutPP();
+//    dcPin->SetSpeedHigh();
+//
+//    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
+//    ssPin->SetupGPIO_OutPP();
+//    ssPin->SetSpeedHigh();
+//
+//
+//    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
+//    lcd.Init(0xbc);
+//    //bat(&display);
+//
+//    lcd.write("123", 0, 0, 6);
+//    lcd.write("123", 1, 1, 6);
+//    lcd.display();
+//
+//    uint32_t clockSpeed = 9600;
+//    USART* usart = GPIO_Helper::SetupUSART(USART1_PA_9_10, clockSpeed);
+//
+//    while(1)
+//    {
+//        while (!usart->IsRXNE())
+//            ;
+//
+//        {
+//            if (usart->Receive() == 23)
+//            {
+//                usart->SendByte(47);
+//                lcd.clearDisplay();
+//                lcd.write("Rx", 1, 1, 4);
+//                lcd.display();
+//            }
+//        }
+//
+//    }
+//
+//
+//
+//    while(1)
+//        ;
+//
+//    //0xb4, 0x14 default
+//    //0xb1 - lighter 0xbf - darker
+//
+//    //red ones
+//    //display.Init(0xac);
+//
+//    //display.Init();
+//
+//    //new blue
+//    //display.Init(0xbc);
+//
+//}
+//
 
 int main()
 {
@@ -331,6 +308,8 @@ int main()
     RCC_EnableHSI_168Mhz();
 #elif defined (STM32F411xE) || defined(STM32F2)
     RCC_EnableHSI_100Mhz();
+#elif defined(STM32F401xC)
+    RCC_EnableHSI_84Mhz();
 #endif
 
     test_display();

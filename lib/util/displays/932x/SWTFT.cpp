@@ -40,7 +40,6 @@ void SWTFT::init(void) {
 
   rotation  = 0;
   cursor_y  = cursor_x = 0;
-  textsize  = 1;
   fgcolor = 0xFFFF;
   _width    = TFTWIDTH;
   _height   = TFTHEIGHT;

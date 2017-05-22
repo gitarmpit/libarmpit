@@ -52,8 +52,7 @@ Adafruit_Nokia5110::Adafruit_Nokia5110(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstP
     _dcPin = dcPin;
     _rstPin = rstPin;
     _ssPin = ssPin;
-    setBgColor(0);
-    setTextColor(1);
+    setTextColor(1, 0);
 }
 
 

@@ -125,19 +125,20 @@ void test()
 
     Adafruit_ILI9341 display(spi, dcPin, rstPin, ssPin);
 
-    //display.fillScreen(ILI9341_CYAN);
+    display.fillScreen(ILI9341_BLACK);
     //display.clearScreen();
 
-    speed_test4(&display);
+    //speed_test4(&display);
 
     //display.display();
     //while(1);
 
-    display.setBgColor(ILI9341_RED);
-    display.setTextColor(ILI9341_BLACK);
+    display.setBgColor(ILI9341_BLACK);
+    display.setTextColor(ILI9341_WHITE);
     display.setRotation(1);
-    display.setTextSize(4);
-    display.write("ABCabc-123.O");
+    display.setTextSize(7);
+    display.setCursor(4, 3);
+    display.write("11:45");
     while(1);
 
     //display.setTextColor(ILI9340_BLACK, ILI9340_WHITE);

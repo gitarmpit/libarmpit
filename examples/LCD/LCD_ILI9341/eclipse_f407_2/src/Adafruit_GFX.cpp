@@ -36,29 +36,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "ee_printf.h"
 
-// Many (but maybe not all) non-AVR board installs define macros
-// for compatibility with existing PROGMEM-reading AVR code.
-// Do our own checks and defines here for good measure...
-
-#ifndef pgm_read_byte
- #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-#endif
-#ifndef pgm_read_word
- #define pgm_read_word(addr) (*(const unsigned short *)(addr))
-#endif
-#ifndef pgm_read_dword
- #define pgm_read_dword(addr) (*(const unsigned long *)(addr))
-#endif
-
-// Pointers are a peculiar case...typically 16-bit on AVR boards,
-// 32 bits elsewhere.  Try to accommodate both...
-
-#if !defined(__INT_MAX__) || (__INT_MAX__ > 0xFFFF)
- #define pgm_read_pointer(addr) ((void *)pgm_read_dword(addr))
-#else
- #define pgm_read_pointer(addr) ((void *)pgm_read_word(addr))
-#endif
 
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
@@ -75,11 +54,11 @@ WIDTH(w), HEIGHT(h)
     _height   = HEIGHT;
     rotation  = 0;
     cursor_y  = cursor_x    = 0;
-    textsize  = 1;
-    textcolor = textbgcolor = 0xFFFF;
+    fgcolor = bgcolor = 0xFFFF;
     wrap      = true;
-    _cp437    = false;
     gfxFont   = 0;
+    yAdvance  = 0;
+    xAdvance  = 1;
 }
 
 // Bresenham's algorithm - thx wikpedia
@@ -455,289 +434,36 @@ void Adafruit_GFX::fillTriangle(int16_t x0, int16_t y0,
     endWrite();
 }
 
-// BITMAP / XBITMAP / GRAYSCALE / RGB BITMAP FUNCTIONS ---------------------
-
-// Draw a PROGMEM-resident 1-bit image at the specified (x,y) position,
-// using the specified foreground color (unset bits are transparent).
-void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
-  const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color) {
-
-    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
-    uint8_t byte = 0;
-
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++) {
-            if(i & 7) byte <<= 1;
-            else      byte   = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
-            if(byte & 0x80) writePixel(x+i, y, color);
-        }
-    }
-    endWrite();
-}
-
-// Draw a PROGMEM-resident 1-bit image at the specified (x,y) position,
-// using the specified foreground (for set bits) and background (unset
-// bits) colors.
-void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
-  const uint8_t bitmap[], int16_t w, int16_t h,
-  uint16_t color, uint16_t bg) {
-
-    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
-    uint8_t byte = 0;
-
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            if(i & 7) byte <<= 1;
-            else      byte   = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
-            writePixel(x+i, y, (byte & 0x80) ? color : bg);
-        }
-    }
-    endWrite();
-}
-
-// Draw a RAM-resident 1-bit image at the specified (x,y) position,
-// using the specified foreground color (unset bits are transparent).
-void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
-  uint8_t *bitmap, int16_t w, int16_t h, uint16_t color) {
-
-    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
-    uint8_t byte = 0;
-
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            if(i & 7) byte <<= 1;
-            else      byte   = bitmap[j * byteWidth + i / 8];
-            if(byte & 0x80) writePixel(x+i, y, color);
-        }
-    }
-    endWrite();
-}
-
-// Draw a RAM-resident 1-bit image at the specified (x,y) position,
-// using the specified foreground (for set bits) and background (unset
-// bits) colors.
-void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
-  uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg) {
-
-    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
-    uint8_t byte = 0;
-
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            if(i & 7) byte <<= 1;
-            else      byte   = bitmap[j * byteWidth + i / 8];
-            writePixel(x+i, y, (byte & 0x80) ? color : bg);
-        }
-    }
-    endWrite();
-}
-
-// Draw PROGMEM-resident XBitMap Files (*.xbm), exported from GIMP,
-// Usage: Export from GIMP to *.xbm, rename *.xbm to *.c and open in editor.
-// C Array can be directly used with this function.
-// There is no RAM-resident version of this function; if generating bitmaps
-// in RAM, use the format defined by drawBitmap() and call that instead.
-void Adafruit_GFX::drawXBitmap(int16_t x, int16_t y,
-  const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color) {
-
-    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
-    uint8_t byte = 0;
-
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            if(i & 7) byte >>= 1;
-            else      byte   = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
-            // Nearly identical to drawBitmap(), only the bit order
-            // is reversed here (left-to-right = LSB to MSB):
-            if(byte & 0x01) writePixel(x+i, y, color);
-        }
-    }
-    endWrite();
-}
-
-// Draw a PROGMEM-resident 8-bit image (grayscale) at the specified (x,y)
-// pos.  Specifically for 8-bit display devices such as IS31FL3731;
-// no color reduction/expansion is performed.
-void Adafruit_GFX::drawGrayscaleBitmap(int16_t x, int16_t y,
-  const uint8_t bitmap[], int16_t w, int16_t h) {
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            writePixel(x+i, y, (uint8_t)pgm_read_byte(&bitmap[j * w + i]));
-        }
-    }
-    endWrite();
-}
-
-// Draw a RAM-resident 8-bit image (grayscale) at the specified (x,y)
-// pos.  Specifically for 8-bit display devices such as IS31FL3731;
-// no color reduction/expansion is performed.
-void Adafruit_GFX::drawGrayscaleBitmap(int16_t x, int16_t y,
-  uint8_t *bitmap, int16_t w, int16_t h) {
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            writePixel(x+i, y, bitmap[j * w + i]);
-        }
-    }
-    endWrite();
-}
-
-// Draw a PROGMEM-resident 8-bit image (grayscale) with a 1-bit mask
-// (set bits = opaque, unset bits = clear) at the specified (x,y) position.
-// BOTH buffers (grayscale and mask) must be PROGMEM-resident.
-// Specifically for 8-bit display devices such as IS31FL3731;
-// no color reduction/expansion is performed.
-void Adafruit_GFX::drawGrayscaleBitmap(int16_t x, int16_t y,
-  const uint8_t bitmap[], const uint8_t mask[],
-  int16_t w, int16_t h) {
-    int16_t bw   = (w + 7) / 8; // Bitmask scanline pad = whole byte
-    uint8_t byte = 0;
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            if(i & 7) byte <<= 1;
-            else      byte   = pgm_read_byte(&mask[j * bw + i / 8]);
-            if(byte & 0x80) {
-                writePixel(x+i, y, (uint8_t)pgm_read_byte(&bitmap[j * w + i]));
-            }
-        }
-    }
-    endWrite();
-}
-
-// Draw a RAM-resident 8-bit image (grayscale) with a 1-bit mask
-// (set bits = opaque, unset bits = clear) at the specified (x,y) pos.
-// BOTH buffers (grayscale and mask) must be RAM-resident, no mix-and-
-// match.  Specifically for 8-bit display devices such as IS31FL3731;
-// no color reduction/expansion is performed.
-void Adafruit_GFX::drawGrayscaleBitmap(int16_t x, int16_t y,
-  uint8_t *bitmap, uint8_t *mask, int16_t w, int16_t h) {
-    int16_t bw   = (w + 7) / 8; // Bitmask scanline pad = whole byte
-    uint8_t byte = 0;
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            if(i & 7) byte <<= 1;
-            else      byte   = mask[j * bw + i / 8];
-            if(byte & 0x80) {
-                writePixel(x+i, y, bitmap[j * w + i]);
-            }
-        }
-    }
-    endWrite();
-}
-
-// Draw a PROGMEM-resident 16-bit image (RGB 5/6/5) at the specified (x,y)
-// position.  For 16-bit display devices; no color reduction performed.
-void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
-  const uint16_t bitmap[], int16_t w, int16_t h) {
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            writePixel(x+i, y, pgm_read_word(&bitmap[j * w + i]));
-        }
-    }
-    endWrite();
-}
-
-// Draw a RAM-resident 16-bit image (RGB 5/6/5) at the specified (x,y)
-// position.  For 16-bit display devices; no color reduction performed.
-void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
-  uint16_t *bitmap, int16_t w, int16_t h) {
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            writePixel(x+i, y, bitmap[j * w + i]);
-        }
-    }
-    endWrite();
-}
-
-// Draw a PROGMEM-resident 16-bit image (RGB 5/6/5) with a 1-bit mask
-// (set bits = opaque, unset bits = clear) at the specified (x,y) position.
-// BOTH buffers (color and mask) must be PROGMEM-resident.
-// For 16-bit display devices; no color reduction performed.
-void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
-  const uint16_t bitmap[], const uint8_t mask[],
-  int16_t w, int16_t h) {
-    int16_t bw   = (w + 7) / 8; // Bitmask scanline pad = whole byte
-    uint8_t byte = 0;
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            if(i & 7) byte <<= 1;
-            else      byte   = pgm_read_byte(&mask[j * bw + i / 8]);
-            if(byte & 0x80) {
-                writePixel(x+i, y, pgm_read_word(&bitmap[j * w + i]));
-            }
-        }
-    }
-    endWrite();
-}
-
-// Draw a RAM-resident 16-bit image (RGB 5/6/5) with a 1-bit mask
-// (set bits = opaque, unset bits = clear) at the specified (x,y) pos.
-// BOTH buffers (color and mask) must be RAM-resident, no mix-and-match.
-// For 16-bit display devices; no color reduction performed.
-void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
-  uint16_t *bitmap, uint8_t *mask, int16_t w, int16_t h) {
-    int16_t bw   = (w + 7) / 8; // Bitmask scanline pad = whole byte
-    uint8_t byte = 0;
-    startWrite();
-    for(int16_t j=0; j<h; j++, y++) {
-        for(int16_t i=0; i<w; i++ ) {
-            if(i & 7) byte <<= 1;
-            else      byte   = mask[j * bw + i / 8];
-            if(byte & 0x80) {
-                writePixel(x+i, y, bitmap[j * w + i]);
-            }
-        }
-    }
-    endWrite();
-}
 
 // TEXT- AND CHARACTER-HANDLING FUNCTIONS ----------------------------------
 
 // Draw a character
 void Adafruit_GFX::drawChar(int16_t x, int16_t y, uint16_t c,
-  uint16_t color, uint16_t bg, uint8_t size) {
+  uint16_t color, uint16_t bg) {
 
     if(!gfxFont) { // 'Classic' built-in font
 
         if((x >= _width)            || // Clip right
            (y >= _height)           || // Clip bottom
-           ((x + 6 * size - 1) < 0) || // Clip left
-           ((y + 8 * size - 1) < 0))   // Clip top
+           ((x + 6 - 1) < 0) || // Clip left
+           ((y + 8 - 1) < 0))   // Clip top
             return;
 
-        if(!_cp437 && (c >= 176)) c++; // Handle 'classic' charset behavior
+        if((c >= 176)) c++; // Handle 'classic' charset behavior
 
         startWrite();
         for(int8_t i=0; i<5; i++ ) { // Char bitmap = 5 columns
-            uint8_t line = pgm_read_byte(&font[c * 5 + i]);
+            uint8_t line = font[c * 5 + i];
             for(int8_t j=0; j<8; j++, line >>= 1) {
                 if(line & 1) {
-                    if(size == 1)
-                        writePixel(x+i, y+j, color);
-                    else
-                        writeFillRect(x+i*size, y+j*size, size, size, color);
+                    writePixel(x+i, y+j, color);
                 } else if(bg != color) {
-                    if(size == 1)
-                        writePixel(x+i, y+j, bg);
-                    else
-                        writeFillRect(x+i*size, y+j*size, size, size, bg);
+                    writePixel(x+i, y+j, bg);
                 }
             }
         }
         if(bg != color) { // If opaque, draw vertical line for last column
-            if(size == 1) writeFastVLine(x+5, y, 8, bg);
-            else          writeFillRect(x+5*size, y, size, 8*size, bg);
+            writeFastVLine(x+5, y, 8, bg);
         }
         endWrite();
 
@@ -747,23 +473,19 @@ void Adafruit_GFX::drawChar(int16_t x, int16_t y, uint16_t c,
         // newlines, returns, non-printable characters, etc.  Calling
         // drawChar() directly with 'bad' characters of font may cause mayhem!
 
-        c -= (uint8_t)pgm_read_byte(&gfxFont->first);
-        GFXglyph *glyph  = &(((GFXglyph *)pgm_read_pointer(&gfxFont->glyph))[c]);
-        uint8_t  *bitmap = (uint8_t *)pgm_read_pointer(&gfxFont->bitmap);
+        c -= gfxFont->first;
+        GFXglyph *glyph  = &gfxFont->glyph[c];
+        uint8_t  *bitmap = gfxFont->bitmap;
 
-        uint16_t bo = pgm_read_word(&glyph->bitmapOffset);
-        uint8_t  w  = pgm_read_byte(&glyph->width),
-                 h  = pgm_read_byte(&glyph->height);
-        int8_t   xo = pgm_read_byte(&glyph->xOffset),
-                 yo = pgm_read_byte(&glyph->yOffset);
+        uint16_t bo = glyph->bitmapOffset;
+        uint8_t  w  = glyph->width,
+                 h  = glyph->height;
+        int8_t   xo = glyph->xOffset,
+                 yo = glyph->yOffset;
         uint8_t  xx, yy, bits = 0, bit = 0;
         int16_t  xo16 = 0, yo16 = 0;
 
 
-        if(size > 1) {
-            xo16 = xo;
-            yo16 = yo;
-        }
 
         // Todo: Add character clipping here
 
@@ -787,15 +509,10 @@ void Adafruit_GFX::drawChar(int16_t x, int16_t y, uint16_t c,
         for(yy=0; yy<h; yy++) {
             for(xx=0; xx<w; xx++) {
                 if(!(bit++ & 7)) {
-                    bits = pgm_read_byte(&bitmap[bo++]);
+                    bits = bitmap[bo++];
                 }
                 if(bits & 0x80) {
-                    if(size == 1) {
-                        writePixel(x+xo+xx, y+yo+yy, color);
-                    } else {
-                        writeFillRect(x+(xo16+xx)*size, y+(yo16+yy)*size,
-                          size, size, color);
-                    }
+                    writePixel(x+xo+xx, y+yo+yy, color);
                 }
                 bits <<= 1;
             }
@@ -810,39 +527,38 @@ void Adafruit_GFX::writeChar(uint16_t c) {
 
         if(c == '\n') {                        // Newline?
             cursor_x  = 0;                     // Reset x to zero,
-            cursor_y += textsize * 8;          // advance y one line
+            cursor_y +=  8;          // advance y one line
         } else if(c != '\r') {                 // Ignore carriage returns
-            if(wrap && ((cursor_x + textsize * 6) > _width)) { // Off right?
+            if(wrap && ((cursor_x + 6) > _width)) { // Off right?
                 cursor_x  = 0;                 // Reset x to zero,
-                cursor_y += textsize * 8;      // advance y one line
+                cursor_y +=  8;      // advance y one line
             }
-            drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
-            cursor_x += textsize * 6;          // Advance x one char
+            drawChar(cursor_x, cursor_y, c, fgcolor, bgcolor);
+            cursor_x += 6;          // Advance x one char
         }
 
     } else { // Custom font
 
         if(c == '\n') {
             cursor_x  = 0;
-            cursor_y += (int16_t)textsize *
-                        (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
+            //cursor_y += (int16_t)gfxFont->yAdvance;
+            ++cursor_y;
         } else if(c != '\r') {
             uint16_t first = gfxFont->first;
             if((c >= first) && (c <= gfxFont->last)) {
-                GFXglyph *glyph = &(((GFXglyph *)pgm_read_pointer(
-                  &gfxFont->glyph))[c - first]);
-                uint8_t   w     = pgm_read_byte(&glyph->width),
-                          h     = pgm_read_byte(&glyph->height);
+                GFXglyph *glyph = &gfxFont->glyph[c - first];
+                uint8_t w = glyph->width, h = glyph->height;
                 if((w > 0) && (h > 0)) { // Is there an associated bitmap?
-                    int16_t xo = (int8_t)pgm_read_byte(&glyph->xOffset); // sic
-                    if(wrap && ((cursor_x + textsize * (xo + w)) > _width)) {
+                    int16_t xo = glyph->xOffset; // sic
+                    if(wrap && ((cursor_x + (xo + w)) > _width)) {
                         cursor_x  = 0;
-                        cursor_y += (int16_t)textsize *
-                          (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
+                        //cursor_y += (int16_t)gfxFont->yAdvance;
+                        ++cursor_y;
                     }
-                    drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+                    drawChar(cursor_x, (cursor_y+1)*yAdvance, c, fgcolor, bgcolor);
                 }
-                cursor_x += (uint8_t)pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
+                ++cursor_x;
+                cursor_x += glyph->xAdvance;
             }
         }
 
@@ -883,7 +599,7 @@ uint8_t Adafruit_GFX::write(const wchar_t *str)
 
 
 void Adafruit_GFX::setCursor(int16_t x, int16_t y) {
-    cursor_x = x;
+    cursor_x = x*xAdvance;
     cursor_y = y;
 }
 
@@ -895,19 +611,16 @@ int16_t Adafruit_GFX::getCursorY(void) const {
     return cursor_y;
 }
 
-void Adafruit_GFX::setTextSize(uint8_t s) {
-    textsize = (s > 0) ? s : 1;
-}
 
 void Adafruit_GFX::setTextColor(uint16_t c) {
     // For 'transparent' background, we'll set the bg
     // to the same as fg instead of using a flag
-    textcolor = textbgcolor = c;
+    fgcolor = bgcolor = c;
 }
 
 void Adafruit_GFX::setTextColor(uint16_t c, uint16_t b) {
-    textcolor   = c;
-    textbgcolor = b;
+    fgcolor   = c;
+    bgcolor = b;
 }
 
 void Adafruit_GFX::setTextWrap(bool w) {
@@ -934,149 +647,34 @@ void Adafruit_GFX::setRotation(uint8_t x) {
     }
 }
 
-// Enable (or disable) Code Page 437-compatible charset.
-// There was an error in glcdfont.c for the longest time -- one character
-// (#176, the 'light shade' block) was missing -- this threw off the index
-// of every character that followed it.  But a TON of code has been written
-// with the erroneous character indices.  By default, the library uses the
-// original 'wrong' behavior and old sketches will still work.  Pass 'true'
-// to this function to use correct CP437 character values in your code.
-void Adafruit_GFX::cp437(bool x) {
-    _cp437 = x;
-}
 
 void Adafruit_GFX::setFont(const GFXfont *f) {
     if(f) {            // Font struct pointer passed in?
         if(!gfxFont) { // And no current font struct?
             // Switching from classic to new font behavior.
             // Move cursor pos down 6 pixels so it's on baseline.
-            cursor_y += 6;
+            //cursor_y += 6;
         }
     } else if(gfxFont) { // NULL passed.  Current font struct defined?
         // Switching from new to classic font behavior.
         // Move cursor pos up 6 pixels so it's at top-left of char.
-        cursor_y -= 6;
+        //cursor_y -= 6;
     }
     gfxFont = (GFXfont *)f;
-}
-
-// Broke this out as it's used by both the PROGMEM- and RAM-resident
-// getTextBounds() functions.
-void Adafruit_GFX::charBounds(char c, int16_t *x, int16_t *y,
-  int16_t *minx, int16_t *miny, int16_t *maxx, int16_t *maxy) {
-
-    if(gfxFont) {
-
-        if(c == '\n') { // Newline?
-            *x  = 0;    // Reset x to zero, advance y by one line
-            *y += textsize * (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
-        } else if(c != '\r') { // Not a carriage return; is normal char
-            uint16_t first = pgm_read_byte(&gfxFont->first),
-                    last  = pgm_read_byte(&gfxFont->last);
-            if((c >= first) && (c <= last)) { // Char present in this font?
-                GFXglyph *glyph = &(((GFXglyph *)pgm_read_pointer(
-                  &gfxFont->glyph))[c - first]);
-                uint8_t gw = pgm_read_byte(&glyph->width),
-                        gh = pgm_read_byte(&glyph->height),
-                        xa = pgm_read_byte(&glyph->xAdvance);
-                int8_t  xo = pgm_read_byte(&glyph->xOffset),
-                        yo = pgm_read_byte(&glyph->yOffset);
-                if(wrap && ((*x+(((int16_t)xo+gw)*textsize)) > _width)) {
-                    *x  = 0; // Reset x to zero, advance y by one line
-                    *y += textsize * (uint8_t)pgm_read_byte(&gfxFont->yAdvance);
-                }
-                int16_t ts = (int16_t)textsize,
-                        x1 = *x + xo * ts,
-                        y1 = *y + yo * ts,
-                        x2 = x1 + gw * ts - 1,
-                        y2 = y1 + gh * ts - 1;
-                if(x1 < *minx) *minx = x1;
-                if(y1 < *miny) *miny = y1;
-                if(x2 > *maxx) *maxx = x2;
-                if(y2 > *maxy) *maxy = y2;
-                *x += xa * ts;
-            }
-        }
-
-    } else { // Default font
-
-        if(c == '\n') {                     // Newline?
-            *x  = 0;                        // Reset x to zero,
-            *y += textsize * 8;             // advance y one line
-            // min/max x/y unchaged -- that waits for next 'normal' character
-        } else if(c != '\r') {  // Normal char; ignore carriage returns
-            if(wrap && ((*x + textsize * 6) > _width)) { // Off right?
-                *x  = 0;                    // Reset x to zero,
-                *y += textsize * 8;         // advance y one line
-            }
-            int x2 = *x + textsize * 6 - 1, // Lower-right pixel of char
-                y2 = *y + textsize * 8 - 1;
-            if(x2 > *maxx) *maxx = x2;      // Track max x, y
-            if(y2 > *maxy) *maxy = y2;
-            if(*x < *minx) *minx = *x;      // Track min x, y
-            if(*y < *miny) *miny = *y;
-            *x += textsize * 6;             // Advance x one char
-        }
+    if (yAdvance == 0)
+    {
+        yAdvance = gfxFont->yAdvance;
     }
+    xAdvance = gfxFont->xAdvance;
 }
 
-// Pass string and a cursor position, returns UL corner and W,H.
-void Adafruit_GFX::getTextBounds(char *str, int16_t x, int16_t y,
-        int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h) {
-    uint8_t c; // Current character
+uint8_t Adafruit_GFX::printf(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    ee_vsprintf(buf, fmt, args);
+    va_end(args);
 
-    *x1 = x;
-    *y1 = y;
-    *w  = *h = 0;
+    return write (buf);
 
-    int16_t minx = _width, miny = _height, maxx = -1, maxy = -1;
-
-    while((c = *str++))
-        charBounds(c, &x, &y, &minx, &miny, &maxx, &maxy);
-
-    if(maxx >= minx) {
-        *x1 = minx;
-        *w  = maxx - minx + 1;
-    }
-    if(maxy >= miny) {
-        *y1 = miny;
-        *h  = maxy - miny + 1;
-    }
-}
-
-// Same as above, but for PROGMEM strings
-//void Adafruit_GFX::getTextBounds(const __FlashStringHelper *str,
-//        int16_t x, int16_t y, int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h) {
-//    uint8_t *s = (uint8_t *)str, c;
-//
-//    *x1 = x;
-//    *y1 = y;
-//    *w  = *h = 0;
-//
-//    int16_t minx = _width, miny = _height, maxx = -1, maxy = -1;
-//
-//    while((c = pgm_read_byte(s++)))
-//        charBounds(c, &x, &y, &minx, &miny, &maxx, &maxy);
-//
-//    if(maxx >= minx) {
-//        *x1 = minx;
-//        *w  = maxx - minx + 1;
-//    }
-//    if(maxy >= miny) {
-//        *y1 = miny;
-//        *h  = maxy - miny + 1;
-//    }
-//}
-
-// Return the size of the display (per current rotation)
-int16_t Adafruit_GFX::width(void) const {
-    return _width;
-}
-
-int16_t Adafruit_GFX::height(void) const {
-    return _height;
-}
-
-void Adafruit_GFX::invertDisplay(bool i) {
-    // Do nothing, must be subclassed if supported by hardware
 }
