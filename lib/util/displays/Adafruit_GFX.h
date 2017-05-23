@@ -99,10 +99,6 @@ public:
     void setFont(const GFXfont *f = 0);
     void setTextSize(uint8_t s);
 
-    virtual void writeChar(uint16_t);
-    uint8_t write(const char *str);
-    uint8_t write(const wchar_t *str);
-    void    drawChar(int16_t x, int16_t y, uint16_t c,  uint16_t color, uint16_t bg, uint8_t size);
 
     int16_t height(void) const;
     int16_t width(void) const;
@@ -113,11 +109,20 @@ public:
     int16_t getCursorX(void) const;
     int16_t getCursorY(void) const;
 
-    uint8_t printf(const char *fmt, ...);
-
     void setYadvance (uint8_t val) { yAdvance = val; }
 
+
+    uint8_t write(const wchar_t *str);
+    uint8_t printf(const char *fmt, ...);
+    uint8_t printf(uint8_t x, uint8_t y, const char *fmt, ...);
+    void drawBmp(int16_t x, int16_t y, const uint8_t *bmp);
+
 protected:
+
+    uint8_t write(const char *str);
+    virtual void writeChar(uint16_t);
+    void    drawChar(int16_t x, int16_t y, uint16_t c,  uint16_t color, uint16_t bg);
+
     const int16_t WIDTH, HEIGHT; // This is the 'raw' display w/h - never changes
     int16_t _width, _height; // Display w/h as modified by current rotation
     int16_t cursor_x, cursor_y;

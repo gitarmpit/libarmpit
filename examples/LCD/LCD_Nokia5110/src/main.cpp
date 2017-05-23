@@ -10,11 +10,9 @@
 #include "spi_cpp.h"
 #include "usart_cpp.h"
 #include "debug.h"
-#include "fonts/consola6.h"
-#include "fonts/TomThumb.h"
-#include "fonts/calibri6.h"
-#include "fonts/cour4.h"
-#include "fonts/tahoma6.h"
+#include "fonts/consola15.h"
+#include "consolas_16.cpp"
+#include "goback1.cpp"
 
 //Vref = 3.3 * adc_res / 4095;  3.3*1480/4095= 1.193
 
@@ -216,11 +214,20 @@ static void test_display()
     lcd.Init(0xbc);
     lcd.clearDisplay();
     //lcd.setRotation(2); //upside down
-    lcd.setTextSize(2);
-    lcd.write("testOAWtestM\n\n");
+    //double f = 1311.234;
+    //lcd.printf(2, 2, "test:%7.3f \n\n", f);
+
+//    lcd.printf ("adc ");
+//    lcd.printf ("123\n");
+//    lcd.printf ("ABC");
+//    lcd.printf ("456\n");
+
     //lcd.setFont(&cour4);
-    lcd.setCursor(0, 2);
     //lcd.write("testOAWtestM");
+
+    //lcd.setFont(&consola_ttf);
+    //lcd.printf ("123456");
+    lcd.drawBmp(10, 10, goback1);
     lcd.display();
 
     while(1)
