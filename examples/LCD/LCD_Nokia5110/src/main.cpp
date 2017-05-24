@@ -10,9 +10,90 @@
 #include "spi_cpp.h"
 #include "usart_cpp.h"
 #include "debug.h"
-#include "fonts/consola15.h"
-#include "consolas_16.cpp"
+#include "consolas_4bit_2.cpp"
 #include "goback1.cpp"
+
+
+//#include "ARLRDBD47_40.h"  try it for 4-5 digits?
+
+//maybe
+//#include "gil46_40.h"
+//#include "ltype46_40.h"
+//#include "lucon46_40.h"  //same as ltype?
+//#include "micross46_40.h"
+//#include "micross34_40.h"  //best?
+//#include "tahoma32_40.h"   //also very good , 34 fits but '1' is odd (thin), use 36 with reduced spacing
+//#include "tahomabd32_40.h"  //bold, ok
+//#include "msyi34_40.h" //good, very light, smaller than others use 44 or 46 instead of 32 (42 looks weird)
+//#include "segoeui32_40.h"  //light  32 or 34  or 36
+
+//#include "verdana35_40.h"  //good
+//#include "verdana36_40.h"  //good, but 6 digits only
+
+//good small ones
+//#include "tahoma20_40.h" 16-20
+//#include "msyi20_40.h"  //20 is smaller that the default font;  some sizes produces unequal character sizes
+                          //23-24 ok-ish, same size as the default font but not kind ugly
+                          //27,31,35,38 ok
+
+
+
+static void test_display()
+{
+    delay(10);
+    GPIOA* portA = GPIOA::GetInstance();
+    GPIOB* portB = GPIOB::GetInstance();
+    portA->EnablePeripheralClock(true);
+    portB->EnablePeripheralClock(true);
+
+    //Too fast won't work, check clock and baud rate
+    SPI* lcdSpi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_16);
+
+    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN2);
+    rstPin->SetupGPIO_OutPP();
+    rstPin->SetSpeedHigh();
+
+    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN1);
+    dcPin->SetupGPIO_OutPP();
+    dcPin->SetSpeedHigh();
+
+    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
+    ssPin->SetupGPIO_OutPP();
+    ssPin->SetSpeedHigh();
+
+
+    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
+    lcd.Init(0xbc);
+    lcd.clearDisplay();
+    lcd.display();
+    //lcd.setRotation(2); //upside down
+    lcd.setTextColor(1, 0);
+    //lcd.setFont(&cour4);
+    //lcd.write("testOAWtestM");
+
+    //lcd.printf ("1'234'567\n");
+    //lcd.setFont(&ARLRDBD47_40);
+    //lcd.setYadvance(12);
+    //lcd.setXadvance(5);
+    //lcd.setFont(0);
+    //lcd.printf (0, 1, "1,234,567\n");
+    lcd.printf ("1,234,567\n");
+    //lcd.printf ("2,234,567");
+    //lcd.printf (0, 2, "1,234,567");
+
+    //lcd.setCursor(1, 1);
+    //lcd.printf ("1'234'567");
+    //lcd.printf ("123456");
+    //lcd.drawBmp(0, 0, consolas_4bit_2);
+    lcd.display();
+
+    while(1)
+    {
+    }
+
+}
+
+
 
 //Vref = 3.3 * adc_res / 4095;  3.3*1480/4095= 1.193
 
@@ -186,55 +267,6 @@ public:
 //
 //}
 
-static void test_display()
-{
-    delay(10);
-    GPIOA* portA = GPIOA::GetInstance();
-    GPIOB* portB = GPIOB::GetInstance();
-    portA->EnablePeripheralClock(true);
-    portB->EnablePeripheralClock(true);
-
-    //Too fast won't work, check clock and baud rate
-    SPI* lcdSpi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_16);
-
-    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN2);
-    rstPin->SetupGPIO_OutPP();
-    rstPin->SetSpeedHigh();
-
-    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN1);
-    dcPin->SetupGPIO_OutPP();
-    dcPin->SetSpeedHigh();
-
-    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
-    ssPin->SetupGPIO_OutPP();
-    ssPin->SetSpeedHigh();
-
-
-    Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
-    lcd.Init(0xbc);
-    lcd.clearDisplay();
-    //lcd.setRotation(2); //upside down
-    //double f = 1311.234;
-    //lcd.printf(2, 2, "test:%7.3f \n\n", f);
-
-//    lcd.printf ("adc ");
-//    lcd.printf ("123\n");
-//    lcd.printf ("ABC");
-//    lcd.printf ("456\n");
-
-    //lcd.setFont(&cour4);
-    //lcd.write("testOAWtestM");
-
-    //lcd.setFont(&consola_ttf);
-    //lcd.printf ("123456");
-    lcd.drawBmp(10, 10, goback1);
-    lcd.display();
-
-    while(1)
-    {
-    }
-
-}
 
 //static void test_uart2()
 //{
@@ -281,7 +313,8 @@ static void test_display()
 //            {
 //                usart->SendByte(47);
 //                lcd.clearDisplay();
-//                lcd.write("Rx", 1, 1, 4);
+//                lcd.write("Rx", 1, 1, 4);int Adafruit_GFX::drawChar2(unsigned int uniCode, int size)
+
 //                lcd.display();
 //            }
 //        }

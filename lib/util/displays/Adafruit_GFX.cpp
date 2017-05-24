@@ -47,6 +47,7 @@
 #endif
 
 
+
 //Color palette for 256 color bitmap (microsoft Paint)
 const uint16_t pal256[] =
 {
@@ -84,7 +85,6 @@ Adafruit_GFX::Adafruit_GFX(int16_t w, int16_t h) :
     gfxFont = 0;
     yAdvance = 0;
     xAdvance = 1;
-    textsize = 1;
 
 }
 
@@ -613,8 +613,8 @@ void Adafruit_GFX::writeChar(uint16_t c)
                 cursor_x = 0;                 // Reset x to zero,
                 cursor_y += 8;      // advance y one line
             }
-            drawChar(cursor_x, cursor_y, c, fgcolor, bgcolor);
-            cursor_x += 6;          // Advance x one char
+            drawChar(cursor_x*6, cursor_y*8, c, fgcolor, bgcolor);
+            ++cursor_x;          // Advance x one char
         }
 
     }
@@ -652,21 +652,6 @@ void Adafruit_GFX::writeChar(uint16_t c)
     }
 }
 
-uint8_t Adafruit_GFX::write(const char *str)
-{
-    uint8_t len = 0;
-    if (str != 0)
-    {
-        size_t size = strlen(str);
-        while (size--)
-        {
-            writeChar(*str++);
-        }
-        len = strlen(str);
-    }
-    return len;
-
-}
 
 uint8_t Adafruit_GFX::write(const wchar_t *str)
 {
@@ -759,33 +744,46 @@ void Adafruit_GFX::setFont(const GFXfont *f)
       //cursor_y -= 6;
     }
     gfxFont = (GFXfont *) f;
-    if (yAdvance == 0)
+    if (gfxFont)
     {
-        yAdvance = gfxFont->yAdvance;
+        if (yAdvance == 0)
+        {
+            yAdvance = gfxFont->yAdvance;
+        }
+        xAdvance = gfxFont->xAdvance;
     }
-    xAdvance = gfxFont->xAdvance;
 }
 
 uint8_t Adafruit_GFX::printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    ee_vsprintf(buf, fmt, args);
+    printf(fmt, args);
     va_end(args);
-
-    return write(buf);
 
 }
 
 uint8_t Adafruit_GFX::printf(uint8_t x, uint8_t y, const char *fmt, ...)
 {
-    cursor_x = x;
-    cursor_y = y;
+    setCursor(x, y);
     va_list args;
     va_start(args, fmt);
-    ee_vsprintf(buf, fmt, args);
+    printf(fmt, args);
     va_end(args);
-    return write(buf);
+}
+
+
+uint8_t Adafruit_GFX::printf(const char *fmt, va_list args)
+{
+    ee_vsprintf(buf, fmt, args);
+    uint8_t len = 0;
+    size_t size = strlen(buf);
+    char* p = buf;
+    while (size--)
+    {
+        writeChar(*p++);
+    }
+    return size;
 
 }
 
@@ -868,8 +866,6 @@ void Adafruit_GFX::drawBmp(int16_t x, int16_t y, const uint8_t *bmp)
 
 }
 
-void Adafruit_GFX::setTextSize(uint8_t s)
-{
-    textsize = (s > 0) ? s : 1;
-}
+
+
 

@@ -4,7 +4,7 @@
 #define PROGMEM
 #include "gfxfont.h"
 #include <stdint.h>
-
+#include <stdarg.h>
 
 #ifdef INVERTED_565
 #define COLOR565(r,g,b) \
@@ -97,8 +97,6 @@ public:
     void setTextColor(uint16_t c, uint16_t bg);
     void setTextWrap(bool w);
     void setFont(const GFXfont *f = 0);
-    void setTextSize(uint8_t s);
-
 
     int16_t height(void) const;
     int16_t width(void) const;
@@ -110,6 +108,7 @@ public:
     int16_t getCursorY(void) const;
 
     void setYadvance (uint8_t val) { yAdvance = val; }
+    void setXadvance (uint8_t val) { xAdvance = val; }
 
 
     uint8_t write(const wchar_t *str);
@@ -119,7 +118,7 @@ public:
 
 protected:
 
-    uint8_t write(const char *str);
+    uint8_t printf(const char *fmt, va_list args);
     virtual void writeChar(uint16_t);
     void    drawChar(int16_t x, int16_t y, uint16_t c,  uint16_t color, uint16_t bg);
 
@@ -127,7 +126,7 @@ protected:
     int16_t _width, _height; // Display w/h as modified by current rotation
     int16_t cursor_x, cursor_y;
     uint16_t fgcolor, bgcolor;
-    uint8_t textsize, rotation;
+    uint8_t rotation;
     bool wrap;   // If set, 'wrap' text at right edge of display
     GFXfont *gfxFont;
 private:

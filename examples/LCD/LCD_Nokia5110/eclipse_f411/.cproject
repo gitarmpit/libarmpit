@@ -92,6 +92,9 @@
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.nothreadsafestatics.1301845373" name="Do not use thread-safe statics (-fno-threadsafe-statics)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.nothreadsafestatics" useByScannerDiscovery="true" value="true" valueType="boolean"/>
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs.608803305" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="STM32F411xE"/>
+									<listOptionValue builtIn="false" value="LOAD_FONT2"/>
+									<listOptionValue builtIn="false" value="LOAD_FONT4"/>
+									<listOptionValue builtIn="false" value="LOAD_FONT6"/>
 									<listOptionValue builtIn="false" value="USE_SPI"/>
 									<listOptionValue builtIn="false" value="USE_TIMER"/>
 									<listOptionValue builtIn="false" value="HSE_VALUE=8000000"/>
