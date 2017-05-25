@@ -12,7 +12,8 @@
 #include "debug.h"
 #include "consolas_4bit_2.cpp"
 #include "goback1.cpp"
-
+#include "small.h"
+#include "dos54.h"
 
 //#include "ARLRDBD47_40.h"  try it for 4-5 digits?
 
@@ -30,7 +31,15 @@
 //#include "verdana35_40.h"  //good
 //#include "verdana36_40.h"  //good, but 6 digits only
 
+//fnt
+//#include "fixedsys16.h"
+
+
 //good small ones
+//bitmap fnt
+//#include "small.h"  //very good
+
+
 //#include "tahoma20_40.h" 16-20
 //#include "msyi20_40.h"  //20 is smaller that the default font;  some sizes produces unequal character sizes
                           //23-24 ok-ish, same size as the default font but not kind ugly
@@ -68,8 +77,10 @@ static void test_display()
     lcd.display();
     //lcd.setRotation(2); //upside down
     lcd.setTextColor(1, 0);
-    //lcd.setFont(&cour4);
-    //lcd.write("testOAWtestM");
+    lcd.setFont(&dos54);
+    lcd.printf("TEST 123\n");
+    lcd.printf("TEST 123\n");
+    lcd.printf("TEST 123\n");
 
     //lcd.printf ("1'234'567\n");
     //lcd.setFont(&ARLRDBD47_40);
@@ -77,7 +88,7 @@ static void test_display()
     //lcd.setXadvance(5);
     //lcd.setFont(0);
     //lcd.printf (0, 1, "1,234,567\n");
-    lcd.printf ("1,234,567\n");
+    //lcd.printf ("1,234,567\n");
     //lcd.printf ("2,234,567");
     //lcd.printf (0, 2, "1,234,567");
 
