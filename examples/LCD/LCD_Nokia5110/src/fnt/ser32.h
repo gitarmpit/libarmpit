@@ -551,7 +551,7 @@ const GFXglyph seriff30Glyphs[] = {
   {  5332,  12,  32,  12,    0,  -24 },   // 0x7D '}'
   {  5380,  14,  32,  14,    0,  -24 } }; // 0x7E '~'
 
-const GFXfont seriff32 = 
+const GFXfont ser32 = 
 {
   (uint8_t  *)seriff30Bitmaps,
   (GFXglyph *)seriff30Glyphs,

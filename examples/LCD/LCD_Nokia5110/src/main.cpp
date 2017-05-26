@@ -10,10 +10,6 @@
 #include "spi_cpp.h"
 #include "usart_cpp.h"
 #include "debug.h"
-#include "consolas_4bit_2.cpp"
-#include "goback1.cpp"
-#include "small.h"
-#include "dos54.h"
 
 //#include "ARLRDBD47_40.h"  try it for 4-5 digits?
 
@@ -45,7 +41,8 @@
                           //23-24 ok-ish, same size as the default font but not kind ugly
                           //27,31,35,38 ok
 
-
+#include "fnt/dos12.h"
+#include "fnt/term12.h"
 
 static void test_display()
 {
@@ -73,14 +70,18 @@ static void test_display()
 
     Adafruit_Nokia5110 lcd(lcdSpi, dcPin, rstPin, ssPin);
     lcd.Init(0xbc);
+    lcd.setTextWrap(false);
     lcd.clearDisplay();
     lcd.display();
     //lcd.setRotation(2); //upside down
     lcd.setTextColor(1, 0);
-    lcd.setFont(&dos54);
-    lcd.printf("TEST 123\n");
-    lcd.printf("TEST 123\n");
-    lcd.printf("TEST 123\n");
+    lcd.setFont(&dos12);
+    lcd.printf("ABC0123456789\n");
+    lcd.setFont(&term12);
+    lcd.printf("ABC0123456789\n");
+
+    lcd.display();
+
 
     //lcd.printf ("1'234'567\n");
     //lcd.setFont(&ARLRDBD47_40);
@@ -96,7 +97,6 @@ static void test_display()
     //lcd.printf ("1'234'567");
     //lcd.printf ("123456");
     //lcd.drawBmp(0, 0, consolas_4bit_2);
-    lcd.display();
 
     while(1)
     {

@@ -937,7 +937,7 @@ const GFXglyph seriff40Glyphs[] = {
   {  9892,  19,  42,  19,    0,  -32 },   // 0x7D '}'
   {  9992,  13,  42,  13,    0,  -32 } }; // 0x7E '~'
 
-const GFXfont seriff42 = 
+const GFXfont ser42 = 
 {
   (uint8_t  *)seriff40Bitmaps,
   (GFXglyph *)seriff40Glyphs,

@@ -1053,7 +1053,7 @@ const GFXfont sans46 =
 {
   (uint8_t  *)sans40Bitmaps,
   (GFXglyph *)sans40Glyphs,
-  0x20, 0x7E, 0
+  0x20, 0x7E, 46
 };
 
 // Approx. 12079 bytes

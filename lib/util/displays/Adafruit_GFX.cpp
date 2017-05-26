@@ -84,8 +84,7 @@ Adafruit_GFX::Adafruit_GFX(int16_t w, int16_t h) :
     wrap = true;
     gfxFont = 0;
     yAdvance = 0;
-    xAdvance = 1;
-
+    xAdvance = 0;
 }
 
 // Bresenham's algorithm - thx wikpedia
@@ -645,7 +644,7 @@ void Adafruit_GFX::writeChar(uint16_t c)
                     }
                     drawChar(cursor_x, (cursor_y + 1) * yAdvance, c, fgcolor, bgcolor);
                 }
-                cursor_x += glyph->xAdvance;
+                cursor_x += xAdvance ? xAdvance : glyph->xAdvance;
             }
         }
 
@@ -671,7 +670,14 @@ uint8_t Adafruit_GFX::write(const wchar_t *str)
 
 void Adafruit_GFX::setCursor(int16_t x, int16_t y)
 {
-    cursor_x = x * xAdvance;
+    if (xAdvance > 0)
+    {
+        cursor_x = x * xAdvance;
+    }
+    else
+    {
+        cursor_x = x;
+    }
     cursor_y = y;
 }
 
@@ -746,11 +752,11 @@ void Adafruit_GFX::setFont(const GFXfont *f)
     gfxFont = (GFXfont *) f;
     if (gfxFont)
     {
-        if (yAdvance == 0)
+        yAdvance = gfxFont->yAdvance;
+        if (gfxFont->xAdvance != 0)
         {
-            yAdvance = gfxFont->yAdvance;
+            xAdvance = gfxFont->xAdvance;
         }
-        xAdvance = gfxFont->xAdvance;
     }
 }
 
