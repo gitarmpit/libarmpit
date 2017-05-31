@@ -3,6 +3,8 @@
 #include "GPIO_Helper.h"
 #include "debug.h"
 
+#define TFTWIDTH   176
+#define TFTHEIGHT  220
 
 
 class TestLCD// : public Adafruit_GFX
@@ -40,6 +42,12 @@ public:
         *_dataPort->GetGPIO_OSPEEDR() |= 0xffff;
 
         setWriteDir(); // Set up LCD data port(s) for WRITE operations
+
+        _rst->Reset();
+        delay(2);
+        _rst->Set();
+
+        init();
     }
 
 
@@ -92,12 +100,68 @@ private:
     }
 
 
+    void init()
+    {
+        writeRegister16(0x01, 0x011C);
+        writeRegister16(0x02, 0x0100);
+        writeRegister16(0x03, 0x1030);
+        writeRegister16(0x08, 0x0808);
+        writeRegister16(0x0C, 0x0000);
+        writeRegister16(0x0F, 0x0E01);
+
+        writeRegister16(0x10, 0x0A00);
+        writeRegister16(0x11, 0x1038);
+        writeRegister16(0xFF, 0x0003);
+        writeRegister16(0xB0, 0x1411);
+        writeRegister16(0xB1, 0x0202);
+        writeRegister16(0xB2, 0x0313);
+
+        writeRegister16(0x30, 0x0000);
+        writeRegister16(0x31, 0x00db);
+        writeRegister16(0x32, 0x0000);
+        writeRegister16(0x33, 0x0000);
+        writeRegister16(0x34, 0x00db);
+        writeRegister16(0x35, 0x0000);
+        writeRegister16(0x36, 0x00AF);
+        writeRegister16(0x37, 0x0000);
+        writeRegister16(0x38, 0x00DB);
+        writeRegister16(0x39, 0x0000);
+
+        writeRegister16(0xFF, 0x0003);
+        writeRegister16(0x50, 0x0000);
+        writeRegister16(0x51, 0x0300);
+        writeRegister16(0x52, 0x0103);
+        writeRegister16(0x53, 0x2011);
+        writeRegister16(0x54, 0x0703);
+        writeRegister16(0x55, 0x0000);
+        writeRegister16(0x56, 0x0400);
+        writeRegister16(0x57, 0x0107);
+        writeRegister16(0x58, 0x2011);
+        writeRegister16(0x59, 0x0703);
+        writeRegister16(0x20, 0x0000);
+        writeRegister16(0x21, 0x0000);
+        writeRegister16(0x07, 0x1017);
+
+        setWindow(0, 0, TFTWIDTH - 1, TFTHEIGHT - 1);
+
+    }
 
 
-
+    void setWindow(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
+        writeRegister16(0x37, x1);
+        writeRegister16(0x36, x2);
+        writeRegister16(0x39, y1);
+        writeRegister16(0x38, y2);
+        writeRegister16(0x20, x1);
+        writeRegister16(0x21, y1);
+    }
 
 public:
 
+    void drawPixel(int16_t x, int16_t y, uint16_t color) {
+        setWindow(x, y, x, y);
+        writeRegister16(0x22, color);
+    }
 
     uint16_t readID()
     {
@@ -111,7 +175,7 @@ public:
         //_wr->Set();
 
         write8(0);
-        write8(0x22);
+        write8(0);
 
         //_cs->Set();
 
@@ -127,10 +191,6 @@ public:
         //  //delay_us(10);
         result |= read8();
 
-        uint16_t  result2 = read8() << 8;
-        //  //delay_us(10);
-        result2 |= read8();
-        +result2;
 
         _cs->Set();
         setWriteDir();
@@ -165,18 +225,18 @@ public:
 //        write8(0);
 
         // Data transfer sync
-        _cs->Reset();
-        _rs->Reset();
-        write8(0x00);
-        // Three extra 0x00s
-        for (uint8_t i = 0; i < 3; i++)
-        {
-            _wr->Reset();
-            _wr->Set();
-        }
-
-        _cs->Set();
-        delay(200);
+//        _cs->Reset();
+//        _rs->Reset();
+//        write8(0x00);
+//        // Three extra 0x00s
+//        for (uint8_t i = 0; i < 3; i++)
+//        {
+//            _wr->Reset();
+//            _wr->Set();
+//        }
+//
+//        _cs->Set();
+//        delay(200);
 
     }
 
@@ -216,11 +276,20 @@ void test()
 
     delay(500);
     TestLCD t(cs, rs, wr, rd, rst, dataPort);
-    t.reset();
-    //delay(500);
-    volatile uint16_t id2 = t.readID();
 
-    id2++;
+
+    //t.reset();
+    //delay(500);
+    //volatile uint16_t id2 = t.readID();
+
+    for (int x = 0; x < 100; ++x)
+    {
+        for (int y = 0; y < 100; ++y)
+        {
+            t.drawPixel(x, y, 0x0);
+        }
+    }
+
 }
 
 
