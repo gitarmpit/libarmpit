@@ -151,6 +151,9 @@ public:
 
     volatile uint32_t* GetGPIO_BSRR() { return _pGPIO_BSRR; }
     volatile uint32_t* GetGPIO_ODR() { return _pGPIO_ODR; }
+    volatile uint32_t* GetGPIO_MODER() { return _pGPIO_MODER; }
+    volatile uint32_t* GetGPIO_OTYPER() { return _pGPIO_OTYPER; }
+    volatile uint32_t* GetGPIO_OSPEEDR() { return _pGPIO_OSPEEDR; }
 
 };
 

@@ -47,7 +47,7 @@ public:
         delay(2);
         _rst->Set();
 
-        init();
+        //init();
     }
 
 
@@ -123,7 +123,6 @@ private:
     }
 
 
-
     void init()
     {
         writeRegister16(0x01, 0x011C);
@@ -191,20 +190,45 @@ public:
     {
         setWriteDir();
 
+        writeRegister16(0xb0, 0);
+
         _cs->Reset();
 
         _rs->Reset();  //command
 
-        write8(0);
+        //_rd->Set();
+        //_wr->Set();
+
+        write8(0x0);
         write8(0);
 
+        //_cs->Set();
+
+        /////read data
         setReadDir();
 
+        //_cs->Reset();
+        //
         _rs->Set();  //data
 
-        uint16_t  result = read8() << 8;
+        delay_us(100);
+        uint16_t  result;
+
+        result = read8() << 8;
+        delay_us(10);
         result |= read8();
 
+        result = read8() << 8;
+        delay_us(10);
+        result |= read8();
+
+        result = read8() << 8;
+        delay_us(10);
+        result |= read8();
+
+        result = read8() << 8;
+        delay_us(10);
+        result |= read8();
 
         _cs->Set();
         setWriteDir();
@@ -213,11 +237,88 @@ public:
 
     }
 
-    uint16_t readID2()
-    {
-        return readRegister16(0x0);
+
+    uint32_t readReg(uint8_t r) {
+      uint32_t id;
+      uint8_t x;
+
+      setWriteDir();
+      _cs->Reset();
+      _rs->Reset();  //command
+      write8(r);
+      setReadDir();  // Set up LCD data port(s) for READ operations
+
+      _rs->Set();
+      delay_us(50);
+      x = read8();
+      id = x;          // Do not merge or otherwise simplify
+      id <<= 8;              // these lines.  It's an unfortunate
+      x = read8();
+      id  |= x;        // shenanigans that are going on.
+      id <<= 8;              // these lines.  It's an unfortunate
+      x = read8();
+      id  |= x;        // shenanigans that are going on.
+      id <<= 8;              // these lines.  It's an unfortunate
+      x = read8();
+      id  |= x;        // shenanigans that are going on.
+      _cs->Set();
+      setWriteDir();  // Restore LCD data port(s) to WRITE configuration
+
+      //Serial.print("Read $"); Serial.print(r, HEX);
+      //Serial.print(":\t0x"); Serial.println(id, HEX);
+      return id;
     }
 
+    uint16_t readID2(void) {
+
+      uint8_t hi, lo;
+
+      /*
+      for (uint8_t i=0; i<128; i++) {
+        Serial.print("$"); Serial.print(i, HEX);
+        Serial.print(" = 0x"); Serial.println(readReg(i), HEX);
+      }
+      */
+
+      if (readReg(0x04) == 0x8000) { // eh close enough
+        // setc!
+        /*
+          Serial.println("!");
+          for (uint8_t i=0; i<254; i++) {
+          Serial.print("$"); Serial.print(i, HEX);
+          Serial.print(" = 0x"); Serial.println(readReg(i), HEX);
+          }
+        */
+        //writeRegister24(HX8357D_SETC, 0xFF8357);
+        delay(300);
+        //Serial.println(readReg(0xD0), HEX);
+        if (readReg(0xD0) == 0x990000) {
+          return 0x8357;
+        }
+      }
+
+      uint16_t id = readReg(0xD3);
+      if (id == 0x9341) {
+        return id;
+      }
+
+      _cs->Reset();
+      _rs->Reset();
+      write8(0x00);
+      _wr->Reset();
+      _wr->Set();
+
+      setReadDir();  // Set up LCD data port(s) for READ operations
+
+      _rs->Set();
+      hi = read8();
+      lo = read8();
+      setWriteDir();  // Restore LCD data port(s) to WRITE configuration
+      _cs->Set();
+
+      id = hi; id <<= 8; id |= lo;
+      return id;
+    }
 
     void reset() {
 
@@ -270,23 +371,23 @@ void test()
     GPIO_PORT* dataPort = GPIOC::GetInstance();
     dataPort->EnablePeripheralClock(true);
 
-    GPIO_PIN* rst = GPIO_Helper::GetPin("E2");
+    GPIO_PIN* rst = GPIO_Helper::GetPin("C13");
     rst->SetupGPIO_OutPP();
     rst->SetSpeedHigh();
 
-    GPIO_PIN* rd = GPIO_Helper::GetPin("E3");
+    GPIO_PIN* rd = GPIO_Helper::GetPin("C14");
     rd->SetupGPIO_OutPP();
     rd->SetSpeedHigh();
 
-    GPIO_PIN* wr = GPIO_Helper::GetPin("E4");
+    GPIO_PIN* wr = GPIO_Helper::GetPin("C15");
     wr->SetupGPIO_OutPP();
     wr->SetSpeedHigh();
 
-    GPIO_PIN* rs = GPIO_Helper::GetPin("E5");
+    GPIO_PIN* rs = GPIO_Helper::GetPin("H0");
     rs->SetupGPIO_OutPP();
     rs->SetSpeedHigh();
 
-    GPIO_PIN* cs = GPIO_Helper::GetPin("E6");
+    GPIO_PIN* cs = GPIO_Helper::GetPin("H1");
     cs->SetupGPIO_OutPP();
     cs->SetSpeedHigh();
 
@@ -301,8 +402,6 @@ void test()
     //delay(500);
     volatile uint16_t id2 = t.readID();
 
-    id2 = t.readID2();
-
     for (int x = 0; x < 100; ++x)
     {
         for (int y = 0; y < 100; ++y)
@@ -310,6 +409,9 @@ void test()
             t.drawPixel(x, y, 0x0);
         }
     }
+
+    while(1)
+        ;
 
 }
 
