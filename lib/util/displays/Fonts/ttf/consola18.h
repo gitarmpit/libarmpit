@@ -178,7 +178,7 @@ const GFXglyph consolaGlyphs[] = {
   {   945,   6,  17,  10,    2,  -12 },   // 0x7D '}'
   {   958,   8,   4,  10,    1,   -6 } }; // 0x7E '~'
 
-const GFXfont consola = 
+const GFXfont consola18 = 
 {
   (uint8_t  *)consolaBitmaps,
   (GFXglyph *)consolaGlyphs,

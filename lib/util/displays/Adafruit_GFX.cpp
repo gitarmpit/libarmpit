@@ -644,7 +644,7 @@ void Adafruit_GFX::writeChar(uint16_t c)
                     }
                     drawChar(cursor_x, (cursor_y + 1) * yAdvance, c, fgcolor, bgcolor);
                 }
-                cursor_x += xAdvance ? xAdvance : glyph->xAdvance;
+                cursor_x += glyph->xAdvance;
             }
         }
 
