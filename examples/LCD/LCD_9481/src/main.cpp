@@ -66,7 +66,7 @@ private:
     uint8_t read8()
     {
         _rd->Reset();
-        uint8_t rc = _dataPort->GetInput();
+        uint8_t rc = _dataPort->GetInput() & 0xff;
         _rd->Set();
         return rc;
     }
@@ -74,7 +74,8 @@ private:
 
     inline void write8(uint8_t d)
     {
-        _dataPort->SetOutput(d);
+        //_dataPort->SetOutput(d);
+        *_dataPort->GetGPIO_ODR() |= d;
         _wr->Reset();
         //may need delay
         _wr->Set();
@@ -97,6 +98,8 @@ private:
 
         _cs->Set();
     }
+
+
 
     uint16_t readRegister16(uint16_t addr)
     {
@@ -186,57 +189,43 @@ public:
         writeRegister16(0x22, color);
     }
 
-    uint16_t readID()
+    uint16_t readID2()
     {
-        setWriteDir();
-
-        writeRegister16(0xb0, 0);
-
-        _cs->Reset();
-
-        _rs->Reset();  //command
-
-        //_rd->Set();
-        //_wr->Set();
-
-        write8(0x0);
-        write8(0);
-
-        //_cs->Set();
-
-        /////read data
-        setReadDir();
-
-        //_cs->Reset();
-        //
-        _rs->Set();  //data
-
-        delay_us(100);
-        uint16_t  result;
-
-        result = read8() << 8;
-        delay_us(10);
-        result |= read8();
-
-        result = read8() << 8;
-        delay_us(10);
-        result |= read8();
-
-        result = read8() << 8;
-        delay_us(10);
-        result |= read8();
-
-        result = read8() << 8;
-        delay_us(10);
-        result |= read8();
-
-        _cs->Set();
-        setWriteDir();
-
-        return result;
-
+        return readRegister16(0x0);
     }
 
+    uint16_t readID()
+      {
+          setWriteDir();
+
+          _cs->Reset();
+
+          _rs->Reset();  //command
+
+          write8(0);
+          //write8(0);
+          write8(0xbf);
+
+          setReadDir();
+
+          _rs->Set();  //data
+
+  //        uint16_t  result = read8() << 8;
+  //        result |= read8();
+
+          uint8_t b1 = read8();
+          uint8_t b2 = read8();
+          uint8_t b3 = read8();
+          uint8_t b4 = read8();
+          uint8_t b5 = read8();
+          uint8_t b6 = read8();
+
+          _cs->Set();
+          setWriteDir();
+
+          return 0;
+
+      }
 
     uint32_t readReg(uint8_t r) {
       uint32_t id;
@@ -269,56 +258,6 @@ public:
       return id;
     }
 
-    uint16_t readID2(void) {
-
-      uint8_t hi, lo;
-
-      /*
-      for (uint8_t i=0; i<128; i++) {
-        Serial.print("$"); Serial.print(i, HEX);
-        Serial.print(" = 0x"); Serial.println(readReg(i), HEX);
-      }
-      */
-
-      if (readReg(0x04) == 0x8000) { // eh close enough
-        // setc!
-        /*
-          Serial.println("!");
-          for (uint8_t i=0; i<254; i++) {
-          Serial.print("$"); Serial.print(i, HEX);
-          Serial.print(" = 0x"); Serial.println(readReg(i), HEX);
-          }
-        */
-        //writeRegister24(HX8357D_SETC, 0xFF8357);
-        delay(300);
-        //Serial.println(readReg(0xD0), HEX);
-        if (readReg(0xD0) == 0x990000) {
-          return 0x8357;
-        }
-      }
-
-      uint16_t id = readReg(0xD3);
-      if (id == 0x9341) {
-        return id;
-      }
-
-      _cs->Reset();
-      _rs->Reset();
-      write8(0x00);
-      _wr->Reset();
-      _wr->Set();
-
-      setReadDir();  // Set up LCD data port(s) for READ operations
-
-      _rs->Set();
-      hi = read8();
-      lo = read8();
-      setWriteDir();  // Restore LCD data port(s) to WRITE configuration
-      _cs->Set();
-
-      id = hi; id <<= 8; id |= lo;
-      return id;
-    }
 
     void reset() {
 

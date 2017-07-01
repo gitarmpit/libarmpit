@@ -196,20 +196,27 @@ public:
         _rs->Reset();  //command
 
         write8(0);
-        write8(0);
+        //write8(0);
+        write8(0xbf);
 
         setReadDir();
 
         _rs->Set();  //data
 
-        uint16_t  result = read8() << 8;
-        result |= read8();
+//        uint16_t  result = read8() << 8;
+//        result |= read8();
 
+        uint8_t b1 = read8();
+        uint8_t b2 = read8();
+        uint8_t b3 = read8();
+        uint8_t b4 = read8();
+        uint8_t b5 = read8();
+        uint8_t b6 = read8();
 
         _cs->Set();
         setWriteDir();
 
-        return result;
+        return 0;
 
     }
 
@@ -310,6 +317,9 @@ void test()
             t.drawPixel(x, y, 0x0);
         }
     }
+
+    while(1)
+        ;
 
 }
 
