@@ -146,6 +146,7 @@ public:
     }
 
     void HandleInterrupt();
+    void ClearInterrupt();
     void HandleJInterrupt();
     void SetInterruptHandler(ADC_IRQ_Handler* interruptHandler);
     void SetJInterruptHandler(ADC_IRQ_Handler* interruptHandler);
@@ -256,7 +257,11 @@ private:
 class ADC_IRQ_Handler
 {
 public:
-    virtual void Handle(ADC* adc) = 0;
+    virtual void Handle(ADC* adc)
+    {
+        volatile int i = 0;
+        ++i;
+    }
     virtual ~ADC_IRQ_Handler() {}
 };
 

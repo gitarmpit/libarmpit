@@ -29,32 +29,34 @@
 class ADC1_IRQ_Handler: public ADC_IRQ_Handler
 {
 private:
-    GPIO_PIN* _pin;
+    //GPIO_PIN* _pin;
 
 public:
 
     ADC1_IRQ_Handler()
     {
-        GPIOB* gpioB = GPIOB::GetInstance();
-        gpioB->EnablePeripheralClock(true);
-        _pin = gpioB->GetPin(GPIO_PIN12);
-        _pin->SetupGPIO_OutPP();
+        //GPIOB* gpioB = GPIOB::GetInstance();
+        //gpioB->EnablePeripheralClock(true);
+        //_pin = gpioB->GetPin(GPIO_PIN12);
+        //_pin->SetupGPIO_OutPP();
     }
 
     virtual void Handle(ADC* adc)
     {
+
         static volatile uint32_t d;
         d = adc->GetData();
-        if (d < 2000)
-        {
-            GPIOB::GetInstance()->SetPin(GPIO_PIN12);
-        }
-        else
-        {
-            GPIOB::GetInstance()->ResetPin(GPIO_PIN12);
-        }
+//        if (d < 2000)
+//        {
+//            GPIOB::GetInstance()->SetPin(GPIO_PIN12);
+//        }
+//        else
+//        {
+//            GPIOB::GetInstance()->ResetPin(GPIO_PIN12);
+//        }
     }
 };
+
 
 void Test_Continuous_Conversion()
 {
@@ -73,12 +75,13 @@ void Test_Continuous_Conversion()
     gpioA->EnablePeripheralClock(true);
     gpioA->SetupGPIO_InAnalog(GPIO_PIN0);
 
+
     ADC1* adc1 = ADC1::GetInstance();
     adc1->Enable(true);
     adc1->AddConversion(ADC_IN0, ADC_SMP_SLOWEST);
     adc1->EnableInterrupt(true);
-    ADC1_IRQ_Handler adcHandler;
-    adc1->SetInterruptHandler(&adcHandler);
+    static ADC1_IRQ_Handler adcHandler;
+    adc1->SetInterruptHandler((ADC1_IRQ_Handler*)&adcHandler);
     adc1->StartContinuousConversion();
 
     while (1)

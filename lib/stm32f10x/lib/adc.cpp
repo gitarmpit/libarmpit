@@ -157,6 +157,13 @@ void ADC::HandleInterrupt()
     }
 }
 
+void ADC::ClearInterrupt()
+{
+    *_pADC_SR &= ~ADC_SR_EOC;
+    *_pADC_SR &= ~ADC_SR_STRT;
+
+}
+
 void ADC::HandleJInterrupt()
 {
     *_pADC_SR &= ~ADC_SR_JEOC;

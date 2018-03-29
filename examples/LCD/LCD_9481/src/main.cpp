@@ -357,6 +357,7 @@ void test()
 
 int main()
 {
+
     RCC_EnableHSI_100Mhz();
     test();
 
