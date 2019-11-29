@@ -30,7 +30,7 @@ static void test_lcd()
     display.Init(0xbc);
     //display.setRotation(2);
 
-    display.write("123");
+    display.write(L"123");
     display.display();
     //double f = 4.12345;
     //display.printf(0, 1, 2, "%8.5f", f);

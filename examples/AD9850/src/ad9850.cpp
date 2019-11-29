@@ -252,10 +252,7 @@ static void test_lcd()
 
 }
 
-static void set (uint8_t val)
-{
 
-}
 
 static void test_shift_reg()
 {

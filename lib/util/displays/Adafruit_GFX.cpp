@@ -808,7 +808,7 @@ void Adafruit_GFX::drawBmp(int16_t x, int16_t y, const uint8_t *bmp)
     const uint8_t* bitmap8 = &bmp[hdr1->BitmapOffset];
 
     uint16_t wread = hdr2->Width;
-    uint16_t h = abs(hdr2->Height);
+    uint16_t h = abs((int)hdr2->Height);
 
     if (hdr2->BitsPerPixel == 4)
     {
