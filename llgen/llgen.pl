@@ -6,7 +6,6 @@ use Getopt::Std;
 
 my $output_dir         = "out";
 my $log_file           = "log.txt";
-my $memory_file_prefix = "memory";
 
 # pdftotext or ghostscript
 # Full or relative path if it is on PATH
@@ -99,7 +98,7 @@ sub pass1
     my @lines = split /$sep/, $file_content;
     close $fh;
 
-    my $memory_file = "$output_dir/$memory_file_prefix.$pdf_base_name";
+    my $memory_file = "$output_dir/$pdf_base_name.memory";
 
     if ( $file_exists_warning && -e $memory_file )
     {
@@ -111,7 +110,7 @@ sub pass1
 
     open( $fh, '>', $memory_file ) or die "Could not open file $memory_file $!";
     my $fh_log;
-    open( $fh_log, '>', "$output_dir/$log_file" ) or die "Could not open file $output_dir/$log_file $!";
+    open( $fh_log, '>', "$output_dir/$pdf_base_name.pass1.log" ) or die "Could not open file $output_dir/$pdf_base_name.pass1.log $!";
 
     my $total           = 0;
     my $in_boundary     = 0;
@@ -200,12 +199,19 @@ sub pass2
         die "Text file doesn't exist: $txt_name. Run pass1.pl first";
     }
 
-    my $memory_file = "$output_dir\\$memory_file_prefix.$pdf_base_name";
+    my $memory_file = "$output_dir/$pdf_base_name.memory";
 
     if ( !-e $memory_file )
     {
         die "Memory file doesn't exist: $memory_file. Run pass1.pl first";
     }
+
+    my $regs = "$output_dir/$pdf_base_name.regs";
+    open(my $fh_regs, '>', $regs ) or die "Could not open file '$regs' $!";
+
+    my $regs_404 = "$output_dir/$pdf_base_name.regs.404";
+    open(my $fh_regs_404, '>', $regs_404 ) or die "Could not open file '$regs_404' $!";
+
 
     # Read and parse memory file
     my $fh;
@@ -247,6 +253,9 @@ sub pass2
 
     my $page = 0;
     my $str;
+    my $reg_found = 0;
+    my $regx_found = 0;
+    my $reg_missed = 0;
 
     for ( my $l = 0 ; $l < $#lines - 1 ; ++$l )
     {
@@ -266,6 +275,8 @@ sub pass2
                 next;
             }
 
+
+            # Searching for Reset value below: this is optional, may not need it
             my $cnt   = 20;
             my $found = 0;
             for ( my $i = 0 ; $i < $cnt ; ++$i )
@@ -281,39 +292,64 @@ sub pass2
                 next;
             }
 
+            # Scanning backwards: looking for register name
             $found = 0;
-            $cnt   = 10;
+            $cnt   = 20;
             my $reg;
-            my $regline;
-            for ( my $i = 0 ; $i < $cnt ; ++$i )
+            my $regline = "";
+            for ( my $i = 1 ; $i < $cnt ; ++$i )
             {
-                if ( $lines[ $l - $i ] =~ /\(.*\)/ )
-                {
-                    $regline = $lines[ $l - $i ];
-                }
-
-                # if ($lines[$l-$i] =~ /(\([A-Z0-9]+[x]?_[A-Z0-9]+[x]?\))/)
-                if ( $lines[ $l - $i ] =~ /(\([A-Z0-9]+[x]?_[A-Z0-9]+[x]?.*\))/ )
-                {
+                # Underscore is sometimes missing!
+                 # if ( $lines[ $l - $i ] =~ /(\([A-Z0-9]+[x]?_[A-Z0-9]+[x]?.*\))/ )
+                 if ( $lines[ $l - $i ] =~ /(\((?:[A-Z0-9_xi]+){5,}\).*)/ )
+                 {
                     $found   = 1;
                     $regline = $lines[ $l - $i ];
                     $reg     = $1;
                     last;
-                }
+                 }
             }
+
             if ($found)
             {
-                print "regline: $regline\n";
-                print "reg: $reg\n";
-                print "$str\n";
+                ++$reg_found;
+                print $fh_regs "str: $str\n";
+                print $fh_regs "regline: $regline, line $l, page: $page\n";
+                print $fh_regs "reg: $reg\n";
+                if ($reg =~ /(\(.*\))(.+)$/) 
+                {
+                    $reg = $1; 
+                    my $tail = $2;
+                    print $fh_regs "tail: $tail\n"; 
+                    ++$regx_found;
+                    if ($reg !~ /x/) 
+                    {
+                       print $fh_regs "warning: tail found, but reg name has no 'x'\n";
+                    }
+                }
+                $reg =~ s/[\(\)]//g;
+                print $fh_regs "freg: $reg\n";
+                print $fh_regs "======================================================\n";
+
             }
             else
             {
-                print "line $l, page: $page: NOT FOUND: $str\n";
-                print "regline: $regline\n";
+                ++$reg_missed;
+                print $fh_regs_404 "line $l, page: $page: NOT FOUND: $str\n";
+                for ( my $i = 0 ; $i < 20 ; ++$i )
+                {
+                   print $fh_regs_404 "$lines[ $l - 10 + $i ]\n";
+                }
+                print $fh_regs_404 "===============================================================\n";
             }
         }
     }
+
+    print $fh_regs "reg found: $reg_found, regx found: $regx_found\n";
+    print $fh_regs_404 "missed: $reg_missed\n";
+
+    close ($fh_regs);
+    close ($fh_regs_404);
 }
 
 my $step    = -1;
