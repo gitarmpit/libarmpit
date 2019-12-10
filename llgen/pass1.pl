@@ -9,16 +9,14 @@ use strict;
 use File::Basename;
 use File::Spec;
 
-our $output_dir;
-our $log_file;
-our $memory_file_prefix;
+my $output_dir = "out";
+my $log_file = "log.txt";
+my $memory_file_prefix = "memory";
 
 # pdftotext or ghostscript
 # Full or relative path if it is on PATH
 my $pdftotext_path = "pdftotext.exe";
 my $pdfotext_opts = "-simple";
-
-require "./cfg.pl";
 
 # check if memory file already exists
 #my $file_exists_warning = 1;
@@ -29,15 +27,25 @@ my $file_exists_warning = 0;
 # lowest peripheral address to expect when parsing memory table
 my $lowest_addr = "0x40000000";
 
-if ($#ARGV != 0) 
-{
-  die "usage: scan <datasheet.pdf>";
-}
 
-my $pdf_fname = $ARGV[0];
-if (! -e $pdf_fname) 
+# patterns 
+# Example: Address offset: 0x1FD0  (on a line by itself)
+# our $address_offset = "Address offset:\\s+(0x[0-9A-F]{4})\\s*\$"
+# more relaxed in case there are typos
+my $address_offset = "Address offset:\\s+(\\S+)\\s*\$";
+
+#########################################################
+
+sub get_basename 
 {
-   die "file doesn't exist: $pdf_fname";
+    my @parts = split /[\/\\]/, $_[0];
+    my $base = $parts[$#parts];
+    $base =~ s/^(.*)\.pdf$/$1/;
+    if ($base eq "") 
+    {
+       die "error parsing filename";
+    }
+    return $base;
 }
 
 sub prompt {
@@ -58,6 +66,22 @@ sub prompt_yn {
   while ($answer ne 'y' && $answer ne 'n');
   return lc($answer) eq 'y';
 }
+
+############################################################################
+
+if ($#ARGV != 0) 
+{
+  die "usage: scan <datasheet.pdf>";
+}
+
+my $pdf_fname = $ARGV[0];
+if (! -e $pdf_fname) 
+{
+   die "file doesn't exist: $pdf_fname";
+}
+
+sub pass1 
+{
 
 my $pdf_base_name = get_basename($pdf_fname);
 my $txt_name = "$pdf_base_name.txt";
@@ -174,4 +198,6 @@ print "Take a look at the generated file $memory_file and make manual changes as
 if ($warnings) 
 {
   print "$warnings lines were rejected. Check the log file: $output_dir/$log_file and correct in $txt_name as needed\n";
+}
+
 }
