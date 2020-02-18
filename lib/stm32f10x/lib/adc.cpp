@@ -351,6 +351,15 @@ void ADC::AddConversion(ADC_CHANNEL channel, ADC_SAMPLE_TIME sampleTime)
 
 }
 
+void ADC::ClearSequence()
+{
+	_emptySequence = true;
+	*_pADC_SQR1 = 0;
+	*_pADC_SQR2 = 0;
+	*_pADC_SQR3 = 0;
+}
+
+
 void ADC::AddJConversion(ADC_CHANNEL channel, ADC_SAMPLE_TIME sampleTime)
 {
     SetChannelSampleTime(channel, sampleTime);

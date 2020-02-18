@@ -166,6 +166,8 @@ public:
 
     void EnableTempVref(bool enable);
 
+    void ClearSequence();
+
 };
 
 class ADC1: public ADC
