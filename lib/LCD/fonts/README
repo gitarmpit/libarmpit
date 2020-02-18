@@ -6,7 +6,3 @@ const GFXfont j8514oem =
   0x20, 0x7E, <height> <,width> 
 };
 
-Problem with .fon files.  Can't convert properly (containers for .fnt)
-.ttf .fnt work fine.  
-
-Use the 32 bit version (libfreetype-6.dll) to convert .fnt / .fon files 

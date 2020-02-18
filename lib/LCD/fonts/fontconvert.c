@@ -217,6 +217,8 @@ int main(int argc, char *argv[])
 
     int max_xadvance = 0;
     int mono = 1; 
+    int last_height = 0;
+
      // Output glyph attributes table (one per character)
     fprintf(f_out, "const GFXglyph %sGlyphs[] = {\n", fontName);
     for(i=first, j=0; i<=last; i++, j++) {
@@ -231,6 +233,8 @@ int main(int argc, char *argv[])
         if (table[j].xAdvance > max_xadvance) {
             max_xadvance = table[j].xAdvance;
         }
+
+        last_height = table[j].height;
 
         if (max_xadvance !=0 && table[j].xAdvance != max_xadvance) {
             mono = 0;
@@ -250,15 +254,22 @@ int main(int argc, char *argv[])
     if((last >= ' ') && (last <= '~')) fprintf(f_out, " '%c'", last);
     fprintf(f_out, "\n\n");
 
+    int height =  face->size->metrics.height >> 6;
+    if (height == 0) 
+    {
+        printf ("Height (yadvance) is zero, guess: %d\n", last_height);
+        height = last_height;
+    }
+
     // Output font structure
     fprintf(f_out, "const GFXfont %s = \n", fontName);
     fprintf(f_out, "{\n");
     fprintf(f_out, "  (uint8_t  *)%sBitmaps,\n", fontName);
     fprintf(f_out, "  (GFXglyph *)%sGlyphs,\n", fontName);
-    fprintf(f_out, "  0x%02X, 0x%02X, %ld, %ld\n",  first, last, face->size->metrics.height >> 6, max_xadvance);
+    fprintf(f_out, "  0x%02X, 0x%02X, %ld, %ld\n",  first, last, height, max_xadvance);
     fprintf(f_out, "};\n\n");
     fprintf(f_out, "// Approx. %d bytes\n",  bitmapOffset + (last - first + 1) * 7 + 7);
-    printf ("yadv:%d xadv: %d\n", face->size->metrics.height >> 6, max_xadvance);
+    printf ("yadv:%d xadv: %d\n", height, max_xadvance);
     printf ("mono ? %d\n", mono);
     printf ("generated: %s\n", fname);
     FT_Done_FreeType(library);
