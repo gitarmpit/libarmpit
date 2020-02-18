@@ -24,6 +24,8 @@ void RCC_EnableHSI_24Mhz(void)
 	RCC_EnablePLL(6);
 }
 
+// This is the max for HSI: 8Mhz/2 * 16 = 64
+// AHB max: 72,  APB1 max: 36, APB2 max:  72
 void RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz(void)
 {
 	FLASH_SetWaitState(2);
