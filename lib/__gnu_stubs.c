@@ -7,7 +7,7 @@
 #include <malloc.h>
 
 //C++ stubs. Required to be able to build C++ code using gcc instead of g++ and without linking with libstdc++
-//C++ limitations: no rtti, no exceptions
+//C++ limitations: no rtti, no exceptions: -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics
 
 void __cxa_pure_virtual() { while (1); } 
 
@@ -19,7 +19,7 @@ void __cxa_pure_virtual() { while (1); }
 /*This function is used for handle heap option*/
 extern int  _end;
 
-#ifndef SEMIHOSTING
+//#ifndef SEMIHOSTING
 
 __attribute__ ((used))
  caddr_t _sbrk ( int incr )
@@ -37,7 +37,7 @@ __attribute__ ((used))
     return (caddr_t) prev_heap;
 }
 
-#endif
+//#endif
 
 
 
