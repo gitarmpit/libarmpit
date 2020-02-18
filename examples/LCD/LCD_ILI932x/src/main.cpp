@@ -9,8 +9,15 @@
 #include "932x/ILI932x.h"
 #include "systick.h"
 #include "consola24.h"  //xmax=24 ymax=8
-#include "cour20.h"
+//#include "cour20.h"
 #include "lucon22.h"   //24 x 10
+#include "andalemo24.h"
+//#include "fixedsys20.h"
+#include "fixedsys1616.h"
+#include "8514fix24.h"
+#include "coure12.h"
+#include "DSEG7ModernMini_BoldItalic36.h"
+#include "digital_7_monoitalic72.h"
 
 volatile int tick = 0;
 static void systick_handler(void) {
@@ -317,33 +324,22 @@ static void test_font() {
     lcd.setTextSize(2);
     lcd.fillScreen(BLUE);
     lcd.setTextColor(YELLOW);
-    while(1)
-    {
-        lcd.fillScreen(BLUE);
-    	lcd.setFont(&lucon);
-    	lcd.printf(0, 0, "123456789012345678901234");
-    	lcd.printf(14, 1, "2AbcdEF");
-    	lcd.printf(0, 2, "3AbcdEF lucon");
-    	lcd.printf(0, 3, "4AbcdEF");
-    	lcd.printf(0, 4, "5AbcdEF");
-    	lcd.printf(0, 5, "6AbcdEF");
-    	lcd.printf(0, 6, "7AbcdEF");
-    	lcd.printf(0, 7, "8AbcdEF");
-    	lcd.printf(0, 8, "9AbcdEF");
-    	lcd.printf(0, 9, "0AbcdEF");
-    	delay(1000);
-        lcd.fillScreen(BLUE);
-    	lcd.setFont(&consola);
-    	lcd.printf(0, 0, "123456789012345678901234");
-    	lcd.printf(14, 1, "AbcdEF");
-    	lcd.printf(0, 2, "AbcdEF consola");
-    	lcd.printf(0, 3, "AbcdEF");
-    	lcd.printf(0, 4, "AbcdEF");
-    	lcd.printf(0, 5, "AbcdEF");
-    	lcd.printf(0, 6, "AbcdEF");
-    	lcd.printf(0, 7, "AbcdEF");
-    	delay(1000);
-    }
+    lcd.fillScreen(BLUE);
+    /*
+    lcd.setFont(&coure);
+	lcd.printf(0, 0, "123456789012345678901234");
+	lcd.printf(14, 1, "2AbcdEF");
+	lcd.printf(0, 2, "3AbcdEF lucon");
+	lcd.printf(0, 3, "4AbcdEF");
+	lcd.printf(0, 4, "5AbcdEF");
+	lcd.printf(0, 5, "6AbcdEF");
+	lcd.printf(0, 6, "7AbcdEF");
+	lcd.printf(0, 7, "8AbcdEF");
+	lcd.printf(0, 8, "9AbcdEF");
+	lcd.printf(0, 9, "0AbcdEF");
+     */
+    lcd.setFont(&digital_7_monoitalic);
+    lcd.printf(2,2, "11:40");
 
     while(1)
       ;
