@@ -5,7 +5,7 @@
 #include "9163/TFT_ILI9163C.h"
 #include "debug.h"
 #include "fonts/ttf/tahoma20.h"
-
+#include "Fonts2\FreeMono9pt7b.h"
 
 static void test()
 {
@@ -35,9 +35,10 @@ static void test()
     display.setTextColor(COLOR565(255, 255, 255), 0);
 
     //display.drawBmp(0, 10, consolas_16bit);
-    display.setFont(&tahoma20);
+    //display.setFont(&tahoma20);
+    display.setFont(&FreeMono9pt7b);
     //display.setYadvance(50);
-    display.printf (0, 0, "ABC abc 123456");
+    display.printf (0, 0, "2/13/2020");
     display.display();
     while(1)
         ;
