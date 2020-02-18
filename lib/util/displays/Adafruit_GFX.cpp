@@ -85,6 +85,8 @@ Adafruit_GFX::Adafruit_GFX(int16_t w, int16_t h) :
     gfxFont = 0;
     yAdvance = 0;
     xAdvance = 0;
+    textsize_x = 1;
+    textsize_y = 1;
 }
 
 // Bresenham's algorithm - thx wikpedia
@@ -509,8 +511,8 @@ void Adafruit_GFX::drawChar(int16_t x, int16_t y, uint16_t c, uint16_t color, ui
 
         if ((x >= _width) || // Clip right
                 (y >= _height) || // Clip bottom
-                ((x + 6 - 1) < 0) || // Clip left
-                ((y + 8 - 1) < 0))   // Clip top
+                ((x + 6 * textsize_x - 1) < 0) || // Clip left
+                ((y + 8 * textsize_y - 1) < 0))   // Clip top
             return;
 
         if (c >= 176)
@@ -524,17 +526,27 @@ void Adafruit_GFX::drawChar(int16_t x, int16_t y, uint16_t c, uint16_t color, ui
             {
                 if (line & 1)
                 {
+                	if (textsize_x == 1 && textsize_y == 1)
                     writePixel(x + i, y + j, color);
+                	else
+                		writeFillRect(x + i * textsize_x, y + j * textsize_y,
+                				textsize_x, textsize_y, color);
                 }
                 else if (bg != color)
                 {
-                    writePixel(x + i, y + j, bg);
-                }
+                	if (textsize_x == 1 && textsize_y == 1)
+                		writePixel(x + i, y + j, bg);
+                	else
+                		writeFillRect(x + i * textsize_x, y + j * textsize_y,
+                				textsize_x, textsize_y, bg);                }
             }
         }
         if (bg != color)
         { // If opaque, draw vertical line for last column
-            writeFastVLine(x + 5, y, 8, bg);
+        	if (textsize_x == 1 && textsize_y == 1)
+        		writeFastVLine(x + 5, y, 8, bg);
+        	else
+        		writeFillRect(x + 5 * textsize_x, y, textsize_x, 8 * textsize_y, bg);
         }
         endWrite();
 
@@ -603,16 +615,16 @@ void Adafruit_GFX::writeChar(uint16_t c)
         if (c == '\n')
         {                        // Newline?
             cursor_x = 0;                     // Reset x to zero,
-            cursor_y += 8;          // advance y one line
+            ++cursor_y;          // advance y one line
         }
         else if (c != '\r')
         {                 // Ignore carriage returns
-            if (wrap && ((cursor_x + 6) > _width))
+            if (wrap && ((cursor_x + textsize_x * 6) > _width))
             { // Off right?
                 cursor_x = 0;                 // Reset x to zero,
-                cursor_y += 8;      // advance y one line
+                ++cursor_y;      // advance y one line
             }
-            drawChar(cursor_x*6, cursor_y*8, c, fgcolor, bgcolor);
+            drawChar(cursor_x*textsize_x*6, cursor_y*textsize_y*8, c, fgcolor, bgcolor);
             ++cursor_x;          // Advance x one char
         }
 
@@ -668,6 +680,12 @@ uint8_t Adafruit_GFX::write(const wchar_t *str)
 
 }
 
+void Adafruit_GFX::setTextSize(uint8_t textSize) {
+	if (gfxFont == 0) {
+		textsize_x = textsize_y = textSize;
+	}
+}
+
 void Adafruit_GFX::setCursor(int16_t x, int16_t y)
 {
     if (xAdvance > 0)
@@ -704,6 +722,11 @@ void Adafruit_GFX::setTextColor(uint16_t c, uint16_t b)
     bgcolor = b;
 }
 
+void Adafruit_GFX::setBgColor(uint16_t b) 
+{
+    bgcolor = b;
+}
+
 void Adafruit_GFX::setTextWrap(bool w)
 {
     wrap = w;
@@ -734,39 +757,28 @@ void Adafruit_GFX::setRotation(uint8_t x)
 
 void Adafruit_GFX::setFont(const GFXfont *f)
 {
-    if (f)
-    {            // Font struct pointer passed in?
-        if (!gfxFont)
-        { // And no current font struct?
-          // Switching from classic to new font behavior.
-          // Move cursor pos down 6 pixels so it's on baseline.
-          //cursor_y += 6;
-        }
-    }
-    else if (gfxFont)
-    { // NULL passed.  Current font struct defined?
-      // Switching from new to classic font behavior.
-      // Move cursor pos up 6 pixels so it's at top-left of char.
-      //cursor_y -= 6;
-    }
-    gfxFont = (GFXfont *) f;
-    if (gfxFont)
-    {
-        yAdvance = gfxFont->yAdvance;
-        if (gfxFont->xAdvance != 0)
-        {
-            xAdvance = gfxFont->xAdvance;
-        }
-    }
+	if (f)
+	{
+		gfxFont = (GFXfont *) f;
+		if (gfxFont)
+		{
+			yAdvance = gfxFont->yAdvance;
+			if (gfxFont->xAdvance != 0)
+			{
+				xAdvance = gfxFont->xAdvance;
+			}
+			textsize_x = textsize_y = 1;
+		}
+	}
 }
 
 uint8_t Adafruit_GFX::printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    printf(fmt, args);
+    uint8_t size = printf(fmt, args);
     va_end(args);
-
+    return size;
 }
 
 uint8_t Adafruit_GFX::printf(uint8_t x, uint8_t y, const char *fmt, ...)
@@ -774,8 +786,9 @@ uint8_t Adafruit_GFX::printf(uint8_t x, uint8_t y, const char *fmt, ...)
     setCursor(x, y);
     va_list args;
     va_start(args, fmt);
-    printf(fmt, args);
+    int size = printf(fmt, args);
     va_end(args);
+    return size;
 }
 
 

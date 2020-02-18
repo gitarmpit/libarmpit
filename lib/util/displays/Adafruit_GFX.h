@@ -95,6 +95,7 @@ public:
     void setCursor(int16_t x, int16_t y);
     void setTextColor(uint16_t c);
     void setTextColor(uint16_t c, uint16_t bg);
+    void setBgColor(uint16_t b);
     void setTextWrap(bool w);
     void setFont(const GFXfont *f = 0);
 
@@ -115,6 +116,7 @@ public:
     uint8_t printf(const char *fmt, ...);
     uint8_t printf(uint8_t x, uint8_t y, const char *fmt, ...);
     void drawBmp(int16_t x, int16_t y, const uint8_t *bmp);
+    void setTextSize(uint8_t textSize);
 
 protected:
 
@@ -134,6 +136,9 @@ private:
     uint8_t yAdvance;  //can override the font associated value
     uint8_t xAdvance;
 
+    //ignored for custom fonts;
+    int textsize_x;
+    int textsize_y;
 };
 
 #endif // _ADAFRUIT_GFX_H
