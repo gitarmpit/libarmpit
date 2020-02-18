@@ -4,9 +4,9 @@
 #include "timer_cpp.h"
 #include "gpio_cpp.h"
 
-/* Default behavior is active low: button is configured as a weak pull-up
+/* The default behavior is active low: button is configured as a weak pull-up
  * So to active it, the switch needs to be connected from the input port to ground
- * Then pushing the switch will set it low the IsOn method will return true
+ * Then pushing the switch will set it low
  *
  */
 class Button

@@ -6,9 +6,9 @@
 #include "button.h"
 #include "system_time.h"
 
-/* Default behavior is active low: button is configured as a weak pull-up
+/* The default behavior is active low: button is configured as a weak pull-up
  * So to active it, the switch needs to be connected from the input port to ground
- * Then pushing the switch will set it low the IsOn method will return true
+ * Then pushing the switch will set it low: the IsOn method will return true
  *
  */
 class ButtonHandler : protected TIMER_Interrupt_Handler
