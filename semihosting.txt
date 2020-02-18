@@ -1,0 +1,25 @@
+--specs=rdimon.specs
+--specs=nano.specs
+
+can omit nano but the binary size will be much larger
+
+nano + rdimon  adds ~15k
+
+rdimon adds ~60-70k
+ 
+
+
+optionally define SEMIHOSTING as a macro in the project settings 
+optional since __gnu_stubs.c  doesnt need to ifdef _sbrk anymore it seems 
+as including rdimon doesn't clash with it 
+
+
+
+
+#ifdef SEMIHOSTING
+extern "C" void initialise_monitor_handles(void);
+#include <stdio.h>  //for printf
+
+    initialise_monitor_handles();
+    printf ("test semihosting\n");
+#endif
