@@ -71,14 +71,24 @@ int main(int argc, char *argv[])
     // Unless overridden, default first and last chars are
     // ' ' (space) and '~', respectively
 
+    /*
+    dpi can default to 72, it doesn't affect anything, increase dpi -> decrease font size, same result   
     if(argc < 3) 
     {
         fprintf(stderr, "Usage: %s fontfile size dpi\n",      argv[0]);
         return 1;
     }
+    */
+
+    if(argc != 3) 
+    {
+        fprintf(stderr, "Usage: fontfile size\n");
+        return 1;
+    }
+
 
     size = atoi(argv[2]);
-    dpi  = atoi(argv[3]);
+    //dpi  = atoi(argv[3]);
 
     ptr = strrchr(argv[1], '\\'); // Find last slash in filename
     if(ptr) 
@@ -205,7 +215,9 @@ int main(int argc, char *argv[])
 
     fprintf(f_out, " };\n\n"); // End bitmap array
 
-    // Output glyph attributes table (one per character)
+    int max_xadvance = 0;
+    int mono = 1; 
+     // Output glyph attributes table (one per character)
     fprintf(f_out, "const GFXglyph %sGlyphs[] = {\n", fontName);
     for(i=first, j=0; i<=last; i++, j++) {
         fprintf(f_out, "  { %5d, %3d, %3d, %3d, %4d, %4d }",
@@ -215,6 +227,17 @@ int main(int argc, char *argv[])
           table[j].xAdvance,
           table[j].xOffset,
           table[j].yOffset);
+
+        if (table[j].xAdvance > max_xadvance) {
+            max_xadvance = table[j].xAdvance;
+        }
+
+        if (max_xadvance !=0 && table[j].xAdvance != max_xadvance) {
+            mono = 0;
+        }
+
+        //printf ("w: %d, xadv: %d\n", table[j].width, table[j].xAdvance);
+        
         if(i < last) {
             fprintf(f_out, ",   // 0x%02X", i);
             if((i >= ' ') && (i <= '~')) {
@@ -232,10 +255,12 @@ int main(int argc, char *argv[])
     fprintf(f_out, "{\n");
     fprintf(f_out, "  (uint8_t  *)%sBitmaps,\n", fontName);
     fprintf(f_out, "  (GFXglyph *)%sGlyphs,\n", fontName);
-    fprintf(f_out, "  0x%02X, 0x%02X, %ld\n",  first, last, face->size->metrics.height >> 6);
+    fprintf(f_out, "  0x%02X, 0x%02X, %ld, %ld\n",  first, last, face->size->metrics.height >> 6, max_xadvance);
     fprintf(f_out, "};\n\n");
     fprintf(f_out, "// Approx. %d bytes\n",  bitmapOffset + (last - first + 1) * 7 + 7);
-
+    printf ("yadv:%d xadv: %d\n", face->size->metrics.height >> 6, max_xadvance);
+    printf ("mono ? %d\n", mono);
+    printf ("generated: %s\n", fname);
     FT_Done_FreeType(library);
 
     return 0;
