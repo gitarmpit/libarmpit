@@ -18,6 +18,8 @@
 #include "coure12.h"
 #include "DSEG7ModernMini_BoldItalic36.h"
 #include "digital_7_monoitalic72.h"
+#include "system_time.h"
+#include "GPIO_Helper.h"
 
 volatile int tick = 0;
 static void systick_handler(void) {
@@ -31,16 +33,24 @@ static void systick_cfg() {
     SystickEnable(count / 8, true, true, systick_handler);
 }
 
-static GPIOA* portA;
-static GPIOB* portB;
+static GPIO_PORT* _dataPort;
 static GPIO_PIN *cs, *rs, *rd, *wr, *rst;
 
+
+//f103, f407 directly to pins, no socket
 static void initGPIO()
 {
-	portA = GPIOA::GetInstance();
-	portB = GPIOB::GetInstance();
-    portA->EnablePeripheralClock(true);
+	_dataPort = GPIOA::GetInstance();
+    _dataPort->EnablePeripheralClock(true);
+
+    GPIOB* portB = GPIOB::GetInstance();
     portB->EnablePeripheralClock(true);
+
+    rst = portB->GetPin(GPIO_PIN11);
+    rst->SetupGPIO_OutPP();
+    rst->SetSpeedHigh();
+
+    rst->Set();
 
     cs = portB->GetPin(GPIO_PIN0);
     cs->SetupGPIO_OutPP();
@@ -50,29 +60,56 @@ static void initGPIO()
     rs->SetupGPIO_OutPP();
     rs->SetSpeedHigh();
 
-    rd = portB->GetPin(GPIO_PIN12);
-    rd->SetupGPIO_OutPP();
-    rd->SetSpeedHigh();
-
     wr = portB->GetPin(GPIO_PIN10);
     wr->SetupGPIO_OutPP();
     wr->SetSpeedHigh();
 
-    rst = portB->GetPin(GPIO_PIN11);
+    rd = portB->GetPin(GPIO_PIN12);
+    rd->SetupGPIO_OutPP();
+    rd->SetSpeedHigh();
+
+    delay(500);
+
+}
+
+//411 socket
+static void initGPIO_411()
+{
+	_dataPort = GPIOC::GetInstance();
+    _dataPort->EnablePeripheralClock(true);
+	GPIOB* portB = GPIOB::GetInstance();
+    portB->EnablePeripheralClock(true);
+
+    rst = portB->GetPin(GPIO_PIN5);
     rst->SetupGPIO_OutPP();
     rst->SetSpeedHigh();
 
     rst->Set();
 
-    // delay(10);
+    cs = portB->GetPin(GPIO_PIN6);
+    cs->SetupGPIO_OutPP();
+    cs->SetSpeedHigh();
+
+    rs = portB->GetPin(GPIO_PIN7);
+    rs->SetupGPIO_OutPP();
+    rs->SetSpeedHigh();
+
+    wr = portB->GetPin(GPIO_PIN8);
+    wr->SetupGPIO_OutPP();
+    wr->SetSpeedHigh();
+
+    rd = portB->GetPin(GPIO_PIN9);
+    rd->SetupGPIO_OutPP();
+    rd->SetSpeedHigh();
 
 }
+
 
 /////////////////////////////////////////
 static void test_flood() {
 
 	initGPIO();
-    ILI932x lcd(cs, rs, wr, rd, rst, portA, portB);
+    ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
     systick_cfg();
@@ -80,26 +117,27 @@ static void test_flood() {
     int cnt = 0;
     int _tick;
     while (tick < 1000*60) {
-        lcd.fillScreen(RED);
-        lcd.fillScreen(GREEN);
+        lcd.fillScreen(0xf0f0);
+        lcd.fillScreen(0x0f0f);
         cnt += 2;
     }
     _tick = tick;
 
-    lcd.setRotation(1);
     lcd.fillScreen(BLUE);
+    lcd.setRotation(1);
     lcd.setFont(&consola);
-    lcd.printf(1, 1, "Tick: %d, Cnt: %d, fps: %f", _tick, cnt, (float)cnt/60.0);
+    lcd.printf(1, 1, "Tick: %d, Cnt: %d, fps: %7.3f", _tick, cnt, (float)cnt/60.0);
     while(1)
         ;
 
     //f103 debug: 8.6fps, release inline asm: 59 fps, release obj: 33.5
+    //f407 240Mhz (4 nops): 182fps (2 bytes different), 182: 2 bytes same
 }
 
 static void test_drawPixel() {
 
 	initGPIO();
-	ILI932x lcd(cs, rs, wr, rd, rst, portA, portB);
+	ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
     systick_cfg();
@@ -139,8 +177,12 @@ static void test_drawPixel() {
 static void testPushColors()
 {
 	initGPIO();
-	ILI932x lcd(cs, rs, wr, rd, rst, portA, portB);
+	ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
+    //lcd.fillScreen(BLUE);
+    //int id = lcd.readID();
+    //lcd.printf (3, 3, "ID: %x", id);
+    //delay(1000);
 
     int cnt = 0;
     int _tick;
@@ -155,7 +197,59 @@ static void testPushColors()
     }
 
     systick_cfg();
+    while (tick < 1000*60) {
+
+        lcd.setAddrWindow(0, 0, TFTWIDTH, TFTHEIGHT);
+        lcd.startPushColors();
+        for (int i = 0; i < total; ++i)
+            lcd.pushColors(red, n);
+
+        lcd.setAddrWindow(0, 0, TFTWIDTH, TFTHEIGHT);
+        lcd.startPushColors();
+        for (int i = 0; i < total; ++i)
+            lcd.pushColors(green, n);
+
+        cnt += 2;
+    }
+
+    _tick = tick;
+
+
+    lcd.setRotation(1);
+    lcd.fillScreen(BLUE);
+    lcd.setFont(&consola);
+    lcd.printf(1, 1, "Tick: %d, Cnt: %d, fps: %f", _tick, cnt, (float)cnt/60.0);
+
+    while (1)
+        ;
+
+    //f103: 37 fps, f407 at 168Mhz: 97fps, f411 at 100Mhz: 65fps
+}
+
+static void testPushColors_407()
+{
+	initGPIO();
+	ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
+    lcd.init();
+    //lcd.fillScreen(BLUE);
+    //int id = lcd.readID();
+    //lcd.printf (3, 3, "ID: %x", id);
+    //delay(1000);
+
+    int cnt = 0;
+    int _tick;
+
+    const int n = TFTWIDTH * TFTHEIGHT / 4;
+    int total = TFTWIDTH * TFTHEIGHT / n;
+
+    uint16_t red[n], green[n];
+    for (int i = 0; i < n; ++i) {
+        red[i] = RED;
+        green[i] = GREEN;
+    }
+
     lcd.setAddrWindow(0, 0, TFTWIDTH, TFTHEIGHT);
+    systick_cfg();
     while (tick < 1000*60) {
 
         lcd.startPushColors();
@@ -171,11 +265,68 @@ static void testPushColors()
 
     _tick = tick;
 
+
+    lcd.setRotation(1);
+    lcd.fillScreen(BLUE);
+    lcd.setFont(&consola);
+    lcd.printf(1, 1, "Tick: %d, Cnt: %d, fps: %f", _tick, cnt, (float)cnt/60.0);
+
+    while (1)
+        ;
+
+    //f103: 37 fps, f407 at 168Mhz: 97fps, f411 at 100Mhz: 65fps
+}
+
+static void testPushColors5()
+{
+	initGPIO();
+	ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
+    lcd.init();
+
+    //F1/F411
+    const int n = 3200;
+
+    //F407
+    //const int n = TFTWIDTH * TFTHEIGHT / 2;
+
+    int total = TFTWIDTH * TFTHEIGHT / n;
+
+    uint16_t color[n];
+
+    for (int j = 0; j < 10; ++j)
+    {
+        for (int i = 0; i < n; ++i) {
+            color[i] = (j % 2) ? 0xf0f0 : 0x0f0f;
+        }
+    	lcd.startPushColors();
+    	for (int i = 0; i < total; ++i)
+    		lcd.pushColors(color, n);
+    	delay (500);
+    }
+
+    for (int i = 0; i < n; ++i) {
+        color[i] = 0x0f0f;
+    }
+
+    systick_enable(TRUE);
+    int m1 = millis();
+
+    int cnt = 100;
+	lcd.setAddrWindow(0, 0, TFTWIDTH, TFTHEIGHT);
+    for (int j = 0; j < cnt; ++j)
+    {
+    	lcd.startPushColors();
+    	for (int i = 0; i < total; ++i)
+    		lcd.pushColors(color, n);
+    }
+    int m2 = millis() - m1;
+
     lcd.setRotation(1);
     lcd.setFont(&consola);
     lcd.fillScreen(BLUE);
 
-    lcd.printf(1, 1, "Tick: %d, Cnt: %d, fps: %f", _tick, cnt, (float)cnt/60.0);
+    lcd.printf(1, 2, "Millis: %7.3f", (float)m2/cnt);
+    lcd.printf(1, 3, "fps: %7.3f", 1000.*cnt/(float)m2);
 
     while (1)
         ;
@@ -183,10 +334,11 @@ static void testPushColors()
     //f103: release:  37 fps
 }
 
+#ifdef STM32F1
 void testPushColors2()
 {
 	initGPIO();
-    ILI932x lcd(cs, rs, wr, rd, rst, portA, portB);
+    ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
     const int n = 3000;
@@ -235,7 +387,7 @@ void testPushColors2()
 static void testPushColorsAsm()
 {
 	initGPIO();
-    ILI932x lcd(cs, rs, wr, rd, rst, portA, portB);
+    ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
     const int n = 3000;
@@ -277,12 +429,14 @@ static void testPushColorsAsm()
     //f103: debug: ,  release: 37
 }
 
+#endif
+
 /////////////////////////////////////////
 static void test() {
 
 	initGPIO();
 
-    ILI932x lcd(cs, rs, wr, rd, rst, portA, portB);
+    ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
     uint16_t id2 = lcd.readID();
@@ -301,7 +455,7 @@ static void test2() {
 
 	initGPIO();
 
-    ILI932x* lcd =  new ILI932x(cs, rs, wr, rd, rst, portA, portB);
+    ILI932x* lcd =  new ILI932x(cs, rs, wr, rd, rst, _dataPort);
     lcd->init();
 
     uint16_t id2 = lcd->readID();
@@ -318,8 +472,10 @@ static void test2() {
 
 static void test_font() {
 	initGPIO();
-    ILI932x lcd(cs, rs, wr, rd, rst, portA, portB);
+    ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
+    //delay(500);
+    int id = lcd.readID();
     lcd.setRotation(1);
     lcd.setTextSize(2);
     lcd.fillScreen(BLUE);
@@ -356,7 +512,7 @@ static void test_semihosting()
     //initialise_monitor_handles();
     int i = 0;
 	initGPIO();
-    ILI932x lcd(cs, rs, wr, rd, rst, portA, portB);
+    ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
     systick_cfg();
@@ -370,7 +526,67 @@ static void test_semihosting()
 #endif
 
 int main() {
+#if defined(STM32F1)
     RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+
+	// FLASH_SetWaitState(2);
+	//FLASH_SetWaitState(3);
+	//RCC_EnableHSE(TRUE);
+	//RCC_EnablePLL(16);
+
+#elif defined(STM32F4)
+    //RCC_EnableHSI_168Mhz();
+
+    //f411
+    //RCC_EnableHSI_100Mhz();
+
+    /* 411
+    FLASH_EnableDCache();
+    FLASH_EnableICache();
+    FLASH_EnablePrefetchBuffer();
+
+    FLASH_SetWaitState(3);
+
+    RCC_EnableHSI(TRUE);
+    uint8_t pllm = 4;
+    uint16_t plln = 145;
+    uint16_t pllp = 4;
+    RCC_EnablePLL(pllm, plln, pllp);
+    */
+
+    //f407
+    //190(3 nops): 110fps
+    //>190 requires 4 nops.
+    //Max without distortion: 240Mhz(4 nops) 125fps
+    //4:
+    //200: 105fps (worse than 3 nops at 190)
+    //210: 110fps (same as 3 nops at 190)
+    //230: 120fps
+    //240: 125fps : 8ms
+
+
+    FLASH_EnableDCache();
+    FLASH_EnableICache();
+    FLASH_EnablePrefetchBuffer();
+
+    FLASH_SetWaitState(5);
+
+    RCC_EnableHSI(TRUE);
+    //F4: HSI=16
+    //PLL=16/m/p * n
+    //m=16 p=2 :  PLL = n/2
+    uint8_t pllm = 16;
+    uint16_t pllp = 2; //vco out / pllp = sysclock
+    uint16_t plln = MCU_FREQ*2;
+    RCC_EnablePLL(pllm, plln, pllp);
+
+
+    // RCC_SetAHBPrescalerDiv2();
+
+#endif
     Debug_EnableCYCCNT(true);
-    test_font();
+    //testPushColors();
+    testPushColors5();
+    //test_flood();
+    //test_font();
 }

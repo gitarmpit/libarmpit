@@ -11,33 +11,33 @@
 
 
 ILI932x::ILI932x(GPIO_PIN* cs, GPIO_PIN* rs, GPIO_PIN* wr, GPIO_PIN* rd,
-		GPIO_PIN* rst, GPIO_PORT* dataPort, GPIO_PORT* ctrlPort) :
+		GPIO_PIN* rst, GPIO_PORT* dataPort) :
 		Adafruit_GFX(TFTWIDTH, TFTHEIGHT) {
+
+	// For STM32F1 all 5 pins must be on the same port
 	_cs = cs;
 	_rs = rs;
 	_wr = wr;
 	_rd = rd;
 	_rst = rst;
+
 	_dataPort = dataPort;
 
 	_odr_addr = _dataPort->GetGPIO_ODR();
-	_bsrr_addr = ctrlPort->GetGPIO_BSRR();
-	_brr_addr = ctrlPort->GetGPIO_BRR();
-
+	_bsrr_addr = _wr->GetPort()->GetGPIO_BSRR();
+#ifdef STM32F1
+	_brr_addr = _cs->GetPort()->GetGPIO_BRR();
+#endif
 	_csMask = 1 << _cs->GetPinNumber();
 	_rsMask = 1 << _rs->GetPinNumber();
 	_wrMask = 1 << _wr->GetPinNumber();
-	_rdMask = 1 << _rd->GetPinNumber();
-
-	_csrstMask = (1 << _cs->GetPinNumber()) << 16;
+	_wrstMask = (1 << _wr->GetPinNumber()) << 16;
 
 	_cs->Set(); // Set all control bits to idle state
 	_wr->Set();
 	_rd->Set();
 	_rs->Set();
-	if (_rst) {
-		_rst->Set();
-	}
+	_rst->Set();
 
 	setWriteDir(); // Set up LCD data port(s) for WRITE operations
 
@@ -77,46 +77,14 @@ void ILI932x::init(void) {
 uint8_t ILI932x::read8() {
 	_rd->Reset();
 	delay_us(10);
-	uint8_t rc = GPIOA::GetInstance()->GetInput() & 0xff;
+	uint8_t rc = _dataPort->GetInput() & 0xff;
 	_rd->Set();
 	return rc;
 }
 
-void ILI932x::__write8(uint8_t d) {
-	_dataPort->SetOutput(d);
-	_wr->Reset();
-	_wr->Set();
-}
-
-void ILI932x::_writeRegister16(uint16_t addr, uint16_t data) {
-	_cs->Reset();
-
-	// Set  Addr
-	_rs->Reset();
-
-	_dataPort->SetOutput(0);
-	_wr->Reset();
-	_wr->Set();
-
-	_dataPort->SetOutput(addr);
-	_wr->Reset();
-	_wr->Set();
-
-	// Set Data
-	_rs->Set();
-
-	_dataPort->SetOutput(data >> 8);
-	_wr->Reset();
-	_wr->Set();
-
-	_dataPort->SetOutput(data);
-	_wr->Reset();
-	_wr->Set();
-
-	_cs->Set();
-}
-
 void ILI932x::writeRegister16(uint16_t addr, uint16_t data) {
+//#ifdef STM32F1
+#if 0
 	__asm volatile(
 
 			// cs Low
@@ -170,6 +138,41 @@ void ILI932x::writeRegister16(uint16_t addr, uint16_t data) {
 			[d_hi] "r" (data>>8),
 			[d_lo] "r" (data)
 	);
+#else
+	_cs->Reset();
+
+	// Set  Addr
+	_rs->Reset();
+
+	_dataPort->SetOutput(0);
+	_wr->Reset();
+	//for (volatile int i = 0; i < 1; ++i)
+	//	;
+	//__asm volatile("nop\n\t nop\n\t");
+
+	_wr->Set();
+
+	_dataPort->SetOutput(addr);
+	_wr->Reset();
+	//delay_us(1);
+	_wr->Set();
+
+	// Set Data
+	_rs->Set();
+
+	_dataPort->SetOutput(data >> 8);
+	_wr->Reset();
+	//delay_us(1);
+	_wr->Set();
+
+	_dataPort->SetOutput(data);
+	_wr->Reset();
+	//delay_us(1);
+	_wr->Set();
+
+	_cs->Set();
+
+#endif
 }
 
 // Fast block fill operation for fillScreen, fillRect, H/V line, etc.
@@ -202,15 +205,54 @@ void ILI932x::flood(uint16_t color, uint32_t len) {
 				for (uint8_t s = 0; s < 8; ++s) {
 					*_brr_addr = 1 << _wrMask;
 					*_bsrr_addr = 1 << _wrMask;
+					// new:
+					//*_bsrr_addr = _wrstMask;
+					//*_bsrr_addr = _wrMask;
+
+					/*
+					__asm volatile(
+							"str  %[wrst],   [%[bsrr]]   \n\t"
+							__DELAY__
+							"str  %[wr], [%[bsrr]]   \n\t"
+							"nop \n\t"
+							"nop \n\t"
+							::
+							[bsrr] "r" (_bsrr_addr),
+							[wr]   "r" (_wrMask),
+							[wrst] "r" (_wrstMask)
+					);
+*/
 				}
 			} while (--i);
 		}
 		// Fill any remaining pixels (1 to 64)
 		for (i = (uint8_t) len & 63; i--;) {
+			/*
 			*_brr_addr = 1 << _wrMask;
 			*_bsrr_addr = 1 << _wrMask;
 			*_brr_addr = 1 << _wrMask;
 			*_bsrr_addr = 1 << _wrMask;
+			*/
+			//new:
+/*
+			*_bsrr_addr = _wrstMask;
+			*_bsrr_addr = _wrMask;
+			*_bsrr_addr = _wrstMask;
+			*_bsrr_addr = _wrMask;
+*/
+			for (uint8_t i = 0; i < 2; ++i)
+			{
+				__asm volatile(
+						"str  %[wrst],   [%[bsrr]]   \n\t"
+						__DELAY__
+						"str  %[wr], [%[bsrr]]   \n\t"
+						::
+						[bsrr] "r" (_bsrr_addr),
+						[wr]   "r" (_wrMask),
+						[wrst] "r" (_wrstMask)
+				);
+
+			}
 		}
 	} else {
 		while (blocks--) {
@@ -284,7 +326,7 @@ void ILI932x::reset() {
 	}
 
 	_cs->Set();
-	//delay(200);
+	delay(200);
 }
 
 void ILI932x::setRotation(uint8_t x) {
@@ -470,6 +512,7 @@ void ILI932x::pushColors(uint16_t *data, int len) {
 	_cs->Set();
 }
 
+#ifdef STM32F1
 void ILI932x::pushColors2(uint16_t *data, int len) {
 	static int _len;
 	static uint16_t *_data;
@@ -519,6 +562,7 @@ void ILI932x::pushColors2(uint16_t *data, int len) {
 	);
 
 }
+#endif
 
 void ILI932x::startPushColors() {
 	_cs->Reset();

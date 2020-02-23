@@ -29,7 +29,6 @@ public:
 
         _odr_addr = (uint32_t)_dataPort->GetGPIO_ODR();
 
-
         _cs->Set(); // Set all control bits to idle state
         _wr->Set();
         _rd->Set();
@@ -39,13 +38,15 @@ public:
             _rst->Set();
         }
 
-        *_dataPort->GetGPIO_OSPEEDR() |= 0xffff;
-
         setWriteDir(); // Set up LCD data port(s) for WRITE operations
 
         _rst->Reset();
         delay(2);
         _rst->Set();
+
+#ifndef STM32F1
+#error TODO
+#endif
 
         //init();
     }
@@ -55,12 +56,22 @@ private:
 
     void setWriteDir()
     {
+#ifdef STM32F1
+        *_dataPort->GetGPIO_CR() &= ~(0xffffffff);
+        *_dataPort->GetGPIO_CR() |= 0x33333333; //CNF=0(out PP) MODE=3(fast)
+#else
        *_dataPort->GetGPIO_MODER() |= 0x5555;
+#endif
     }
 
     void setReadDir()
     {
+#ifdef STM32F1
+        *_dataPort->GetGPIO_CR() &= ~(0xffffffff);
+        *_dataPort->GetGPIO_CR() |= 0x44444444; //CNF=1(Floating Input) MODE = 0 (input)
+#else
         *_dataPort->GetGPIO_MODER() &= ~0xffff;
+#endif
     }
 
     uint8_t read8()
@@ -304,8 +315,7 @@ public:
 };
 
 /////////////////////////////////////////
-
-void test()
+void test_f411()
 {
     GPIO_PORT* dataPort = GPIOC::GetInstance();
     dataPort->EnablePeripheralClock(true);
@@ -354,11 +364,64 @@ void test()
 
 }
 
+void test_f1()
+{
+	GPIOA* portA = GPIOA::GetInstance();
+    GPIOB* portB = GPIOB::GetInstance();
+    portA->EnablePeripheralClock(true);
+    portB->EnablePeripheralClock(true);
+
+    GPIO_PIN* cs = portB->GetPin(GPIO_PIN0);
+    cs->SetupGPIO_OutPP();
+    cs->SetSpeedHigh();
+
+    GPIO_PIN* rs = portB->GetPin(GPIO_PIN1);
+    rs->SetupGPIO_OutPP();
+    rs->SetSpeedHigh();
+
+    GPIO_PIN* rd = portB->GetPin(GPIO_PIN12);
+    rd->SetupGPIO_OutPP();
+    rd->SetSpeedHigh();
+
+    GPIO_PIN* wr = portB->GetPin(GPIO_PIN10);
+    wr->SetupGPIO_OutPP();
+    wr->SetSpeedHigh();
+
+    GPIO_PIN* rst = portB->GetPin(GPIO_PIN11);
+    rst->SetupGPIO_OutPP();
+    rst->SetSpeedHigh();
+
+
+    rst->Set();
+
+    delay(500);
+    TestLCD t(cs, rs, wr, rd, rst, portA);
+
+
+    t.reset();
+    delay(500);
+    volatile uint16_t id2 = t.readID2();
+
+    for (int x = 0; x < 100; ++x)
+    {
+        for (int y = 0; y < 100; ++y)
+        {
+            t.drawPixel(x, y, 0x0);
+        }
+    }
+
+    while(1)
+        ;
+
+}
 
 int main()
 {
+	//RCC_EnableHSI_100Mhz();
 
-    RCC_EnableHSI_100Mhz();
-    test();
+	RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+	Debug_EnableCYCCNT(true);
+
+	test_f1();
 
 }
