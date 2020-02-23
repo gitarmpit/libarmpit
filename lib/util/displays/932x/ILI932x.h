@@ -148,20 +148,6 @@ private:
     uint8_t read8();
 
     inline void write8(uint8_t d) {
-
-//#ifdef STM32F1
-#if 0
-        __asm volatile(
-                "str  %[data], [%[odr]]   \n\t"
-                "str  %[wr],   [%[brr]]   \n\t"
-                "str  %[wr],   [%[bsrr]]  \n\t"
-                :: [brr] "r" (_brr_addr),
-                [bsrr] "r" (_bsrr_addr),
-                [odr] "r" (_odr_addr),
-                [wr] "r" (_wrMask),
-                [data] "r" (d)
-        );
-#else
         __asm volatile(
                 "str  %[data], [%[odr]]   \n\t"
                 "str  %[wrst],   [%[bsrr]]   \n\t"
@@ -176,8 +162,6 @@ private:
                 [wrst] "r" (_wrstMask),
                 [data] "r" (d)
         );
-
-#endif
     }
 
     void writeRegister16(uint16_t addr, uint16_t data);

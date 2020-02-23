@@ -40,20 +40,6 @@ ILI932x::ILI932x(GPIO_PIN* cs, GPIO_PIN* rs, GPIO_PIN* wr, GPIO_PIN* rd,
 	_rst->Set();
 
 	setWriteDir(); // Set up LCD data port(s) for WRITE operations
-
-	/*
-
-	 _width = WIDTH;
-	 _height = HEIGHT;
-	 rotation = 0;
-	 cursor_y = cursor_x = 0;
-	 textsize = 1;
-	 textcolor = textbgcolor = 0xFFFF;
-	 wrap = true;
-	 _cp437 = false;
-	 */
-
-	//reset();
 }
 
 void ILI932x::init(void) {
@@ -146,15 +132,10 @@ void ILI932x::writeRegister16(uint16_t addr, uint16_t data) {
 
 	_dataPort->SetOutput(0);
 	_wr->Reset();
-	//for (volatile int i = 0; i < 1; ++i)
-	//	;
-	//__asm volatile("nop\n\t nop\n\t");
-
 	_wr->Set();
 
 	_dataPort->SetOutput(addr);
 	_wr->Reset();
-	//delay_us(1);
 	_wr->Set();
 
 	// Set Data
@@ -162,12 +143,10 @@ void ILI932x::writeRegister16(uint16_t addr, uint16_t data) {
 
 	_dataPort->SetOutput(data >> 8);
 	_wr->Reset();
-	//delay_us(1);
 	_wr->Set();
 
 	_dataPort->SetOutput(data);
 	_wr->Reset();
-	//delay_us(1);
 	_wr->Set();
 
 	_cs->Set();
@@ -333,8 +312,6 @@ void ILI932x::setRotation(uint8_t x) {
 	// Call parent rotation func first -- sets up rotation flags, etc.
 	Adafruit_GFX::setRotation(x);
 	// Then perform hardware-specific rotation operations...
-
-	//_cs->Reset();
 
 	uint16_t t;
 	switch (rotation) {
