@@ -188,7 +188,6 @@ void ILI932x::flood(uint16_t color, uint32_t len) {
 					//*_bsrr_addr = _wrstMask;
 					//*_bsrr_addr = _wrMask;
 
-					/*
 					__asm volatile(
 							"str  %[wrst],   [%[bsrr]]   \n\t"
 							__DELAY__
@@ -200,7 +199,7 @@ void ILI932x::flood(uint16_t color, uint32_t len) {
 							[wr]   "r" (_wrMask),
 							[wrst] "r" (_wrstMask)
 					);
-*/
+
 				}
 			} while (--i);
 		}
