@@ -1,7 +1,7 @@
 #ifndef _ILI932x_H
 #define _ILI932x_H
 
-#define MCU_FREQ 60
+#define MCU_FREQ 64
 
 #ifndef MCU_FREQ
 #error  MCU_FREQ not defined
@@ -23,8 +23,11 @@
 #define __DELAY__ NOP2
 #endif
 #else
-#define __DELAY__ NOP0
+#define __DELAY__ NOP1
 #endif
+
+//Can force delay directly
+//#define __DELAY__ NOP4
 
 #define BLACK   0x0000
 #define BLUE    0x001F

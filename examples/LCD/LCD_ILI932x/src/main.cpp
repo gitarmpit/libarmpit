@@ -383,7 +383,7 @@ void testPushColors2()
     while (1)
         ;
 
-    //f103: release:  36 fps
+    //f103: release:  40 fps
 }
 
 static void testPushColorsAsm()
@@ -531,6 +531,8 @@ static void test_semihosting()
 static void initF1()
 {
 	RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+
+
 	//HSE over clock: 128
 	//FLASH_SetWaitState(3);
 	//RCC_EnableHSE(TRUE);
@@ -597,9 +599,9 @@ int main() {
 	initF407();
 #endif
     Debug_EnableCYCCNT(true);
-    //testPushColors();
-    //testPushColors5();
-    test_flood();
+    testPushColors();
+    //testPushColors2();
+    //test_flood();
     //test_font();
     //test_drawPixel();
 }

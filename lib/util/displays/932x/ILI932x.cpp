@@ -182,18 +182,14 @@ void ILI932x::flood(uint16_t color, uint32_t len) {
 			i = 16; // 64 pixels/block / 4 pixels/pass
 			do {
 				for (uint8_t s = 0; s < 8; ++s) {
-					//*_brr_addr = _wrMask;
-					//*_bsrr_addr = _wrMask;
-					// new:
-					//*_bsrr_addr = _wrstMask;
-					//*_bsrr_addr = _wrMask;
-
 					__asm volatile(
 							"str  %[wrst],   [%[bsrr]]   \n\t"
 							__DELAY__
 							"str  %[wr], [%[bsrr]]   \n\t"
+#ifndef STM32F1
 							"nop \n\t"
 							"nop \n\t"
+#endif
 							::
 							[bsrr] "r" (_bsrr_addr),
 							[wr]   "r" (_wrMask),
@@ -205,19 +201,6 @@ void ILI932x::flood(uint16_t color, uint32_t len) {
 		}
 		// Fill any remaining pixels (1 to 64)
 		for (i = (uint8_t) len & 63; i--;) {
-			/*
-			*_brr_addr = 1 << _wrMask;
-			*_bsrr_addr = 1 << _wrMask;
-			*_brr_addr = 1 << _wrMask;
-			*_bsrr_addr = 1 << _wrMask;
-			*/
-			//new:
-/*
-			*_bsrr_addr = _wrstMask;
-			*_bsrr_addr = _wrMask;
-			*_bsrr_addr = _wrstMask;
-			*_bsrr_addr = _wrMask;
-*/
 			for (uint8_t i = 0; i < 2; ++i)
 			{
 				__asm volatile(
