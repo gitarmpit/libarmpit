@@ -525,16 +525,20 @@ static void test_semihosting()
 }
 #endif
 
-int main() {
-#if defined(STM32F1)
-    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
-
-	// FLASH_SetWaitState(2);
+#ifdef STM32F1
+static void initF1()
+{
+	RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+	//HSE over clock: 128
 	//FLASH_SetWaitState(3);
 	//RCC_EnableHSE(TRUE);
 	//RCC_EnablePLL(16);
+}
+#endif
 
-#elif defined(STM32F4)
+#ifdef STM32F4
+static void initF407()
+{
     //RCC_EnableHSI_168Mhz();
 
     //f411
@@ -564,7 +568,6 @@ int main() {
     //230: 120fps
     //240: 125fps : 8ms
 
-
     FLASH_EnableDCache();
     FLASH_EnableICache();
     FLASH_EnablePrefetchBuffer();
@@ -582,11 +585,18 @@ int main() {
 
 
     // RCC_SetAHBPrescalerDiv2();
+}
+#endif
 
+int main() {
+#if defined(STM32F1)
+	initF1();
+#elif defined(STM32F4)
+	initF407();
 #endif
     Debug_EnableCYCCNT(true);
-    //testPushColors();
-    testPushColors5();
+    testPushColors();
+    //testPushColors5();
     //test_flood();
     //test_font();
 }
