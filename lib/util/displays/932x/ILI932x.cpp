@@ -182,11 +182,11 @@ void ILI932x::flood(uint16_t color, uint32_t len) {
 			i = 16; // 64 pixels/block / 4 pixels/pass
 			do {
 				for (uint8_t s = 0; s < 8; ++s) {
-					//*_brr_addr = 1 << _wrMask;
-					//*_bsrr_addr = 1 << _wrMask;
+					//*_brr_addr = _wrMask;
+					//*_bsrr_addr = _wrMask;
 					// new:
-					*_bsrr_addr = _wrstMask;
-					*_bsrr_addr = _wrMask;
+					//*_bsrr_addr = _wrstMask;
+					//*_bsrr_addr = _wrMask;
 
 					/*
 					__asm volatile(
