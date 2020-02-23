@@ -117,8 +117,10 @@ static void test_flood() {
     int cnt = 0;
     int _tick;
     while (tick < 1000*60) {
-        lcd.fillScreen(0xf0f0);
-        lcd.fillScreen(0x0f0f);
+        lcd.fillScreen(0xf0f0); //f0f0
+        delay(1000);
+        lcd.fillScreen(0x0f0f); //0f0f
+        delay(1000);
         cnt += 2;
     }
     _tick = tick;
@@ -595,8 +597,9 @@ int main() {
 	initF407();
 #endif
     Debug_EnableCYCCNT(true);
-    testPushColors();
+    //testPushColors();
     //testPushColors5();
-    //test_flood();
+    test_flood();
     //test_font();
+    //test_drawPixel();
 }
