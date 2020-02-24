@@ -72,7 +72,7 @@ static void initGPIO()
 
 }
 
-//411 socket
+//411 board with pin header
 static void initGPIO_411()
 {
 	_dataPort = GPIOC::GetInstance();
@@ -108,7 +108,6 @@ static void initGPIO_411()
 /////////////////////////////////////////
 static void test_flood() {
 
-	initGPIO();
     ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
@@ -118,9 +117,7 @@ static void test_flood() {
     int _tick;
     while (tick < 1000*60) {
         lcd.fillScreen(0xf0f0); //f0f0
-        delay(1000);
         lcd.fillScreen(0x0f0f); //0f0f
-        delay(1000);
         cnt += 2;
     }
     _tick = tick;
@@ -132,13 +129,12 @@ static void test_flood() {
     while(1)
         ;
 
-    //f103 debug: 8.6fps, release inline asm: 59 fps, release obj: 33.5
+    //f103 86fps (same color), 60fps 2 bytes different
     //f407 240Mhz (4 nops): 182fps (2 bytes different), 182: 2 bytes same
 }
 
 static void test_drawPixel() {
 
-	initGPIO();
 	ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
@@ -178,7 +174,6 @@ static void test_drawPixel() {
 
 static void testPushColors()
 {
-	initGPIO();
 	ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
     //lcd.fillScreen(BLUE);
@@ -216,7 +211,6 @@ static void testPushColors()
 
     _tick = tick;
 
-
     lcd.setRotation(1);
     lcd.fillScreen(BLUE);
     lcd.setFont(&consola);
@@ -225,12 +219,12 @@ static void testPushColors()
     while (1)
         ;
 
-    //f103: 37 fps, f407 at 168Mhz: 97fps, f411 at 100Mhz: 65fps
+    //f103: 37 fps, f407 at 168Mhz: 97fps, f407 at 240Mhz: 120fps,
+    //f411 at 100Mhz: 76fps, at 140Mhz: 107fps
 }
 
 static void testPushColors_407()
 {
-	initGPIO();
 	ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
     //lcd.fillScreen(BLUE);
@@ -276,12 +270,11 @@ static void testPushColors_407()
     while (1)
         ;
 
-    //f103: 37 fps, f407 at 168Mhz: 97fps, f411 at 100Mhz: 65fps
+    //f407 at 168Mhz: 97fps, at 240Mhz: 120fps
 }
 
-static void testPushColors5()
+static void testPushColors_quick()
 {
-	initGPIO();
 	ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
@@ -295,6 +288,7 @@ static void testPushColors5()
 
     uint16_t color[n];
 
+    /*
     for (int j = 0; j < 10; ++j)
     {
         for (int i = 0; i < n; ++i) {
@@ -305,9 +299,10 @@ static void testPushColors5()
     		lcd.pushColors(color, n);
     	delay (500);
     }
+    */
 
     for (int i = 0; i < n; ++i) {
-        color[i] = 0x0f0f;
+        color[i] = i;
     }
 
     systick_enable(TRUE);
@@ -333,13 +328,13 @@ static void testPushColors5()
     while (1)
         ;
 
-    //f103: release:  37 fps
+    //f103: release:  33.3 fps
 }
 
-#ifdef STM32F1
+#if defined (USE_ASM)
+
 void testPushColors2()
 {
-	initGPIO();
     ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
 
@@ -385,7 +380,9 @@ void testPushColors2()
 
     //f103: release:  40 fps
 }
+#endif
 
+/*
 static void testPushColorsAsm()
 {
 	initGPIO();
@@ -430,13 +427,11 @@ static void testPushColorsAsm()
 
     //f103: debug: ,  release: 37
 }
+*/
 
-#endif
 
 /////////////////////////////////////////
 static void test() {
-
-	initGPIO();
 
     ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
@@ -455,8 +450,6 @@ static void test() {
 
 static void test2() {
 
-	initGPIO();
-
     ILI932x* lcd =  new ILI932x(cs, rs, wr, rd, rst, _dataPort);
     lcd->init();
 
@@ -473,7 +466,6 @@ static void test2() {
 }
 
 static void test_font() {
-	initGPIO();
     ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
     lcd.init();
     //delay(500);
@@ -532,9 +524,8 @@ static void initF1()
 {
 	RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
 
-
 	//HSE over clock: 128
-	//FLASH_SetWaitState(3);
+	//FLASH_SetWaitState(4);
 	//RCC_EnableHSE(TRUE);
 	//RCC_EnablePLL(16);
 }
@@ -599,8 +590,10 @@ int main() {
 	initF407();
 #endif
     Debug_EnableCYCCNT(true);
-    testPushColors();
-    //testPushColors2();
+    // initGPIO();
+    initGPIO_411();
+    //testPushColors();
+    testPushColors_quick();
     //test_flood();
     //test_font();
     //test_drawPixel();

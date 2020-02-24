@@ -8,13 +8,10 @@
 #include "debug.h"
 #include "ILI932x.h"
 
-
-
 ILI932x::ILI932x(GPIO_PIN* cs, GPIO_PIN* rs, GPIO_PIN* wr, GPIO_PIN* rd,
 		GPIO_PIN* rst, GPIO_PORT* dataPort) :
 		Adafruit_GFX(TFTWIDTH, TFTHEIGHT) {
 
-	// For STM32F1 all 5 pins must be on the same port
 	_cs = cs;
 	_rs = rs;
 	_wr = wr;
@@ -24,12 +21,21 @@ ILI932x::ILI932x(GPIO_PIN* cs, GPIO_PIN* rs, GPIO_PIN* wr, GPIO_PIN* rd,
 	_dataPort = dataPort;
 
 	_odr_addr = _dataPort->GetGPIO_ODR();
+
+	// The single BSRR used based on the WR pin
+	// CS and RST must be on the same port ONLY if using asm versions
+	// of WriteRegister16 and PushColors2: when USE_ASM is defined
 	_bsrr_addr = _wr->GetPort()->GetGPIO_BSRR();
-#ifdef STM32F1
-	_brr_addr = _cs->GetPort()->GetGPIO_BRR();
+
+#if defined(USE_ASM)
+	_csrstMask = (1 << _cs->GetPinNumber()) << 16;
+	_rsrstMask = (1 << _rs->GetPinNumber()) << 16;
 #endif
+
 	_csMask = 1 << _cs->GetPinNumber();
+
 	_rsMask = 1 << _rs->GetPinNumber();
+
 	_wrMask = 1 << _wr->GetPinNumber();
 	_wrstMask = (1 << _wr->GetPinNumber()) << 16;
 
@@ -69,27 +75,27 @@ uint8_t ILI932x::read8() {
 }
 
 void ILI932x::writeRegister16(uint16_t addr, uint16_t data) {
-//#ifdef STM32F1
-#if 0
+#if defined(USE_ASM)
+	//some gain for f103
 	__asm volatile(
 
 			// cs Low
-			" str  %[cs],    [%[brr]]    \n\t"
+			" str  %[csrst],    [%[bsrr]]    \n\t"
 
 			//rs Low : address mode
-			" str  %[rs],    [%[brr]]    \n\t"
+			" str  %[rsrst],    [%[bsrr]]    \n\t"
 
 			// Store 0 (low addr)
 			" str  %[a_hi], [%[odr]]          \n\t"
 			// Trigger ws low/high
-			" str  %[wr],    [%[brr]]    \n\t"
+			" str  %[wrst],    [%[bsrr]]    \n\t"
 			//  "nop\n\t; nop\n\t; nop\n\t"
 			" str  %[wr],    [%[bsrr]]      \n\t"
 
 			// Store addr
 			" str  %[a_lo], [%[odr]]          \n\t"
 			// Trigger ws low/high
-			" str  %[wr],    [%[brr]]    \n\t"
+			" str  %[wrst],    [%[bsrr]]    \n\t"
 			//  "nop\n\t; nop\n\t; nop\n\t"
 			" str  %[wr],    [%[bsrr]]      \n\t"
 
@@ -99,26 +105,29 @@ void ILI932x::writeRegister16(uint16_t addr, uint16_t data) {
 			//Store high data
 			" str  %[d_hi], [%[odr]]          \n\t"
 			// Trigger ws low/high
-			" str  %[wr],    [%[brr]]    \n\t"
+			" str  %[wrst],    [%[bsrr]]    \n\t"
 			//  "nop\n\t; nop\n\t; nop\n\t"
 			" str  %[wr],    [%[bsrr]]      \n\t"
 
 			//Store low data
 			" str  %[d_lo], [%[odr]]          \n\t"
 			// Trigger ws low/high
-			" str  %[wr],    [%[brr]]    \n\t"
+			" str  %[wrst],  [%[bsrr]]    \n\t"
 			//  "nop\n\t; nop\n\t; nop\n\t"
 			" str  %[wr],    [%[bsrr]]      \n\t"
 
 			// cs High
 			" str  %[cs],    [%[bsrr]]    \n\t"
 
-			:: [brr] "r" (_brr_addr),
+			::
 			[bsrr] "r" (_bsrr_addr),
 			[odr] "r" (_odr_addr),
 			[cs] "r" (_csMask),
 			[wr] "r" (_wrMask),
 			[rs] "r" (_rsMask),
+			[csrst] "r" (_csrstMask),
+			[wrst] "r" (_wrstMask),
+			[rsrst] "r" (_rsrstMask),
 			[a_hi] "r" (0),
 			[a_lo] "r" (addr),
 			[d_hi] "r" (data>>8),
@@ -471,7 +480,8 @@ void ILI932x::pushColors(uint16_t *data, int len) {
 	_cs->Set();
 }
 
-#ifdef STM32F1
+#if defined (USE_ASM)
+// No gain
 void ILI932x::pushColors2(uint16_t *data, int len) {
 	static int _len;
 	static uint16_t *_data;
@@ -482,44 +492,43 @@ void ILI932x::pushColors2(uint16_t *data, int len) {
 	__asm volatile(
 
 			// cs Low
-			" str  %[cs],    [%[brr]]    \n\t"
+			" str  %[csrst],    [%[bsrr]]   \n\t"
 
 			"loop_%=:                       \n\t"
-			"ldrb r3, [%[data]], #1      \n\t"//low
-			"ldrb r4, [%[data]], #1      \n\t"//high
+			"ldrb r3, [%[data]], #1         \n\t"//low
+			"ldrb r4, [%[data]], #1         \n\t"//high
 
 			//Store high data
-			" str  r4, [%[odr]]          \n\t"
+			" str  r4, [%[odr]]             \n\t"
 			// Trigger ws low/high
-			" str  %[wr],    [%[brr]]    \n\t"
+			" str  %[wrst],    [%[bsrr]]    \n\t"
 			//  "nop\n\t; nop\n\t; nop\n\t"
 			" str  %[wr],    [%[bsrr]]      \n\t"
 
 			//Store low data
-			" str  r3, [%[odr]]          \n\t"
+			" str  r3, [%[odr]]              \n\t"
 			// Trigger ws low/high
-			" str  %[wr],    [%[brr]]    \n\t"
+			" str  %[wrst],    [%[bsrr]]     \n\t"
 			//  "nop\n\t; nop\n\t; nop\n\t"
 			" str  %[wr],    [%[bsrr]]      \n\t"
 
-			"subs %[len], #1             \n\t"
-			"bne loop_%=                  \n\t"
+			"subs %[len], #1                \n\t"
+			"bne loop_%=                    \n\t"
 
 			// cs High
 			" str  %[cs],    [%[bsrr]]    \n\t"
-
 			:
 			[len] "+r" (_len),
 			[data] "+r" (_data)
 			:
-			[brr] "r" (_brr_addr),
 			[bsrr] "r" (_bsrr_addr),
 			[odr] "r" (_odr_addr),
 			[cs] "r" (_csMask),
-			[wr] "r" (_wrMask)
+			[csrst] "r" (_csrstMask),
+			[wr] "r" (_wrMask),
+			[wrst] "r" (_wrstMask)
 			:"r3", "r4", "cc"
 	);
-
 }
 #endif
 

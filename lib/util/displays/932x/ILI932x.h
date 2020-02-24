@@ -1,12 +1,11 @@
 #ifndef _ILI932x_H
 #define _ILI932x_H
 
-#define MCU_FREQ 64
+#define MCU_FREQ 100
 
 #ifndef MCU_FREQ
 #error  MCU_FREQ not defined
 #endif
-
 
 #define NOP0 ""
 #define NOP1 "\tnop \n\t"
@@ -14,20 +13,23 @@
 #define NOP3 "\tnop \n\t nop \n\t nop \n\t"
 #define NOP4 "\tnop \n\t nop\n \t nop \n\t nop \n\t"
 
-#ifdef STM32F4
-#if MCU_FREQ > 190
-#define __DELAY__ NOP4
-#elif MCU_FREQ > 140
-#define __DELAY__ NOP3
+#if defined(STM32F4) || defined(STM32F2)
+	#if MCU_FREQ > 190
+		#define __DELAY__ NOP4
+	#elif MCU_FREQ > 140
+		#define __DELAY__ NOP3
+	#else
+		#define __DELAY__ NOP2
+	#endif
+#elif defined (STM32F1)
+//	#define   USE_ASM   // Not much gain, probably not worth it even for F103
+	#define __DELAY__ NOP0
 #else
-#define __DELAY__ NOP2
-#endif
-#else
-#define __DELAY__ NOP1
+	#define __DELAY__ NOP4
 #endif
 
 //Can force delay directly
-//#define __DELAY__ NOP4
+//#define __DELAY__ NOP3
 
 #define BLACK   0x0000
 #define BLUE    0x001F
@@ -113,10 +115,13 @@ private:
 
     volatile uint32_t* _odr_addr;
     volatile uint32_t* _bsrr_addr; //set
-    volatile uint32_t* _brr_addr; //reset
+    // volatile uint32_t* _brr_addr; //reset
 
     uint32_t _csMask, _rsMask, _wrMask;
     uint32_t _wrstMask;
+#if defined (USE_ASM)
+    uint32_t _csrstMask, _rsrstMask;
+#endif
 
 public:
     ILI932x(GPIO_PIN* cs, GPIO_PIN* rs, GPIO_PIN* wr, GPIO_PIN* rd,
@@ -150,6 +155,7 @@ private:
 
     uint8_t read8();
 
+    // This is always assembly regardless of USE_ASM
     inline void write8(uint8_t d) {
         __asm volatile(
                 "str  %[data], [%[odr]]   \n\t"
@@ -195,12 +201,10 @@ public:
     // Call setWindowAddr() + startPushColors() first
     // No difference in speed, can just use the default one
     void pushColors(uint16_t *data, int len);
-#ifdef STM32F1
     void pushColors2(uint16_t *data, int len);
-    inline void pushColors3(uint16_t *data, uint16_t len) {
-        pushColorsAsm(data, len, _brr_addr, _bsrr_addr, _odr_addr, _csMask, _wrMask, _rsMask);
-    }
-#endif
+    //inline void pushColors3(uint16_t *data, uint16_t len) {
+    //    pushColorsAsm(data, len, _brr_addr, _bsrr_addr, _odr_addr, _csMask, _wrMask, _rsMask);
+    //}
 
     //TODO: private
     // Sets the LCD address window (and address counter, on 932X).
