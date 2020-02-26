@@ -795,7 +795,6 @@ uint8_t Adafruit_GFX::printf(uint8_t x, uint8_t y, const char *fmt, ...)
 uint8_t Adafruit_GFX::printf(const char *fmt, va_list args)
 {
     ee_vsprintf(buf, fmt, args);
-    uint8_t len = 0;
     size_t size = strlen(buf);
     char* p = buf;
     while (size--)
