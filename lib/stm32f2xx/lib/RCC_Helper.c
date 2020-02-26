@@ -55,6 +55,6 @@ void RCC_EnableHSI_100Mhz()
     uint16_t plln = 200;
     uint16_t pllp = 4;
     RCC_EnablePLL(pllm, plln, pllp);
-    RCC_SetAHBPrescalerDiv2();
+    //RCC_SetAHBPrescalerDiv2();
 
 }
