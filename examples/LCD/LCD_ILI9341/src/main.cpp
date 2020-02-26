@@ -38,23 +38,23 @@ static void speed_test2(Adafruit_ILI9341* display)
     while (1)
     {
         uint32_t t0 = millis();
-        display->printf (1, 0, 4, "test1 %7.4f", f);
+        display->printf (1, 0, "test1 %7.4f", f);
         display->printf (" %7.4f", f);
-        display->printf (1, 1, 4, "test2 %7.4f", f);
+        display->printf (1, 1, "test2 %7.4f", f);
         display->printf (" %7.4f", f);
-        display->printf (1, 2, 4, "test3 %7.4f", f);
+        display->printf (1, 2, "test3 %7.4f", f);
         display->printf (" %7.4f", f);
-        display->printf (1, 3, 4, "test4 %7.4f", f);
+        display->printf (1, 3, "test4 %7.4f", f);
         display->printf (" %7.4f", f);
-        display->printf (1, 4, 4, "test5 %7.4f", f);
+        display->printf (1, 4, "test5 %7.4f", f);
         display->printf (" %7.4f", f);
-        display->printf (1, 5, 4, "test6 %7.4f", f);
+        display->printf (1, 5, "test6 %7.4f", f);
         display->printf (" %7.4f", f);
-        display->printf (1, 6, 4, "test7 %7.4f", f);
+        display->printf (1, 6, "test7 %7.4f", f);
         display->printf (" %7.4f", f);
-        display->printf (1, 7, 4, "test8 %7.4f", f);
+        display->printf (1, 7, "test8 %7.4f", f);
         display->printf (" %7.4f", f);
-        display->printf (1, 8, 4, "test9 %7.4f", f);
+        display->printf (1, 8, "test9 %7.4f", f);
         display->printf (" %7.4f", f);
         f += 0.01;
         volatile uint32_t d = millis() - t0;
@@ -90,7 +90,7 @@ static void speed_test4(Adafruit_ILI9341* display)
     for (int i = 0; i < 10; ++i)
     {
         display->setCursor(0, 0);
-        display->write("ABCDEFGH1234");
+        display->write(L"ABCDEFGH1234");
     }
 
     volatile uint32_t t = millis() - t0;
@@ -138,7 +138,7 @@ void test()
     display.setRotation(1);
     display.setTextSize(7);
     display.setCursor(4, 3);
-    display.write("11:45");
+    display.write(L"11:45");
     while(1);
 
     //display.setTextColor(ILI9340_BLACK, ILI9340_WHITE);
