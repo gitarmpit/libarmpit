@@ -4,30 +4,58 @@
 #include <stdio.h>
 #include "9163/TFT_ILI9163C.h"
 #include "debug.h"
-#include "fonts/ttf/tahoma20.h"
-#include "Fonts2\FreeMono9pt7b.h"
+#include "consola12.h"
+#include "coure8.h"
+#include "systick.h"
+//#include "calibril10.h"
+#include "lucon9.h"
+#include "dos8.h"
+//#include "Org_01.h"
+#include "cour10.h"
 
-static void test()
+volatile int tick = 0;
+static void systick_handler(void) {
+    ++tick;
+}
+
+static void systick_cfg() {
+    uint32_t ms = 1;
+    static volatile uint32_t clock = RCC_GetAHB_CLK();
+    static volatile uint32_t count = (uint64_t) clock * (uint64_t) ms / 1000llu;
+    SystickEnable(count / 8, true, true, systick_handler);
+}
+
+
+SPI* spi;
+GPIO_PIN *rstPin, *dcPin, *ssPin;
+
+//F2 board pin header
+static void initGPIO()
 {
-    delay(10);
     GPIOA* portA = GPIOA::GetInstance();
     GPIOB* portB = GPIOB::GetInstance();
     portA->EnablePeripheralClock(true);
     portB->EnablePeripheralClock(true);
 
-    SPI* spi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_2);
+    spi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_2);
 
-    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN2);
+    rstPin = portB->GetPin(GPIO_PIN2);
     rstPin->SetupGPIO_OutPP();
     rstPin->SetSpeedHigh();
 
-    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN1);
+    dcPin = portB->GetPin(GPIO_PIN1);
     dcPin->SetupGPIO_OutPP();
     dcPin->SetSpeedHigh();
 
-    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
+    ssPin = portA->GetPin(GPIO_PIN4);
     ssPin->SetupGPIO_OutPP();
     ssPin->SetSpeedHigh();
+
+}
+static void test()
+{
+    //delay(10);
+	initGPIO();
 
     TFT_ILI9163C display(spi, dcPin, rstPin, ssPin);
     display.setRotation(2);
@@ -36,7 +64,8 @@ static void test()
 
     //display.drawBmp(0, 10, consolas_16bit);
     //display.setFont(&tahoma20);
-    display.setFont(&FreeMono9pt7b);
+    display.setFont(&coure);
+    //display.setFont(&consola);
     //display.setYadvance(50);
     display.printf (0, 0, "2/13/2020");
     display.display();
@@ -116,42 +145,66 @@ static void bat(TFT_ILI9163C* display)
 
 
 
+static void test_flood() {
 
+	initGPIO();
 
-void test2()
-{
-    delay(10);
-    GPIOA* portA = GPIOA::GetInstance();
-    GPIOB* portB = GPIOB::GetInstance();
-    portA->EnablePeripheralClock(true);
-    portB->EnablePeripheralClock(true);
+    TFT_ILI9163C lcd(spi, dcPin, rstPin, ssPin);
 
-    SPI* spi = GPIO_Helper::SetupSPI(SPI1_PA_5_6_7, true, false, false, SPI_BAUD_RATE_2);
+    systick_cfg();
 
-    GPIO_PIN* rstPin = portB->GetPin(GPIO_PIN1);
-    rstPin->SetupGPIO_OutPP();
-    rstPin->SetSpeedHigh();
+    int cnt = 0;
+    int _tick;
+    while (tick < 1000*60) {
+        lcd.fillScreen(0xf0f0); //f0f0
+        lcd.display();
+        //delay(12);
+        //delay(6);
+        //lcd.fillScreen(0x0f0f); //0f0f
+        //lcd.displayFast();
+        //delay(12);
+        cnt += 2;
+    }
+    _tick = tick;
 
-    GPIO_PIN* dcPin = portB->GetPin(GPIO_PIN0);
-    dcPin->SetupGPIO_OutPP();
-    dcPin->SetSpeedHigh();
+    lcd.fillScreen(BLUE);
+    //lcd.setRotation(1);
+    lcd.setFont(&lucon);
+    lcd.printf(1, 1, "Tick: %d, Cnt: %d", _tick, cnt);
+    lcd.printf(1, 2, "fps: %7.3f", (float)cnt/60.0);
+    lcd.display();
 
-    GPIO_PIN* ssPin = portA->GetPin(GPIO_PIN4);
-    ssPin->SetupGPIO_OutPP();
-    ssPin->SetSpeedHigh();
+    while(1)
+        ;
 
-    TFT_ILI9163C display(spi, dcPin, rstPin, ssPin);
-    display.fillScreen(1);
-    display.fillScreen(0x8080);
-    display.setTextColor(0x2020);
-    //display.write("Hello ILI9163 world!");
-    display.printf(0, 0, "test");
-    display.display(true);
+    //F2 140Mhz: 160fps, 160Mhz: 180fps, 180Mhz: 203fps, 200Mhz: 226fps
+}
+
+static void test_font() {
+
+	initGPIO();
+
+    TFT_ILI9163C lcd(spi, dcPin, rstPin, ssPin);
+
+    lcd.fillScreen(BLUE);
+    //lcd.setRotation(1);
+    lcd.setFont(&dos8);
+    lcd.printf(0, 0, "dos8: TEST test 123");
+    lcd.setFont(&lucon);
+    lcd.printf(0, 1, "lucon: TEST test 123456");
+    //lcd.setFont(&Org_01);
+    //lcd.printf(0, 2, "Org_01: TEST test 123");  //weird square
+    //lcd.setFont(&coure);
+    //lcd.printf(0, 2, "coure: TEST test 123");  //cour8 13x8 too big
+    lcd.setFont(&cour);
+    lcd.printf(0, 3, "cour10: TEST test 123");
+
+    lcd.display();
+
     while(1)
         ;
 
 }
-
 
 
 int main()
@@ -159,11 +212,25 @@ int main()
 #if defined(STM32F1)
     RCC_EnableHSI_64Mhz_AHB_32Mhz_APB1_16MHz_APB2_16MHz();
 #elif defined(STM32F2)
-    RCC_EnableHSI_100Mhz();
+    //RCC_EnableHSI_100Mhz();
+    FLASH_EnableDCache();
+    FLASH_EnableICache();
+    FLASH_EnablePrefetchBuffer();
+
+    FLASH_SetWaitState(4);
+
+    RCC_EnableHSI(TRUE);
+    uint8_t pllm = 8;
+    uint16_t plln = 400;  //200Mhz
+    uint16_t pllp = 4;
+    RCC_EnablePLL(pllm, plln, pllp);
+
+
 #elif defined(STM32F4)
     RCC_EnableHSI_168Mhz();
 #endif
 
-    test();
-
+    Debug_EnableCYCCNT(true);
+    //test_flood();
+    test_font();
 }
