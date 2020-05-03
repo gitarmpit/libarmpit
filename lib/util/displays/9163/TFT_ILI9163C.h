@@ -134,7 +134,6 @@ private:
     GPIO_PIN* _ssPin;
     volatile uint32_t* DR;
     volatile uint32_t* SR;
-    uint16_t _frameBuffer[_GRAMSIZE];
     uint8_t sleep;
     uint8_t _initError;
 

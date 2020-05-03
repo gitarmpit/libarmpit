@@ -2,6 +2,12 @@
 #include "debug.h"
 #include <string.h>
 
+//TODO make the display class a singleton to avoid sharing this frambuffer
+//had to make it a static buffer outside of class to make the class instances
+//smaller so the stack or heap wouldn't overflow
+static uint16_t _frameBuffer[_GRAMSIZE];
+
+
 TFT_ILI9163C::TFT_ILI9163C(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin) :
         Adafruit_GFX(_TFTWIDTH, _TFTHEIGHT)
 {
@@ -578,8 +584,9 @@ void TFT_ILI9163C::drawBmp2(int16_t x, int16_t y, const uint8_t *bmp)
         	c = bitmap16[(hdr2->Height-j-1)*wread + i];
         	if (i < hdr2->Width)
         	{
-        		//drawPixel2(x + i, y + j, c);
-        	    _frameBuffer[(y + j)*_GRAMWIDTH + x + i] = c;
+        		if (x + i >= 0 && y + j >= 0 && (x + i < _width) && (y + j  < _height))
+        		//drawPixel(x + i, y + j, c);
+        			_frameBuffer[(y + j)*_GRAMWIDTH + x + i] = c;
         	}
         }
     }
