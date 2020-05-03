@@ -526,27 +526,27 @@ void Adafruit_GFX::drawChar(int16_t x, int16_t y, uint16_t c, uint16_t color, ui
             {
                 if (line & 1)
                 {
-                	if (textsize_x == 1 && textsize_y == 1)
+                    if (textsize_x == 1 && textsize_y == 1)
                     writePixel(x + i, y + j, color);
-                	else
-                		writeFillRect(x + i * textsize_x, y + j * textsize_y,
-                				textsize_x, textsize_y, color);
+                    else
+                        writeFillRect(x + i * textsize_x, y + j * textsize_y,
+                                textsize_x, textsize_y, color);
                 }
                 else if (bg != color)
                 {
-                	if (textsize_x == 1 && textsize_y == 1)
-                		writePixel(x + i, y + j, bg);
-                	else
-                		writeFillRect(x + i * textsize_x, y + j * textsize_y,
-                				textsize_x, textsize_y, bg);                }
+                    if (textsize_x == 1 && textsize_y == 1)
+                        writePixel(x + i, y + j, bg);
+                    else
+                        writeFillRect(x + i * textsize_x, y + j * textsize_y,
+                                textsize_x, textsize_y, bg);                }
             }
         }
         if (bg != color)
         { // If opaque, draw vertical line for last column
-        	if (textsize_x == 1 && textsize_y == 1)
-        		writeFastVLine(x + 5, y, 8, bg);
-        	else
-        		writeFillRect(x + 5 * textsize_x, y, textsize_x, 8 * textsize_y, bg);
+            if (textsize_x == 1 && textsize_y == 1)
+                writeFastVLine(x + 5, y, 8, bg);
+            else
+                writeFillRect(x + 5 * textsize_x, y, textsize_x, 8 * textsize_y, bg);
         }
         endWrite();
 
@@ -680,10 +680,34 @@ uint8_t Adafruit_GFX::write(const wchar_t *str)
 
 }
 
+uint8_t Adafruit_GFX::write(const char *str)
+{
+    uint8_t len = 0;
+    if (str != 0)
+    {
+        size_t size = strlen(str);
+        while (size--)
+        {
+            writeChar(*str++);
+        }
+        len = strlen(str);
+    }
+    return len;
+
+}
+
+uint8_t Adafruit_GFX::write(const char *str, int16_t x, int16_t y, uint8_t size)
+{
+	if (size != 0)
+		setTextSize(size);
+	setCursor(x, y);
+	return write(str);
+}
+
 void Adafruit_GFX::setTextSize(uint8_t textSize) {
-	if (gfxFont == 0) {
-		textsize_x = textsize_y = textSize;
-	}
+    if (gfxFont == 0) {
+        textsize_x = textsize_y = textSize;
+    }
 }
 
 void Adafruit_GFX::setCursor(int16_t x, int16_t y)
@@ -757,19 +781,19 @@ void Adafruit_GFX::setRotation(uint8_t x)
 
 void Adafruit_GFX::setFont(const GFXfont *f)
 {
-	if (f)
-	{
-		gfxFont = (GFXfont *) f;
-		if (gfxFont)
-		{
-			yAdvance = gfxFont->yAdvance;
-			if (gfxFont->xAdvance != 0)
-			{
-				xAdvance = gfxFont->xAdvance;
-			}
-			textsize_x = textsize_y = 1;
-		}
-	}
+    if (f)
+    {
+        gfxFont = (GFXfont *) f;
+        if (gfxFont)
+        {
+            yAdvance = gfxFont->yAdvance;
+            if (gfxFont->xAdvance != 0)
+            {
+                xAdvance = gfxFont->xAdvance;
+            }
+            textsize_x = textsize_y = 1;
+        }
+    }
 }
 
 uint8_t Adafruit_GFX::printf(const char *fmt, ...)
@@ -803,6 +827,81 @@ uint8_t Adafruit_GFX::printf(const char *fmt, va_list args)
     }
     return size;
 
+}
+
+void Adafruit_GFX::drawEllipse(int16_t x0, int16_t y0, int16_t rx, int16_t ry, int16_t color)
+{
+    if (color == -1)
+    {
+        color = fgcolor;
+    }
+
+    int x, y;
+    int dx, dy;
+    int err;
+    int twoASquare, twoBSquare;
+    int xend, yend;
+
+    twoASquare = 2*rx*rx;
+    twoBSquare = 2*ry*ry;
+
+    x = rx;
+    y = 0;
+
+    dx = ry*ry*(1 - 2*rx);
+    dy = rx*rx;
+    err = 0;
+
+    xend = twoBSquare*rx;
+    yend = 0;
+    while (xend  >= yend )
+    {
+        drawPixel(x0+x, y0+y, color);
+        drawPixel(x0-x, y0+y, color);
+        drawPixel(x0-x, y0-y, color);
+        drawPixel(x0+x, y0-y, color);
+
+        ++y;
+        yend += twoASquare;
+        err += dy;
+        dy += twoASquare;
+        if ((2*err + dx) > 0 )
+        {
+            --x;
+            xend -= twoBSquare;
+            err += dx;
+            dx += twoBSquare;
+        }
+    }
+
+
+    x = 0;
+    y = ry;
+    dx = ry*ry;
+    dy = rx*rx*(1 - 2*ry);
+    err = 0;
+    xend = 0;
+    yend = twoASquare*ry;
+
+    while ( xend <= yend )
+    {
+        drawPixel(x0+x, y0+y, color);
+        drawPixel(x0-x, y0+y, color);
+        drawPixel(x0-x, y0-y, color);
+        drawPixel(x0+x, y0-y, color);
+        ++x;
+        xend += twoBSquare;
+        err += dx;
+        dx += twoBSquare;
+
+        if ((2*err + dy) > 0 )
+        {
+            --y;
+            yend -= twoASquare;
+            err += dy;
+            dy += twoASquare;
+        }
+    }
 }
 
 void Adafruit_GFX::drawBmp(int16_t x, int16_t y, const uint8_t *bmp)

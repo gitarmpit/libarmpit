@@ -113,10 +113,13 @@ public:
 
 
     uint8_t write(const wchar_t *str);
+    uint8_t write(const char *str);
+    uint8_t write(const char *str, int16_t x, int16_t y, uint8_t size = 0);
     uint8_t printf(const char *fmt, ...);
     uint8_t printf(uint8_t x, uint8_t y, const char *fmt, ...);
     void drawBmp(int16_t x, int16_t y, const uint8_t *bmp);
     void setTextSize(uint8_t textSize);
+    void drawEllipse(int16_t x0, int16_t y0, int16_t rx, int16_t ry, int16_t color = -1);
 
 protected:
 
@@ -139,6 +142,8 @@ private:
     //ignored for custom fonts;
     int textsize_x;
     int textsize_y;
+
+
 };
 
 #endif // _ADAFRUIT_GFX_H
