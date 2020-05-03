@@ -12,6 +12,7 @@
 #include "dos8.h"
 //#include "Org_01.h"
 #include "cour10.h"
+#include "rote-gefahr-16.cpp"
 
 volatile int tick = 0;
 static void systick_handler(void) {
@@ -55,7 +56,7 @@ static void initGPIO()
 static void test()
 {
     //delay(10);
-	initGPIO();
+    initGPIO();
 
     TFT_ILI9163C display(spi, dcPin, rstPin, ssPin);
     display.setRotation(2);
@@ -147,7 +148,7 @@ static void bat(TFT_ILI9163C* display)
 
 static void test_flood() {
 
-	initGPIO();
+    initGPIO();
 
     TFT_ILI9163C lcd(spi, dcPin, rstPin, ssPin);
 
@@ -180,9 +181,39 @@ static void test_flood() {
     //F2 140Mhz: 160fps, 160Mhz: 180fps, 180Mhz: 203fps, 200Mhz: 226fps
 }
 
+static void test_bmp() {
+    initGPIO();
+
+    TFT_ILI9163C lcd(spi, dcPin, rstPin, ssPin);
+
+    while(1)
+    {
+        lcd.drawBmp(0, 0, rote_gefahr_16);
+        lcd.display();
+        delay(200);
+        lcd.clearScreen();
+        lcd.display();
+        delay(200);
+    }
+}
+static void test_bmp2() {
+    initGPIO();
+
+    TFT_ILI9163C lcd(spi, dcPin, rstPin, ssPin);
+
+    int y = 0;
+    while(1)
+    {
+        lcd.clearScreen();
+        lcd.drawBmp(0, y++, rote_gefahr_16);
+        lcd.displayFast();
+        delay(50);
+    }
+}
+
 static void test_font() {
 
-	initGPIO();
+    initGPIO();
 
     TFT_ILI9163C lcd(spi, dcPin, rstPin, ssPin);
 
@@ -232,5 +263,6 @@ int main()
 
     Debug_EnableCYCCNT(true);
     //test_flood();
-    test_font();
+    //test_font();
+    test_bmp2();
 }
