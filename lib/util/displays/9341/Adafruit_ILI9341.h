@@ -123,10 +123,11 @@ class Adafruit_ILI9341 : public Adafruit_GFX
 
   Adafruit_ILI9341(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin);
 
-  void display();
+  //void display();
   void  setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
   void  pushColor(uint16_t color);
   void  fillScreen(uint16_t color);
+  void  clearScreen() { fillScreen(0); }
   void  drawPixel(int16_t x, int16_t y, uint16_t color);
   void  drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
   void  drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);

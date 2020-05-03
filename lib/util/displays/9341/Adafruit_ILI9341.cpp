@@ -211,33 +211,37 @@ void Adafruit_ILI9341::pushColor(uint16_t color)
     _dcPin->Set();
     _ssPin->Reset();
 
-//    _spi->TransmitByte(color >> 8);
-//    _spi->TransmitByte(color);
+    //_spi->TransmitByte(color >> 8);
+    //_spi->TransmitByte(color);
+    //_ssPin->Set();
+    //return;
+    static uint32_t tmp;
 
     while (!(*SR & SPI_SR_TXE))
         ;
     *DR = (color>>8); //_frameBuffer[px]>>8;
 
-//        while(!(*SR & SPI_SR_RXNE))
-//            ;
+    while(!(*SR & SPI_SR_RXNE))
+    	;
 
-    //tmp  = *DR;
+    tmp  = *DR;
 
     while (!(*SR & SPI_SR_TXE))
         ;
 
     *DR = color; //_frameBuffer[px];
 
-//        while(!(*SR & SPI_SR_RXNE))
-//            ;
-    //tmp  = *DR;
+        while(!(*SR & SPI_SR_RXNE))
+            ;
+    tmp  = *DR;
 
 
     _ssPin->Set();
 }
 
 
-
+#if 0
+//TODO this needs a framebuffer 320x200
 #ifdef __GNUC__
 #pragma GCC push_options
 #pragma GCC optimize ("O3")
@@ -277,7 +281,7 @@ void Adafruit_ILI9341::display()
 #ifdef __GNUC__
 #pragma GCC pop_options
 #endif
-
+#endif
 
 void Adafruit_ILI9341::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
@@ -286,6 +290,22 @@ void Adafruit_ILI9341::drawPixel(int16_t x, int16_t y, uint16_t color)
 
     setAddrWindow(x, y, x + 1, y + 1);
     pushColor(color);
+    /*
+    uint8_t hi = color >> 8, lo = color;
+
+    _dcPin->Set();
+    _ssPin->Reset();
+
+    while (!(*SR & SPI_SR_TXE))
+    	;
+    *DR = hi; //_frameBuffer[px]>>8;
+
+    while (!(*SR & SPI_SR_TXE))
+    	;
+    *DR = lo; //_frameBuffer[px];
+
+    _ssPin->Set();
+     */
 }
 
 void Adafruit_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
