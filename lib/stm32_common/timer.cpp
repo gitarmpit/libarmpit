@@ -141,7 +141,7 @@ void TIM6_DAC_IRQHandler(void)
 }
 #endif
 
-#if (defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL))
+#if (defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL)) || defined(STM32F4)
 void TIM6_IRQHandler(void)
 {
     TIM6::GetInstance()->HandleInterrupt();

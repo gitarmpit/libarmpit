@@ -2,7 +2,7 @@
 #define RC_PWM_READER_H
 
 #include "timer_cpp.h"
-#include "EXTI_PWM_InputCapture.h"
+#include "PWM_Capture/PWM_Capture_EXTI.h"
 
 class RC_PWM_Reader
 {

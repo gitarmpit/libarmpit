@@ -120,7 +120,7 @@ void CfgView::Run()
 
         if (_idx  != 3 || i < 5)
         {
-            _lcd->write ("Exit", xoff + 0, yoff + 4);
+            _lcd->printf (xoff + 0, yoff + 4, "Exit");
         }
 
         _lcd->display();

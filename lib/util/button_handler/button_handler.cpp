@@ -10,8 +10,6 @@ ButtonHandler::ButtonHandler(TIMER* timer, bool initialize_timer)
 {
     _timer = timer;
     Init(initialize_timer);
-
-
 }
 
 void ButtonHandler::Init(bool initialize_timer)

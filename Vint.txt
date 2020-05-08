@@ -1,0 +1,23 @@
+internal bandgap voltage reference: 
+
+1) Connect precise 3.3V source
+2) Measure Vint:   value on ADC_IN17   
+
+Vint = Val_ADC_IN17 * 3.3 / 4095
+
+
+Vint = 1.2 at Val_ADC_IN17 = 1489
+
+
+3) calc Vcoeff:  3.3^2/4095/Vint 
+
+example for 1.2     0.00221611721
+            1.16    0.00229253505
+            1.25    0.00212747252
+
+
+4) Vcc = Vcoeff * Val_ADC_IN17
+
+
+Lipo min 3.0V     
+

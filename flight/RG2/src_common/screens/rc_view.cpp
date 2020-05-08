@@ -1,5 +1,4 @@
 #include "rc_view.h"
-#include "EXTI_PWM_InputCapture.h"
 #include "ESC_PWM_Control.h"
 #include "RC_PWM_Reader.h"
 #include "debug.h"
