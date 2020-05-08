@@ -19,7 +19,7 @@ void debug_init(TFT_ILI9163C* lcd)
     g_lcd = lcd;
     g_lcd->setBgColor(0);
     g_lcd->setTextColor(YELLOW);
-    g_lcd->setTextSize(2);
+    g_lcd->setTextSize(1);
 }
 
 

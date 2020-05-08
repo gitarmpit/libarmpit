@@ -135,7 +135,7 @@ protected:
     bool wrap;   // If set, 'wrap' text at right edge of display
     GFXfont *gfxFont;
 private:
-    char buf[64];
+    char buf[1024];
     uint8_t yAdvance;  //can override the font associated value
     uint8_t xAdvance;
 

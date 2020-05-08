@@ -137,15 +137,20 @@ private:
     uint8_t sleep;
     uint8_t _initError;
 
-    void begin(void);
-    void init();
     bool boundaryCheck(int16_t x, int16_t y);
     void homeAddress();
     void colorSpace(uint8_t cspace);
 
-public:
+    TFT_ILI9163C();
 
-    TFT_ILI9163C(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin);
+public:
+    static TFT_ILI9163C* GetInstance()
+    {
+        static TFT_ILI9163C instance;
+        return &instance;
+    }
+
+    void init(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin);
 
     void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1); //graphic Addressing
     //void setCursor(int16_t x, int16_t y); //char addressing

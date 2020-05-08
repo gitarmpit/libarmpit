@@ -4,6 +4,7 @@
 #include "GPIO_Helper.h"
 #include "ESC_PWM_Control.h"
 #include "FlightLoop.h"
+#include "debug.h"
 
 #include "GPIO_Helper.h"
 #include "LED_Indicators.h"
@@ -14,6 +15,9 @@
 #include "system_time.h"
 #include "buzzer.h"
 #include "main_button_handler.h"
+#include "lucon9.h"
+
+volatile void* ptr;
 
 static void* I2C_Error (void* arg)
 {
@@ -48,11 +52,37 @@ static TFT_ILI9163C* get_lcd()
     ssPin->SetupGPIO_OutPP();
     ssPin->SetSpeedHigh();
 
-    return new TFT_ILI9163C(spi, dcPin, rstPin, ssPin);
+    TFT_ILI9163C* lcd = TFT_ILI9163C::GetInstance();
+    lcd->init(spi, dcPin, rstPin, ssPin);
+    lcd->setFont(&lucon);
+    lcd->setTextColor(RED);
+    lcd->fillScreen(COLOR565(0,255,255));
+    lcd->setTextColor(BLACK);
+    lcd->printf(0, 1, "test");
+
+    lcd->display();
+    return lcd;
 
 }
 
+static void run2(uint32_t i2cClockSpeed)
+{
+    GPIOA::GetInstance()->EnablePeripheralClock(true);
+    GPIOB::GetInstance()->EnablePeripheralClock(true);
+    GPIOC::GetInstance()->EnablePeripheralClock(true);
+    GPIOD::GetInstance()->EnablePeripheralClock(true);
+    GPIOE::GetInstance()->EnablePeripheralClock(true);
 
+    TFT_ILI9163C* lcd = get_lcd();
+    I2C* i2c = GPIO_Helper::SetupI2C(MPU6050_I2C, i2cClockSpeed);
+    Buzzer*  buzzer = Buzzer::GetInstance();
+    buzzer->Init(BUZZER_TIMER, BUZZER_PIN, BUZZER_TIMER_CHANNEL);
+    buzzer->SetVolume(100);
+    buzzer->PlayTone(1000, 100);
+    MainButtonHandler appl(TIMER::Get_Instance(BUTTON_TIMER), lcd, i2c, buzzer);
+    appl.Run();
+
+}
 
 void debug_init(TFT_ILI9163C* lcd);
 void debug (telemetry* telemetry);
@@ -74,28 +104,54 @@ static void run(uint32_t i2cClockSpeed)
     i2c->SetErrorCallback (I2C_Error, &esc);
 
     TFT_ILI9163C* lcd = get_lcd();
+    ptr = (void*)lcd;
+    int s = sizeof (*lcd);
+
+    // debug_init(lcd);
     lcd->clearScreen();
     lcd->display();
-    debug_init(lcd);
 
-    FlightLoop runner (i2c, 0, &esc, &pwmReader);
-    runner.SetDebugHook(debug, 20);
-    runner.Run(lcd);
+    FlightLoop* runner = new FlightLoop(i2c, 0, &esc, &pwmReader);
+    // runner.SetDebugHook(debug, 20);
+    runner->Run(lcd);
 
 
     while(1);
 
 }
 
+void HardFault_Handler()
+{
+	while(1);
+}
+
+void BusFault_Handler()
+{
+	while(1);
+
+}
+
+void MemManage_Handler()
+{
+	while(1);
+
+}
+
+void UsageFault_Handler()
+{
+	while(1);
+
+}
 
 int main()
 {
     RCC_EnableHSE_168Mhz();
     RCC_EnableHSI(false);
     systick_enable(true);
+    Debug_EnableCYCCNT(true);
 
     uint32_t i2cClockSpeed = 100000;
-    run(i2cClockSpeed);
+    run2(i2cClockSpeed);
 
     while(1);
 }

@@ -43,29 +43,28 @@ void PidView::OnClick(Button* button)
 
 void PidView::TimerHook(Button* button)
 {
-    if (button->GetId() == BUTTON1 && button->GetDurDown() > 500 && _idx != 0)
-    {
-        if (_bhandler->getBuzzer() != 0)
-        {
-            _bhandler->getBuzzer()->PlayTone(500, 2);
-        }
-    _flashing = false;
-//      _cfgModel.IncrementHigh(_idx);
+	if (button->GetId() == BUTTON1 && button->GetDurDown() > 500 && _idx != 0)
+	{
+		if (_bhandler->getBuzzer() != 0)
+		{
+			_bhandler->getBuzzer()->PlayTone(500, 2);
+		}
+		_flashing = false;
 
-         if (_bhandler->GetButton(BUTTON2)->IsDown())
-         {
-             _cfgModel.DecrementHigh(_idx-1);
-         }
-         else
-         {
-             _cfgModel.IncrementHigh(_idx-1);
-         }
+		if (_bhandler->GetButton(BUTTON2)->IsDown())
+		{
+			_cfgModel.DecrementHigh(_idx-1);
+		}
+		else
+		{
+			_cfgModel.IncrementHigh(_idx-1);
+		}
 
-    }
-    else if (button->GetId() == BUTTON1 && !_flashing)
-    {
-        _flashing = true;
-    }
+	}
+	else if (button->GetId() == BUTTON1 && !_flashing)
+	{
+		_flashing = true;
+	}
 }
 
 

@@ -8,22 +8,9 @@
 static uint16_t _frameBuffer[_GRAMSIZE];
 
 
-TFT_ILI9163C::TFT_ILI9163C(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin) :
+TFT_ILI9163C::TFT_ILI9163C() :
         Adafruit_GFX(_TFTWIDTH, _TFTHEIGHT)
 {
-    _spi = spi;
-    _dcPin = dcPin;
-    _rstPin = rstPin;
-    _ssPin = ssPin;
-    bgcolor = BLACK;
-    fgcolor = WHITE;
-
-    memset (_frameBuffer, 0, sizeof(_frameBuffer));
-
-
-    DR = _spi->GetDRAddr();
-    SR = _spi->GetSRAddr();
-    begin();
 }
 
 void TFT_ILI9163C::writecommand(uint8_t cmd)
@@ -64,10 +51,26 @@ void TFT_ILI9163C::writedata16(uint16_t data)
     _ssPin->Set();
 }
 
-//called from ctor
-void TFT_ILI9163C::begin(void)
+uint8_t TFT_ILI9163C::errorCode(void)
 {
-    sleep = 0;
+    return _initError;
+}
+
+void TFT_ILI9163C::init(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin)
+{
+    _spi = spi;
+    _dcPin = dcPin;
+    _rstPin = rstPin;
+    _ssPin = ssPin;
+    bgcolor = BLACK;
+    fgcolor = WHITE;
+
+    memset (_frameBuffer, 0, sizeof(_frameBuffer));
+
+    DR = _spi->GetDRAddr();
+    SR = _spi->GetSRAddr();
+
+	sleep = 0;
     _initError = 0;
     _ssPin->Reset();
 
@@ -103,17 +106,7 @@ void TFT_ILI9163C::begin(void)
      */
     _Mactrl_Data = 0; //0b00000000;
     _colorspaceData = __COLORSPC; //start with default data;
-    init();
-}
 
-uint8_t TFT_ILI9163C::errorCode(void)
-{
-    return _initError;
-}
-
-//called from begin()
-void TFT_ILI9163C::init()
-{
     uint8_t i;
     writecommand(CMD_SWRESET); //software reset
     delay(5);
