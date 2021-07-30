@@ -15,4 +15,11 @@ typedef int BOOL;
 #define EXTRACT_VALUE(v, e, s) ( (v >> s) & (RANGE_MASK(e, s)) )
 
 
+extern uint32_t CORE_FREQ;
+extern uint32_t BUS_FREQ;
+extern uint32_t TPM_FREQ;
+extern uint32_t XTAL_FREQ;
+
+void delay_ms (uint16_t ms);
+
 #endif

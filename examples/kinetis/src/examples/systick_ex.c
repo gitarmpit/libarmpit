@@ -76,18 +76,60 @@ void test_systick2()
 
 }
 
-// Slow IRC 32768
-static void test_systick3()
+// Slow IRC 32768  internal
+void test_systick3()
 {
-	GPIO_PORT* portE = GPIO_GetInstance(PORTE);
-
 	CORE_FREQ = 32768;
 	MCG_Set_FCRDIV1();
+	SIM_SetOUTDIV1(1);
+	SIM_SetOUTDIV4(1);
 	MCG_Set_IRC_Slow();
 	MCG_Select_MCGOUTCLK_IRC();
 
-	GPIO_EnableClock(portE, TRUE);
+	GPIO_PORT* portC = GPIO_GetInstance(PORTC);
+	GPIO_EnableClock(portC, TRUE);
+	GPIO_PIN c3 = GPIO_GetPin(portC, GPIO_PIN3);
+	GPIO_SetAF(&c3, 5);
+	SIM_SelectCLKOUT_BUS();
 
+	GPIO_PORT* portE = GPIO_GetInstance(PORTE);
+	GPIO_EnableClock(portE, TRUE);
+	GPIO_PIN e1 = GPIO_GetPin(portE, GPIO_PIN1);
+	GPIO_SetupOut(&e1);
+	GPIO_SetSlewRateFast(&e1);
+	GPIO_SetPin(&e1);
+
+	//SIM_SetOUTDIV1(4);
+	//CORE_FREQ /= 4;
+
+	g_pin = &e1;
+	uint32_t us = 10000;
+	SystickEnable(us * CORE_FREQ/1000000, TRUE, FALSE, MySysTickHandler);
+	while(1)
+		;
+
+}
+
+// OSC32K
+void test_systick4()
+{
+	CORE_FREQ = 32768;
+	MCG_Set_FCRDIV1();
+	SIM_SetOUTDIV1(1);
+	SIM_SetOUTDIV4(1);
+	GPIO_PORT* portC = GPIO_GetInstance(PORTC);
+	GPIO_EnableClock(portC, TRUE);
+	GPIO_PIN c3 = GPIO_GetPin(portC, GPIO_PIN3);
+	GPIO_SetAF(&c3, 5);
+	OSC_CR |= OSC_CR_SC8P;
+
+	MCG_Set_ExternalClock_OSC();
+	MCG_Select_MCGOUTCLK_OSCCLK();
+	// 32K
+	SIM_SelectCLKOUT_BUS();
+
+	GPIO_PORT* portE = GPIO_GetInstance(PORTE);
+	GPIO_EnableClock(portE, TRUE);
 	GPIO_PIN e1 = GPIO_GetPin(portE, GPIO_PIN1);
 	GPIO_SetupOut(&e1);
 	GPIO_SetSlewRateFast(&e1);

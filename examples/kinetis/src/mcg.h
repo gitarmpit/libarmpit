@@ -7,8 +7,6 @@
 #define MCG_BASE     0x40064000
 #endif
 
-extern uint32_t CORE_FREQ;
-
 
 #define MCG_C1    (*(volatile uint8_t*)(MCG_BASE + 0x0))
 #define MCG_C2    (*(volatile uint8_t*)(MCG_BASE + 0x1))
@@ -73,10 +71,13 @@ extern uint32_t CORE_FREQ;
 #define MCG_S_LOCK0         (1<<6)
 #define MCG_S_PLLST         (1<<5)
 #define MCG_S_IREFST        (1<<4)
-#define MCG_S_CLKST_FLL	    (0<<3)
-#define MCG_S_CLKST_IRC	    (1<<3)
-#define MCG_S_CLKST_OSCCLK	(2<<3)
-#define MCG_S_CLKST_PLL	    (3<<3)
+
+#define MCG_S_CLKST_POS     2
+#define MCG_S_CLKST_FLL     (0<<MCG_S_CLKST_POS)
+#define MCG_S_CLKST_IRC     (1<<MCG_S_CLKST_POS)
+#define MCG_S_CLKST_OSCCLK  (2<<MCG_S_CLKST_POS)
+#define MCG_S_CLKST_PLL     (3<<MCG_S_CLKST_POS)
+
 #define MCG_S_OSCINIT0      (1<<1)
 #define MCG_S_IRCST         (1<<0)
 
@@ -133,7 +134,7 @@ BOOL MCG_Is_PLL_Locked();
 void MCG_Set_PLL_DIV(uint8_t div);
 
 //PLL Output divider (multiplier) 24-55
-void MCG_Set_VCO_DIV(uint8_t div);
+void MCG_Set_VCO_MUL(uint8_t mul);
 
 // 6.
 void MCG_Set_PLLS_PLL();
@@ -175,6 +176,29 @@ void MCG_Set_FLL_OSCCLK();
 // 3.
 void MCG_Enable_MCGIRCLK (BOOL isOn);
 
+
+void InitClock_FEI_24Mhz_Bus_24Mhz();
+void InitClock_FEI_48Mhz_Bus_24Mhz();
+void InitClock_FEI_72Mhz_Bus_24Mhz();
+void InitClock_FEI_72Mhz_Bus_36Mhz();
+void InitClock_FEI_96Mhz_Bus_24Mhz();
+void InitClock_FEI_96Mhz_Bus_32Mhz();
+
+// FLL with external XTAL OSC
+// For 32K XTAL: set frdiv = 0  high = FALSE
+// For 4Mhz XTAL:  set frdiv = 128  high = TRUE
+void InitClock_FEE_24Mhz_Bus_24Mhz(uint8_t frdiv, BOOL high);
+void InitClock_FEE_48Mhz_Bus_24Mhz(uint8_t frdiv, BOOL high);
+void InitClock_FEE_72Mhz_Bus_24Mhz(uint8_t frdiv, BOOL high);
+void InitClock_FEE_72Mhz_Bus_36Mhz(uint8_t frdiv, BOOL high);
+void InitClock_FEE_96Mhz_Bus_24Mhz(uint8_t frdiv, BOOL high);
+void InitClock_FEE_96Mhz_Bus_32Mhz(uint8_t frdiv, BOOL high);
+
+// 4Mhz internal
+void InitClock_FBI_Fast();
+// 32K internal
+void InitClock_FBI_Slow();
+void InitClock_BLPI();
 
 #endif
 

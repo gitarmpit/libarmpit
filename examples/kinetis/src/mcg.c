@@ -1,6 +1,5 @@
 #include "mcg.h"
 
-uint32_t CORE_FREQ = 20000000;
 
 void MCG_Select_MCGOUTCLK_FLL_PLL()
 {
@@ -23,7 +22,7 @@ void MCG_Select_MCGOUTCLK_OSCCLK()
 
 void MCG_Set_FRDIV(uint8_t val)
 {
-	if (val < 1 || val > 7)
+	if (val > 7)
 	{
 		while(1)
 			;
@@ -36,6 +35,9 @@ void MCG_Set_FRDIV(uint8_t val)
 void MCG_Set_FLL_IRC32K()
 {
 	MCG_C1 |= MCG_C1_IREFS;
+	do
+	{
+	}while(!(MCG_S & MCG_S_IREFST));
 }
 
 void MCG_Set_FLL_OSCCLK()
@@ -88,10 +90,12 @@ void MCG_Set_HighGain_OSC(BOOL isOn)
 	else
 		MCG_C2 &= ~MCG_C2_HGO0;
 }
+
 void MCG_Set_ExternalClock_OSC()
 {
 	MCG_C2 |= MCG_C2_EREFS0;
 }
+
 void MCG_Set_ExternalClock_ERC()
 {
 	MCG_C2 &= ~MCG_C2_EREFS0;
@@ -178,6 +182,17 @@ void MCG_Set_PLL_DIV(uint8_t div)
 	MCG_C5 |= (div-1);
 }
 
+void MCG_Set_VCO_MUL(uint8_t mul) {
+
+	if (mul < 24 || mul > 55) {
+		while (1)
+			;
+	}
+	MCG_C6 &= ~MCG_C6_VDIV0_CLEARMASK;
+	MCG_C6 |= (mul - 24);
+}
+
+
 void MCG_Set_PLLS_PLL()
 {
 	MCG_C6 |= MCG_C6_PLLS;
@@ -187,18 +202,6 @@ void MCG_Set_PLLS_FLL()
 {
 	MCG_C6 &= ~MCG_C6_PLLS;
 }
-
-void MCG_Set_VCO_DIV(uint8_t mul)
-{
-	if (mul < 24 || mul > 55)
-	{
-		while(1)
-			;
-	}
-	MCG_C6 &= ~MCG_C6_VDIV0_CLEARMASK;
-	MCG_C6 |= (mul-24);
-}
-
 
 BOOL  MCG_Is_LOLS0()
 {
@@ -218,19 +221,19 @@ BOOL  MCG_Is_IREFST()
 }
 BOOL  MCG_Is_CLKST_FLL()
 {
-	return MCG_S & MCG_S_CLKST_FLL;
+	return (MCG_S & MCG_S_CLKST_FLL) == MCG_S_CLKST_FLL;
 }
 BOOL  MCG_Is_CLKST_IRC()
 {
-	return MCG_S & MCG_S_CLKST_IRC;
+	return (MCG_S & MCG_S_CLKST_IRC) ==  MCG_S_CLKST_IRC;
 }
 BOOL  MCG_Is_CLKST_OSCCLK()
 {
-	return MCG_S & MCG_S_CLKST_OSCCLK;
+	return (MCG_S & MCG_S_CLKST_OSCCLK) == MCG_S_CLKST_OSCCLK;
 }
 BOOL  MCG_Is_CLKST_PLL()
 {
-	return MCG_S & MCG_S_CLKST_PLL;
+	return (MCG_S & MCG_S_CLKST_PLL) == MCG_S_CLKST_PLL;
 }
 BOOL  MCG_Is_OSCINIT0()
 {
