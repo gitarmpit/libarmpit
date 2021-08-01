@@ -1,0 +1,6 @@
+ uint32_t LL_GetUID_Word0(void)
+ uint32_t LL_GetUID_Word1(void)
+ uint32_t LL_GetUID_Word2(void)
+ uint32_t LL_GetFlashSize(void)
+ uint32_t LL_GetPackageType(void)
+ void     LL_InitTick(uint32_t HCLKFrequency, uint32_t Ticks)

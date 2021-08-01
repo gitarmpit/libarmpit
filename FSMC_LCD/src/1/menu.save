@@ -1,0 +1,290 @@
+
+#define BlockSize            512 /* Block Size in Bytes */
+#define BufferWordsSize      (BlockSize >> 2)
+
+#define Bank1_SRAM_ADDR      0x68000000
+#define Bank1_NOR_ADDR       0x64000000
+#define LCD_RAM_ADDR         0x6C000002
+#define Bank1_NAND_ADDR      0x70000000
+#define START_ADDR           0x08019000
+#define FLASH_PAGE_SIZE      0x800
+
+#define NAND_OK   0
+#define NAND_FAIL 1
+#define MAX_PHY_BLOCKS_PER_ZONE  1024
+#define MAX_LOG_BLOCKS_PER_ZONE  1000
+
+extern __IO uint32_t DMAComplete;
+extern __IO uint32_t FirstEntry;
+
+uint32_t Buffer_Block_Rx[BufferWordsSize * 20];
+uint8_t pBuffer[16384], TxBuffer[256];
+__IO uint32_t DMASourceAddress = 0;
+__IO uint32_t fractionaltimeunits = 0;
+
+
+void LCD_NORDisplay(uint32_t address)
+{
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
+  FSMC_NOR_Init();
+  FSMC_NOR_ReadID(&NOR_ID);
+  FSMC_NOR_ReturnToReadMode();
+  LCD_WriteBMP(address);
+}
+
+
+void InternalFlashToLCD(void)
+{
+  LCD_Clear(White);
+
+  while(GPIO_ReadInputDataBit(GPIOG, GPIO_Pin_8) != RESET)
+  {
+    LCD_WriteBMP(START_ADDR);
+    LCD_WriteBMP((START_ADDR + 0x25842));
+  }
+
+}
+
+void InternalFlashToLCD_DMA(void)
+{
+
+  while(GPIO_ReadInputDataBit(GPIOG, GPIO_Pin_8) != RESET)
+  {
+    LCD_WriteDMA(START_ADDR);
+    LCD_WriteDMA((START_ADDR + 0x25842));
+  }
+
+} 
+
+void NORFlashToLCD(void)
+{
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
+  FSMC_NOR_Init();
+  FSMC_NOR_ReadID(&NOR_ID);
+  FSMC_NOR_ReturnToReadMode();
+
+  LCD_SetDisplayWindow(239, 0x13F, 240, 320);
+
+
+    LCD_WriteBMP(SLIDE1);
+    LCD_WriteBMP(SLIDE2);
+
+void NORFlashToLCD_DMA(void)
+{
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
+  FSMC_NOR_Init();
+  FSMC_NOR_ReadID(&NOR_ID);
+  FSMC_NOR_ReturnToReadMode();
+
+  LCD_SetDisplayWindow(239, 0x13F, 240, 320);
+
+  LCD_WriteDMA(SLIDE1);
+  LCD_WriteDMA(SLIDE2);
+}
+
+void NORFlashToLCD_Speed(void)
+{
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
+  FSMC_NOR_Init();
+  FSMC_NOR_ReadID(&NOR_ID);
+  FSMC_NOR_ReturnToReadMode();
+  LCD_SetDisplayWindow(239, 0x13F, 240, 320);
+
+  LCD_WriteBMP(SLIDE1);
+  LCD_WriteBMP(SLIDE2);
+}
+
+
+void ExternalSRAMToLCD(void)
+{
+  /* Configure FSMC Bank1 NOR/SRAM3 */
+  FSMC_SRAM_Init();
+
+  LCD_WriteBMP((uint32_t)  Bank1_SRAM_ADDR);
+  LCD_WriteBMP((uint32_t) (Bank1_SRAM_ADDR + (2 * SLIDE_SIZE)));    
+
+}
+
+void ExternalSRAMToLCD_DMA(void)
+{
+  /* Configure FSMC Bank1 NOR/SRAM3 */
+  FSMC_SRAM_Init();
+  LCD_WriteDMA(Bank1_SRAM_ADDR);
+  LCD_WriteDMA((Bank1_SRAM_ADDR + (2 * SLIDE_SIZE))); 
+}
+
+void SDCardToLCD_Speed(void)
+{
+  Status = SD_Init();
+
+  if (Status == SD_OK)
+  {
+    Status = SD_GetCardInfo(&SDCardInfo);
+  }
+
+  if (Status == SD_OK)
+  {
+    Status = SD_SelectDeselect((uint32_t) (SDCardInfo.RCA << 16));
+  }
+
+  if (Status == SD_OK)
+  {
+    Status = SD_EnableWideBusOperation(SDIO_BusWide_4b);
+  }
+
+  if (Status == SD_OK)
+  {
+    Status = SD_SetDeviceMode(SD_DMA_MODE);
+  }
+}
+
+/**
+  * @brief  Write a full size picture on the SD Card.
+  * @param address: SD card memory address to write to.
+  * @param pointer: pointer to the buffer to be written in SD card.
+  * @retval : None
+  */
+SD_Error LCD_WriteSD(uint32_t address, uint32_t *pointer)
+{
+  uint32_t i = 0, sdaddress = address;
+
+  for(i = 0; i < 15; i++)
+  {
+    if (Status == SD_OK)
+    {
+      /* Write block of 512 bytes on awddress 0 */
+      Status = SD_WriteMultiBlocks(sdaddress, pointer, BlockSize, 20);
+      sdaddress += BlockSize * 20;
+      pointer += BlockSize * 5;
+    }
+    else
+    {
+      break;
+    }
+  }
+  return Status;
+}
+
+/**
+  * @brief  Write a full size picture on the LCD from SD Card.
+  * @param address: SD card memory address to read from.
+  * @retval : None
+  */
+SD_Error LCD_SDDisplay(uint32_t address)
+{
+  uint32_t i = 0, j = 0, sdaddress = address;
+  uint16_t* ptr = (uint16_t *)(Buffer_Block_Rx);
+  
+
+  LCD_SetDisplayWindow(239, 0x13F, 240, 320);
+
+  /* Set GRAM write direction and BGR = 1 */
+  /* I/D=00 (Horizontal : decrement, Vertical : decrement) */
+  /* AM=1 (address is updated in vertical writing direction) */
+  LCD_WriteReg(R3, 0x1008);
+ 
+  LCD_WriteRAM_Prepare();
+ 
+  for(i = 0; i < 15; i++)
+  {
+    if (Status == SD_OK)
+    {
+      /* Read block of 512*20 bytes from address 0 */
+      Status = SD_ReadMultiBlocks(sdaddress, Buffer_Block_Rx, BlockSize, 20);
+      for(j = 0; j < 5120; j++)
+      {
+        LCD_WriteRAM(ptr[j]);
+      }
+    }
+    else
+    {
+      break;
+    }
+    ptr = (uint16_t *)Buffer_Block_Rx;
+    sdaddress += BlockSize*20;
+  }  
+  LCD_WriteReg(R3, 0x1018);
+  return Status;
+}
+
+/**
+  * @brief  Write a full size picture on the LCD from NAND Flash.
+  * @param address: address to the picture on the NAND Flash.
+  * @retval : None
+  */
+uint32_t LCD_NANDDisplay(uint32_t address)
+{
+  uint32_t i = 0, j = 0;
+  uint16_t *ptr;
+
+  ptr = (uint16_t *) pBuffer;
+
+  LCD_SetDisplayWindow(239, 0x13F, 240, 320);
+
+  LCD_WriteReg(R3, 0x1008);
+ 
+  LCD_WriteRAM_Prepare();
+ 
+  for(i = 0; i < 9; i++)
+  { 
+    NAND_Read((address * 512), pBuffer, 32);
+    address += 32;
+    
+    for(j = 0; j < 8192; j++)
+    {
+      LCD_WriteRAM(ptr[j]);
+    }
+  }
+
+  NAND_Read((address * 512), pBuffer, 32);
+
+  for(j = 0; j < 3072; j++)
+  {
+    LCD_WriteRAM(ptr[j]);
+  }
+
+
+  LCD_WriteReg(R3, 0x1018);
+  return Status;
+}
+
+void LCD_WriteDMA(uint32_t address)
+{
+  DMA_InitTypeDef  DMA_InitStructure;
+
+  LCD_WriteReg(R3, 0x1008);
+ 
+  LCD_WriteRAM_Prepare();
+  
+  DMAComplete = 0;
+  FirstEntry = 1;
+  DMASourceAddress = address + 0x42;
+  
+  /* DMA1 channel3 configuration */
+  DMA_DeInit(DMA1_Channel3);
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)DMASourceAddress;  
+  DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)LCD_RAM_ADDR;
+  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
+  DMA_InitStructure.DMA_BufferSize = 0xFFFF;
+  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Enable;
+  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
+  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+  DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
+  DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+  DMA_InitStructure.DMA_M2M = DMA_M2M_Enable;
+  
+  DMA_Init(DMA1_Channel3, &DMA_InitStructure);
+
+  /* Enable DMA Channel3 Transfer Complete interrupt */
+  DMA_ITConfig(DMA1_Channel3, DMA_IT_TC, ENABLE);
+
+  /* Enable DMA1 channel3 */
+  DMA_Cmd(DMA1_Channel3, ENABLE);
+
+  /* Wait for DMA transfer Complete */
+  while(DMAComplete == 0)
+  {
+  }
+}
+
