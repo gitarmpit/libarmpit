@@ -1,32 +1,7 @@
-/*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 igorS
- *  
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 #ifndef _TIMER_CPP_H
 #define _TIMER_CPP_H
 
 #include "timer.h"
-
 
 #include "nvic.h"
 #include "rcc.h"
@@ -38,8 +13,6 @@
 
 class TIMER;
 class TIMER_Channel;
-
-
 
 class TIMER_Interrupt_Handler
 {
@@ -303,11 +276,11 @@ enum TIMER_Number
 
 #if (defined(STM32F10X_XL) || defined(STM32F10X_HD) || defined(STM32F2) || defined(STM32F4)) \
 && (!defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-	TIM8,
+    TIM8,
 #endif
 
 #if defined(STM32F2) || defined(STM32F4) || defined(STM32F10X_XL)
-	TIM9,
+    TIM9,
     TIM10,
     TIM11,
 #endif
@@ -321,7 +294,7 @@ enum TIMER_Number
 #endif
 
 #if defined(VALUE_LINE)
-	TIM15,
+    TIM15,
     TIM16,
     TIM17,
 #endif
@@ -497,7 +470,7 @@ private:
     TIM1() : AdvancedTimer(TIM1_BASE, IRQn_TIM1_UP, IRQn_TIM1_CC,  &RCC_APB2ENR, &RCC_APB2RSTR, RCC_APB2ENR_TIM1EN)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF1;
+        _af = AF1;
 #endif
     }
 
@@ -527,7 +500,7 @@ private:
         &RCC_APB2ENR, &RCC_APB2RSTR, RCC_APB2ENR_TIM8EN)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF3;
+        _af = AF3;
 #endif
     }
 
@@ -560,7 +533,7 @@ private:
     {
 #if (defined(STM32F4) || defined(STM32F2))
         //_is32_bit = true;
-    	_af = AF1;
+        _af = AF1;
 #endif
     }
 
@@ -590,7 +563,7 @@ private:
     TIMER_With_MMS(TIM3_BASE)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF2;
+        _af = AF2;
 #endif
     }
 
@@ -622,7 +595,7 @@ private:
     TIMER_With_MMS(TIM4_BASE)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF2;
+        _af = AF2;
 #endif
     }
 
@@ -656,7 +629,7 @@ private:
     {
 #if (defined(STM32F4) || defined(STM32F2))
         //_is32_bit = true;
-    	_af = AF2;
+        _af = AF2;
 #endif
     }
 
@@ -731,7 +704,7 @@ private:
     TIMER_With_OnePulseMode(TIM9_BASE)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF3;
+        _af = AF3;
 #endif
     }
 
@@ -753,7 +726,7 @@ private:
     TIMER_With_Channels(TIM10_BASE, 1, IRQn_TIM1_UP_TIM10, &RCC_APB2ENR, &RCC_APB2RSTR, RCC_APB2ENR_TIM10EN, false)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF3;
+        _af = AF3;
 #endif
     }
 
@@ -775,7 +748,7 @@ private:
     TIMER_With_Channels(TIM11_BASE, 1, IRQn_TIM1_TRG_COM_TIM11, &RCC_APB2ENR, &RCC_APB2RSTR, RCC_APB2ENR_TIM11EN, false)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF3;
+        _af = AF3;
 #endif
     }
 
@@ -812,7 +785,7 @@ private:
     //TIMER_With_SlaveMode(TIM12_BASE)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF9;
+        _af = AF9;
 #endif
     }
 
@@ -832,7 +805,7 @@ private:
     TIMER_With_Channels(TIM13_BASE, 2, IRQn_TIM13, &RCC_APB1ENR, &RCC_APB1RSTR, RCC_APB1ENR_TIM13EN, true)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF9;
+        _af = AF9;
 #endif
     }
 
@@ -852,7 +825,7 @@ private:
     TIMER_With_Channels(TIM14_BASE, 2, IRQn_TIM14, &RCC_APB1ENR, &RCC_APB1RSTR, RCC_APB1ENR_TIM14EN, true)
     {
 #if defined(STM32F2) || defined(STM32F4)
-    	_af = AF9;
+        _af = AF9;
 #endif
     }
 

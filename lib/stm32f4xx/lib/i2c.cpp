@@ -1,27 +1,3 @@
-/*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 igorS
- *  
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 #include "i2c_cpp.h"
 
 
@@ -889,30 +865,30 @@ bool I2C::WaitStatus (I2C_STATUS_MASK status_mask, bool set)
 
 bool I2C::MasterWrite(uint8_t slave_addr, uint8_t reg_addr, uint32_t length, uint8_t* data)
 {
-	bool rc = _MasterWrite (slave_addr<<1, reg_addr, length, data);
+    bool rc = _MasterWrite (slave_addr<<1, reg_addr, length, data);
 
-	if (!rc)
-	{
-		if (_errorCallBack)
-		{
-			_errorCallBack(_errorCallBackArg);
-		}
+    if (!rc)
+    {
+        if (_errorCallBack)
+        {
+            _errorCallBack(_errorCallBackArg);
+        }
 
-		if (_errorHandler)
-		{
-			_errorHandler->HandleError();
-		}
-	}
-	return rc;
+        if (_errorHandler)
+        {
+            _errorHandler->HandleError();
+        }
+    }
+    return rc;
 }
 
 
 bool I2C::_MasterWrite(uint8_t slave_addr, uint8_t reg_addr, uint32_t length, uint8_t* data)
 {
-	if (length == 0)
-	{
-		return true;
-	}
+    if (length == 0)
+    {
+        return true;
+    }
         
     if (!WaitStatus(I2C_BUSY, false))
     {
@@ -932,7 +908,7 @@ bool I2C::_MasterWrite(uint8_t slave_addr, uint8_t reg_addr, uint32_t length, ui
     ////////////////////////////////////////////////////////////////////////////
     SendByte(reg_addr);
     if (!WaitStatus(MASTER_EV8_2, true))  //TRA, BUSY, MSL, TXE and BTF
-    	return false;
+        return false;
     ////////////////////////////////////////////////////////////////////////////
 
     if (length == 1 || !_dmaTxStream)
@@ -959,88 +935,88 @@ bool I2C::_MasterWrite(uint8_t slave_addr, uint8_t reg_addr, uint32_t length, ui
 
 bool I2C::MasterRead(uint8_t slave_addr,  uint8_t reg_addr, uint32_t length, uint8_t* data)
 {
-	bool rc =  _MasterRead (slave_addr<<1, reg_addr, length, data);
-	if (!rc)
-	{
-		if (_errorCallBack)
-		{
-			_errorCallBack(_errorCallBackArg);
-		}
+    bool rc =  _MasterRead (slave_addr<<1, reg_addr, length, data);
+    if (!rc)
+    {
+        if (_errorCallBack)
+        {
+            _errorCallBack(_errorCallBackArg);
+        }
 
-		if (_errorHandler)
-		{
-			_errorHandler->HandleError();
-		}
-	}
-	return rc;
+        if (_errorHandler)
+        {
+            _errorHandler->HandleError();
+        }
+    }
+    return rc;
 }
 
 bool I2C::_MasterRead (uint8_t slave_addr, uint8_t reg_addr, uint32_t length, uint8_t* data)
 {
-	if (length == 0)
-	{
-		return true;
-	}
+    if (length == 0)
+    {
+        return true;
+    }
 
-	if (!WaitStatus(I2C_BUSY, false))
-	{
-		return false;
-	}
+    if (!WaitStatus(I2C_BUSY, false))
+    {
+        return false;
+    }
 
-	SendStart(true);
+    SendStart(true);
 
-	if (!WaitStatus(MASTER_EV5, true)) //BSY MSL SB
-			return false;
+    if (!WaitStatus(MASTER_EV5, true)) //BSY MSL SB
+            return false;
 
-	Send7bitAddress(slave_addr, true);
+    Send7bitAddress(slave_addr, true);
 
-	if (!WaitStatus(MASTER_EV6_TRA, true)) //MSL | BUSY | ADDR | TXE | TRA
-		return false;
+    if (!WaitStatus(MASTER_EV6_TRA, true)) //MSL | BUSY | ADDR | TXE | TRA
+        return false;
 
-	SendByte(reg_addr);
+    SendByte(reg_addr);
 
-	if (!WaitStatus(MASTER_EV8_2, true))  //TRA, BUSY, MSL, TXE and BTF
-		return false;
+    if (!WaitStatus(MASTER_EV8_2, true))  //TRA, BUSY, MSL, TXE and BTF
+        return false;
 
-	SendStart(true);
+    SendStart(true);
 
-	if (!WaitStatus(MASTER_EV5, true)) //BSY MSL SB
-		return false;
+    if (!WaitStatus(MASTER_EV5, true)) //BSY MSL SB
+        return false;
 
-	Send7bitAddress(slave_addr, false);
+    Send7bitAddress(slave_addr, false);
 
-	if (!WaitStatus(MASTER_EV6_RECV, true)) //MSL | BUSY | ADDR
-		return false;
+    if (!WaitStatus(MASTER_EV6_RECV, true)) //MSL | BUSY | ADDR
+        return false;
 
-	//////////////////////////////////////////////
-	if (length > 1 && _dmaRxStream)
-	{
-		return ReceiveDMA(data, length);
-	}
-	else
-	{
-		while (length)
-		{
-			if (length == 1)
-			{
-				EnableACK(false);
-				SendStop(true);
-			}
-			if (!WaitStatus(RXNE, true)) //or I2C::RXNE //MASTER_EV7
-			{
-				return false;
-			}
+    //////////////////////////////////////////////
+    if (length > 1 && _dmaRxStream)
+    {
+        return ReceiveDMA(data, length);
+    }
+    else
+    {
+        while (length)
+        {
+            if (length == 1)
+            {
+                EnableACK(false);
+                SendStop(true);
+            }
+            if (!WaitStatus(RXNE, true)) //or I2C::RXNE //MASTER_EV7
+            {
+                return false;
+            }
 
-			*data = ReceiveByte();
-			data++;
-			length--;
+            *data = ReceiveByte();
+            data++;
+            length--;
 
-		}
+        }
 
 
-		EnableACK(true);
-		return true;
-	}
+        EnableACK(true);
+        return true;
+    }
 
 
 }
@@ -1123,19 +1099,19 @@ void I2C::SetDMA_RxStream (DMA_Stream* stream)
 
 void I2C::Reinitialize()
 {
-	uint16_t save_cr1 = *_pI2C_CR1;
-	uint16_t save_cr2 = *_pI2C_CR2;
-	uint16_t save_ccr = *_pI2C_CCR;
-	uint16_t save_trise = *_pI2C_TRISE;
+    uint16_t save_cr1 = *_pI2C_CR1;
+    uint16_t save_cr2 = *_pI2C_CR2;
+    uint16_t save_ccr = *_pI2C_CCR;
+    uint16_t save_trise = *_pI2C_TRISE;
 
 
-	SetSoftwareReset(true);
-	SetSoftwareReset(false);
+    SetSoftwareReset(true);
+    SetSoftwareReset(false);
 
-	*_pI2C_CCR = save_ccr;
-	*_pI2C_TRISE = save_trise;
-	*_pI2C_CR2 = save_cr2;
-	*_pI2C_CR1 = save_cr1;
+    *_pI2C_CCR = save_ccr;
+    *_pI2C_TRISE = save_trise;
+    *_pI2C_CR2 = save_cr2;
+    *_pI2C_CR1 = save_cr1;
 }
 
 

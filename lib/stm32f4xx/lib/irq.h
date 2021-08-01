@@ -26,7 +26,7 @@
 #elif defined(STM32F469xx)
   #include "irq_f469xx.h"
 #else
- #error "Please select first the target STM32F4xx device used in your application in the project settings"
+ #error "Please select the target STM32F4xx device used in your application in the project settings"
 #endif
 
 

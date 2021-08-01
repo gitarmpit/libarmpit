@@ -1,27 +1,3 @@
-/*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 igorS
- *  
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 #include "gpio_cpp.h"
 
 GPIO_PORT::GPIO_PORT(volatile uint64_t* pGPIO_CR, volatile uint32_t* pGPIO_IDR,
@@ -62,8 +38,6 @@ void GPIO_PORT::SetupGPIO_Mode(GPIO_PIN_N pin, uint32_t mode)
     *_pGPIO_CR &= ~(0x3LLU << ((uint64_t) pin << 2LLU));
     *_pGPIO_CR |= ((uint64_t) mode)  << ((uint64_t) pin << 2LLU);
 }
-
-
 
 void GPIO_PORT::Lock(uint16_t bitMask)
 {
@@ -221,17 +195,17 @@ void GPIO_PIN::SetupGPIO_OutAltPP()
 
 void GPIO_PIN::SetSpeedLow ()
 {
-	gpioPort->SetSpeedLow(pin);
+    gpioPort->SetSpeedLow(pin);
 }
 
 void GPIO_PIN::SetSpeedMedium ()
 {
-	gpioPort->SetSpeedMedium(pin);
+    gpioPort->SetSpeedMedium(pin);
 }
 
 void GPIO_PIN::SetSpeedHigh ()
 {
-	gpioPort->SetSpeedHigh(pin);
+    gpioPort->SetSpeedHigh(pin);
 }
 
 void GPIO_PIN::Set()
@@ -252,10 +226,10 @@ bool GPIO_PIN::IsSet()
 }
 void GPIO_PIN::PullUp()
 {
-	gpioPort->SetPin(pin);
+    gpioPort->SetPin(pin);
 }
 void GPIO_PIN::PullDown()
 {
-	gpioPort->ResetPin(pin);
+    gpioPort->ResetPin(pin);
 }
 

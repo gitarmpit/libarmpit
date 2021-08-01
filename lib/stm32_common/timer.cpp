@@ -1,30 +1,3 @@
-/*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 igorS
- *  
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-
-
-
 #include "timer_cpp.h"
 
 #ifndef TIMER_INTERRUPTS_OFF
@@ -129,7 +102,7 @@ void TIM5_IRQHandler(void)
 #endif
 
 
-#if defined(STM32F2) ||	\
+#if defined(STM32F2) || \
 (defined(STM32F4) && !defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE)) ||\
 defined(VALUE_LINE)
 void TIM6_DAC_IRQHandler(void)
@@ -856,76 +829,76 @@ TIMER::TIMER (uint32_t timx_base_addr, IRQn_Type irqNo, volatile uint32_t* rccEn
 
 TIMER* TIMER::Get_Instance(TIMER_Number timer_no)
 {
-	switch (timer_no)
-	{
-		case TIM1:
-			return TIM1::GetInstance();
-		case TIM2:
-			return TIM2::GetInstance();
-		case TIM3:
-			return TIM3::GetInstance();
+    switch (timer_no)
+    {
+        case TIM1:
+            return TIM1::GetInstance();
+        case TIM2:
+            return TIM2::GetInstance();
+        case TIM3:
+            return TIM3::GetInstance();
 
 #if !defined(STM32F10X_LD) && !defined(STM32F10X_LD_VL)
-		case TIM4:
-			return TIM4::GetInstance();
+        case TIM4:
+            return TIM4::GetInstance();
 #endif
 #if defined(STM32F4) || defined(STM32F2) || defined(STM32F10X_HD) || defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
-		case TIM5:
-			return TIM5::GetInstance();
+        case TIM5:
+            return TIM5::GetInstance();
 #endif
 
 #if defined(VALUE_LINE) || defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL) \
 || defined(STM32F2) || defined(STM32F4) \
 && (!defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-		case TIM6:
-			return TIM6::GetInstance();
-		case TIM7:
-			return TIM7::GetInstance();
+        case TIM6:
+            return TIM6::GetInstance();
+        case TIM7:
+            return TIM7::GetInstance();
 #endif
 
 #if (defined(STM32F10X_XL) || defined(STM32F10X_HD) || defined(STM32F2) || defined(STM32F4)) \
 && (!defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-		case TIM8:
-			return TIM8::GetInstance();
+        case TIM8:
+            return TIM8::GetInstance();
 #endif
 
 #if defined(STM32F2) || defined(STM32F4) || defined(STM32F10X_XL)
-			case TIM9:
-			return TIM9::GetInstance();
-		case TIM10:
-			return TIM10::GetInstance();
-		case TIM11:
-			return TIM11::GetInstance();
+            case TIM9:
+            return TIM9::GetInstance();
+        case TIM10:
+            return TIM10::GetInstance();
+        case TIM11:
+            return TIM11::GetInstance();
 #endif
 
 #if (defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F2) || defined(STM32F4) \
 && !defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-		case TIM12:
-			return TIM12::GetInstance();
-		case TIM13:
-			return TIM13::GetInstance();
-		case TIM14:
-			return TIM14::GetInstance();
+        case TIM12:
+            return TIM12::GetInstance();
+        case TIM13:
+            return TIM13::GetInstance();
+        case TIM14:
+            return TIM14::GetInstance();
 #endif
 
 #if defined(VALUE_LINE)
-		case TIM15:
-			return TIM15::GetInstance();
-		case TIM16:
-			return TIM16::GetInstance();
-		case TIM17:
-			return TIM17::GetInstance();
+        case TIM15:
+            return TIM15::GetInstance();
+        case TIM16:
+            return TIM16::GetInstance();
+        case TIM17:
+            return TIM17::GetInstance();
 #endif
 
 #if defined(STM32L0)
-		case TIM21:
-			return TIM21::GetInstance();
-		case TIM22:
-			return TIM22::GetInstance();
+        case TIM21:
+            return TIM21::GetInstance();
+        case TIM22:
+            return TIM22::GetInstance();
 #endif
-	};
+    };
 
-	return 0;
+    return 0;
 }
 
 

@@ -1,28 +1,3 @@
-/*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 igorS
- *  
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-
 #ifndef _DMA_H
 #define _DMA_H
 
@@ -252,8 +227,8 @@
 
 typedef enum
 {
-	DMA_1,
-	DMA_2
+    DMA_1,
+    DMA_2
 }DMA_N;
 
 typedef enum
@@ -287,34 +262,34 @@ typedef enum
 
 typedef struct _DMA_STREAM
 {
-	volatile uint32_t* _pDMA_ISR;
-	volatile uint32_t* _pDMA_IFCR;
+    volatile uint32_t* _pDMA_ISR;
+    volatile uint32_t* _pDMA_IFCR;
 
-	volatile uint32_t* _pDMA_SCR;
-	volatile uint32_t* _pDMA_SNDTR;
-	volatile uint32_t* _pDMA_SPAR;
-	volatile uint32_t* _pDMA_SM0AR;
-	volatile uint32_t* _pDMA_SM1AR;
-	volatile uint32_t* _pDMA_SFCR;
+    volatile uint32_t* _pDMA_SCR;
+    volatile uint32_t* _pDMA_SNDTR;
+    volatile uint32_t* _pDMA_SPAR;
+    volatile uint32_t* _pDMA_SM0AR;
+    volatile uint32_t* _pDMA_SM1AR;
+    volatile uint32_t* _pDMA_SFCR;
 
-	uint32_t  _FEIF;
-	uint32_t  _DMEIF;
-	uint32_t  _TEIF;
-	uint32_t  _HTIF;
-	uint32_t  _TCIF;
+    uint32_t  _FEIF;
+    uint32_t  _DMEIF;
+    uint32_t  _TEIF;
+    uint32_t  _HTIF;
+    uint32_t  _TCIF;
 
-	IRQn_Type _nvicIrqNumber;
+    IRQn_Type _nvicIrqNumber;
 
-	uint8_t  _streamNumber;
-	uint8_t  _channelNumber;
+    uint8_t  _streamNumber;
+    uint8_t  _channelNumber;
 } DMA_Stream_Type;
 
 
 typedef struct _DMA
 {
-	volatile uint32_t*  enableReg;
-	volatile uint32_t*  resetReg;
-	uint32_t             rccEnableBit;
+    volatile uint32_t*  enableReg;
+    volatile uint32_t*  resetReg;
+    uint32_t             rccEnableBit;
     IRQn_Type*          _irqNumbers;
     DMA_Stream_Type     _dmaStreams[8];
 } DMA_Type;

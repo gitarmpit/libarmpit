@@ -1,30 +1,4 @@
-/*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 igorS
- *  
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 #include "adc_cpp.h"
-
-
 
 #ifdef __cplusplus
 extern "C"
@@ -189,15 +163,15 @@ void ADC::SetJInterruptHandler(ADC_IRQ_Handler* interruptHandler)
 
 void ADC::StartContinuousConversion()
 {
-	*_pADC_CR2 |= ADC_CR2_CONT;
-	*_pADC_CR2 |= ADC_CR2_SWSTART;
+    *_pADC_CR2 |= ADC_CR2_CONT;
+    *_pADC_CR2 |= ADC_CR2_SWSTART;
 
 }
 
 void ADC::StartContinuousJConversion()
 {
-	*_pADC_CR2 |= ADC_CR2_CONT;
-	*_pADC_CR2 |= ADC_CR2_JSWSTART;
+    *_pADC_CR2 |= ADC_CR2_CONT;
+    *_pADC_CR2 |= ADC_CR2_JSWSTART;
 
 }
 
@@ -205,27 +179,27 @@ void ADC::StartContinuousJConversion()
 uint32_t ADC::SingleConversion()
 {
     *_pADC_CR2 &= ~ADC_CR2_CONT;
-	*_pADC_CR2 |= ADC_CR2_SWSTART;
+    *_pADC_CR2 |= ADC_CR2_SWSTART;
 
-	while ((*_pADC_SR & ADC_SR_EOC) == 0)
-		;
+    while ((*_pADC_SR & ADC_SR_EOC) == 0)
+        ;
 
-	*_pADC_SR &= ~ADC_SR_EOC;  //not needed if DR is read
+    *_pADC_SR &= ~ADC_SR_EOC;  //not needed if DR is read
 
-	return 0xffff & *_pADC_DR;
+    return 0xffff & *_pADC_DR;
 }
 
 uint32_t ADC::SingleJConversion()
 {
     *_pADC_CR2 &= ~ADC_CR2_CONT;
-	*_pADC_CR2 |= ADC_CR2_JSWSTART;
+    *_pADC_CR2 |= ADC_CR2_JSWSTART;
 
-	while ((*_pADC_SR & ADC_SR_JEOC) == 0)
-		;
+    while ((*_pADC_SR & ADC_SR_JEOC) == 0)
+        ;
 
-	*_pADC_SR &= ~ADC_SR_JEOC;
+    *_pADC_SR &= ~ADC_SR_JEOC;
 
-	return 0xffff & *_pADC_JDR1;
+    return 0xffff & *_pADC_JDR1;
 }
 
 
@@ -457,48 +431,48 @@ void ADC::SetResolution6bit()
 
 void ADC::EnableOverrunInterrupt(bool enable)
 {
-	if (enable)
-	{
-		*_pADC_CR1 |= ADC_CR1_OVRIE;
-	}
-	else
-	{
-		*_pADC_CR1 &= ~ADC_CR1_OVRIE;
-	}
+    if (enable)
+    {
+        *_pADC_CR1 |= ADC_CR1_OVRIE;
+    }
+    else
+    {
+        *_pADC_CR1 &= ~ADC_CR1_OVRIE;
+    }
 
 }
 
 bool ADC::IsOverrun()
 {
-	return (*_pADC_SR & ADC_SR_OVR);
+    return (*_pADC_SR & ADC_SR_OVR);
 }
 
 void ADC::ClearOverrun()
 {
-	*_pADC_SR &= ~ADC_SR_OVR;
+    *_pADC_SR &= ~ADC_SR_OVR;
 }
 
 void ADC::SetPrescalerDIV2()
 {
-	ADC_CCR &= ~ADC_CCR_ADCPRE_CLEARMASK;
-	ADC_CCR |= ADC_CCR_ADCPRE_DIV2;
+    ADC_CCR &= ~ADC_CCR_ADCPRE_CLEARMASK;
+    ADC_CCR |= ADC_CCR_ADCPRE_DIV2;
 }
 void ADC::SetPrescalerDIV4()
 {
-	ADC_CCR &= ~ADC_CCR_ADCPRE_CLEARMASK;
-	ADC_CCR |= ADC_CCR_ADCPRE_DIV4;
+    ADC_CCR &= ~ADC_CCR_ADCPRE_CLEARMASK;
+    ADC_CCR |= ADC_CCR_ADCPRE_DIV4;
 }
 
 void ADC::SetPrescalerDIV6()
 {
-	ADC_CCR &= ~ADC_CCR_ADCPRE_CLEARMASK;
-	ADC_CCR |= ADC_CCR_ADCPRE_DIV6;
+    ADC_CCR &= ~ADC_CCR_ADCPRE_CLEARMASK;
+    ADC_CCR |= ADC_CCR_ADCPRE_DIV6;
 }
 
 void ADC::SetPrescalerDIV8()
 {
-	ADC_CCR &= ~ADC_CCR_ADCPRE_CLEARMASK;
-	ADC_CCR |= ADC_CCR_ADCPRE_DIV8;
+    ADC_CCR &= ~ADC_CCR_ADCPRE_CLEARMASK;
+    ADC_CCR |= ADC_CCR_ADCPRE_DIV8;
 }
 
 

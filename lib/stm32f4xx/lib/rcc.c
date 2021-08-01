@@ -1,34 +1,6 @@
-/*
- * The MIT License (MIT)
- * 
- * Copyright (c) 2015 igorS
- *  
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-
-
 #include "rcc.h"
 
 #include <stdint.h>
-
-
 
 #ifdef __cplusplus
 extern "C"
@@ -47,7 +19,7 @@ static void RCC_ResetHSI(void)
 
 }
 
-	
+    
 static void RCC_StartHSI(void)
 {
     RCC_CR |= RCC_CR_HSION;
@@ -238,8 +210,8 @@ void RCC_SetPLLM (uint8_t pllm)
 //Multiplication factor for VCO
 void RCC_SetPLLN (uint16_t plln) 
 {
-	RCC_PLLCFGR &= ~RCC_PLLCFGR_PLLN_CLEARMASK;
-	RCC_PLLCFGR |= plln<<RCC_PLLCFGR_PLLN_OFFSET;
+    RCC_PLLCFGR &= ~RCC_PLLCFGR_PLLN_CLEARMASK;
+    RCC_PLLCFGR |= plln<<RCC_PLLCFGR_PLLN_OFFSET;
 }
 
 void RCC_SetPLLP (uint8_t pllp)
@@ -539,10 +511,10 @@ uint32_t RCC_GetTIMx_CLK(BOOL isAPB1)
 
 //void delay_us(uint32_t us)
 //{
-//	if (us == 0 )
-//	{
-//		return;
-//	}
+//  if (us == 0 )
+//  {
+//      return;
+//  }
 //
 //#ifdef __GNUC__
 //  //uint64_t cnt = (uint64_t)RCC_GetAHB_CLK() * (uint64_t)us / 16000000ull;
@@ -1809,11 +1781,11 @@ void RCC_ResetBKP(BOOL reset)
 {
     if (reset)
     {
-    	RCC_BDCR |= RCC_BDCR_BDRST;
+        RCC_BDCR |= RCC_BDCR_BDRST;
     }
     else
     {
-    	RCC_BDCR &= ~RCC_BDCR_BDRST;
+        RCC_BDCR &= ~RCC_BDCR_BDRST;
     }
 
 }
