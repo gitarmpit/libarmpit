@@ -5,6 +5,7 @@
 #include "mcg.h"
 #include "rtc.h"
 #include "osc.h"
+#include "smc.h"
 #include <time.h>
 
 void HardFault_Handler()
@@ -92,14 +93,17 @@ int main(void)
 //#endif
 
 	SIM_DisableWatchDog();
+	//get_reset_source();
+	test_lptmr();
 	//test_clockout_RTC_LPO_1hz();
 	// test_clockout_OSCCLOCK32();
-	TestClockout3();
+	//TestClockout3();
 	//test_RTCIN();
 	//pit_test1();
 	//test_pwm2();
 	//test_delay2();
 	// delay_ms(2000);
+	test_lptmr3();
 
 	while(1)
 		;

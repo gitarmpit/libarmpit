@@ -150,9 +150,6 @@ void SIM_SetOUTDIV4 (uint8_t div);
 void SIM_GetUID (uint32_t* low, uint32_t* mid, uint32_t* high);
 void SIM_DisableWatchDog();
 
-void SIM_SelectTPMClock_MCGFLLCLK();
-void SIM_SelectTPMClock_OSCERCLK();
-void SIM_SelectTPMClock_MCGIRCLK();
 
 
 

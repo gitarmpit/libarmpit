@@ -18,6 +18,7 @@ typedef int BOOL;
 extern uint32_t CORE_FREQ;
 extern uint32_t BUS_FREQ;
 extern uint32_t TPM_FREQ;
+extern uint32_t LPTMR_FREQ;
 extern uint32_t XTAL_FREQ;
 
 void delay_ms (uint16_t ms);
