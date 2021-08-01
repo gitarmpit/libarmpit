@@ -163,7 +163,7 @@ static void test_pushColor() {
 
     lcd.setTextColor(ILI9341_BLACK);
     lcd.setFont(&consola);
-    lcd.printf (0, 3, "millis: %d\n", millis() - t0);
+    lcd.printf (0, 3, "millis2: %d\n", millis() - t0);
 
     while(1)
         ;
