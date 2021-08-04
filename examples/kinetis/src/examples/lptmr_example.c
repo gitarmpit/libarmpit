@@ -27,6 +27,7 @@ static GPIO_PIN setup_pin()
 void test_lptmr()
 {
 	InitClock_FEI_24Mhz_Bus_24Mhz();
+    delay_ms(100);
 
 	GPIO_PIN pin = setup_pin();
     g_pin = &pin;
@@ -34,7 +35,6 @@ void test_lptmr()
 	LPTMPR_EnableClock(TRUE);
 	LPTMPR_SelectMode_TimeCounter();
 	LPTMR_SelectClock_LPO();
-	LPTMR_ClearCounter();
 	LPTMR_SetTimer_ms(10);
 	LPTMPR_SetInterruptHandler(handler);
 	LPTMPR_EnableCounter(TRUE);
@@ -47,7 +47,7 @@ void test_lptmr()
 // MCGIRCLK 4Mhz
 void test_lptmr2()
 {
-	InitClock_FEI_24Mhz_Bus_24Mhz();
+	// InitClock_FEI_24Mhz_Bus_24Mhz();
 
 	GPIO_PIN pin = setup_pin();
     g_pin = &pin;
@@ -56,10 +56,12 @@ void test_lptmr2()
     MCG_Set_IRC_Fast(); // 4Mhz
     MCG_Enable_MCGIRCLK(TRUE);
 
+    delay_ms(100);
+
 	LPTMPR_EnableClock(TRUE);
+
 	LPTMPR_SelectMode_TimeCounter();
 	LPTMR_SelectClock_MCGIRCLK(4000000);
-	LPTMR_ClearCounter();
 	LPTMR_SetTimer_hours(24);
 	LPTMR_SetTimer_ms(10000);
 
@@ -85,7 +87,6 @@ void test_lptmr3()
 	LPTMPR_SelectMode_TimeCounter();
 	LPTMR_SelectClock_MCGIRCLK(32768);
 	uint16_t cnt = LPTMR_GetCounterValue();
-	LPTMR_ClearCounter();
 	cnt = LPTMR_GetCounterValue();
 	LPTMPR_SetCMR(15);
 	LPTMR_SetPrescaler(LPTMR_DIV2);
@@ -113,7 +114,6 @@ void test_lptmr4()
 	LPTMPR_EnableClock(TRUE);
 	LPTMPR_SelectMode_TimeCounter();
 	LPTMR_SelectClock_MCGIRCLK(32768);
-	LPTMR_ClearCounter();
 
 	LPTMR_SetTimer_ms(10000);
 

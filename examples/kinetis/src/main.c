@@ -88,13 +88,19 @@ static void test2()
 
 int main(void)
 {
-//#ifdef SEMIHOSTING
- //   initialise_monitor_handles();
-//#endif
+#ifdef SEMIHOSTING
+void initialise_monitor_handles(void);
+#include <stdio.h>  //for printf
+
+    initialise_monitor_handles();
+#endif
 
 	SIM_DisableWatchDog();
 	//get_reset_source();
-	test_lptmr();
+	//test_lptmr();
+	//test_llwu();
+	//test_spi();
+	test_uart6();
 	//test_clockout_RTC_LPO_1hz();
 	// test_clockout_OSCCLOCK32();
 	//TestClockout3();

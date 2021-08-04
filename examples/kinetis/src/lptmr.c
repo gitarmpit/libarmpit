@@ -92,13 +92,12 @@ void LPTMR_SetPrescaler(LPTMR_PRESC presc)
 	LPTMR_PSR |= (uint8_t)presc << 3;
 }
 
-void LPTMR_ClearCounter ()
-{
-	LPTMR_CNR = 0;
-}
 
+// When reading the CNR, the bus clock must be at least two times faster than the rate at
+// which the LPTMR counter is incrementing, otherwise incorrect data may be returned
 uint16_t LPTMR_GetCounterValue ()
 {
+	LPTMR_CNR = 0;
     return LPTMR_CNR;
 }
 

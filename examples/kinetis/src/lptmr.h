@@ -72,7 +72,6 @@ void LPTMPR_EnableCounter(BOOL enable);
 void LPTMPR_SetInterruptHandler(void (*handler)());
 void LPTMPR_SetCMR(uint16_t cmr);
 void LPTMR_SetPrescaler(LPTMR_PRESC presc);
-void LPTMR_ClearCounter ();
 uint16_t LPTMR_GetCounterValue ();
 void LPTMR_SelectClock_MCGIRCLK(uint32_t clockFreq);
 void LPTMR_SelectClock_LPO();
