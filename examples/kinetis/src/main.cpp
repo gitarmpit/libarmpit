@@ -21,12 +21,6 @@ GPIO_PIN* g_pin;
 // static const uint8_t array[60000] = {0xdd, 0xcc, 0xaa};
 
 
-
-#ifdef SEMIHOSTING
-void initialise_monitor_handles(void);
-#include <stdio.h>  //for printf
-#endif
-
 static void test1()
 {
 	GPIO_PORT* portD = GPIO_GetInstance(PORTD);
@@ -84,14 +78,18 @@ static void test2()
 
 }
 
+void test_nokia5110();
+extern "C" void test_lm74_2();
+
+#ifdef SEMIHOSTING
+extern "C" void initialise_monitor_handles(void);
+#include <stdio.h>  //for printf
+#endif
 
 
 int main(void)
 {
 #ifdef SEMIHOSTING
-void initialise_monitor_handles(void);
-#include <stdio.h>  //for printf
-
     initialise_monitor_handles();
 #endif
 
@@ -100,7 +98,11 @@ void initialise_monitor_handles(void);
 	//test_lptmr();
 	//test_llwu();
 	//test_spi();
-	test_uart6();
+
+	test_lm74_2();
+	//test_nokia5110();
+
+	//test_uart6();
 	//test_clockout_RTC_LPO_1hz();
 	// test_clockout_OSCCLOCK32();
 	//TestClockout3();
@@ -109,7 +111,7 @@ void initialise_monitor_handles(void);
 	//test_pwm2();
 	//test_delay2();
 	// delay_ms(2000);
-	test_lptmr3();
+	//test_lptmr3();
 
 	while(1)
 		;

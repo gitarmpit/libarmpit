@@ -91,7 +91,12 @@ void SIM_Get_SDID(uint8_t* famID, uint8_t* subfamID, uint8_t* seriesID, uint8_t*
 
 #define SIM_SCGC7_DMA     (1<<8)
 
-/////
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 void SIM_Select_RTCClock_OSC32KCLK();
 void SIM_Select_RTCClock_RTC_CLKIN();
 void SIM_Select_RTCClock_LPO();
@@ -151,6 +156,9 @@ void SIM_GetUID (uint32_t* low, uint32_t* mid, uint32_t* high);
 void SIM_DisableWatchDog();
 
 
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

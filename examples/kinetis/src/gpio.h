@@ -112,11 +112,17 @@ typedef struct
 
 typedef struct
 {
-	GPIO_PORT* GPIO_port;
-	GPIO_PIN_N  pinN;
-	uint32_t    pinMask;
-	volatile uint32_t* PORT_PCR;
+    GPIO_PORT* GPIO_port;
+    GPIO_PIN_N  pinN;
+    uint32_t    pinMask;
+    volatile uint32_t* PORT_PCR;
 } GPIO_PIN;
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 
 GPIO_PORT* GPIO_GetInstance(GPIO_PORT_N port);
 
@@ -143,5 +149,10 @@ uint32_t GPIO_GetInput(GPIO_PORT* port);
 void GPIO_PullDown(GPIO_PIN* pin);
 void GPIO_PullUp(GPIO_PIN* pin);
 void GPIO_SetAF(GPIO_PIN* pin, uint8_t alt);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif
