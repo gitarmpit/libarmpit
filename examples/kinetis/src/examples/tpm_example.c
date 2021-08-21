@@ -40,7 +40,7 @@ void test_tpm()
 	SIM_Select_TPMSRC_OSCERCLK();
 
 	TPM* tpm = TPM_GetInstance(TPM0);
-	tpm->handler = tpm_handler;
+	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	*tpm->TPM_MOD = 32767;
 
@@ -62,7 +62,7 @@ void test_tpm2()
     InitClock_FEE_24Mhz_Bus_24Mhz(0, FALSE);
 
 	TPM* tpm = TPM_GetInstance(TPM0);
-	tpm->handler = tpm_handler;
+	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	*tpm->TPM_MOD = 48000;
 	TPM_SetPrescaler(tpm, TPM_DIV8);
@@ -87,7 +87,7 @@ void test_tpm_timer()
 	TPM_FREQ = CORE_FREQ;
 
 	TPM* tpm = TPM_GetInstance(TPM0);
-	tpm->handler = tpm_handler;
+	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 
 	TPM_Channel_SetUpdatePeriod_us(tpm, 1000);
@@ -114,7 +114,7 @@ void test_tpm_timer2()
 	TPM_FREQ = CORE_FREQ;
 
 	TPM* tpm = TPM_GetInstance(TPM0);
-	tpm->handler = tpm_handler;
+	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	// delay_ms(100);
 
@@ -152,7 +152,7 @@ void test_pwm()
 
 
 	TPM* tpm = TPM_GetInstance(TPM0);
-	tpm->handler = tpm_handler;
+	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	int period_us = 2000;
 	int duty_us = 1000;
@@ -198,7 +198,7 @@ void test_pwm2()
 	MCG_Select_MCGOUTCLK_FLL_PLL();
 
 	TPM* tpm = TPM_GetInstance(TPM0);
-	tpm->handler = tpm_handler;
+	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	int period_us = 500000; //500ms but it will get capped at 350ms being the max at this clock speed (24Mhz)
 	int duty_us = 150000;
@@ -214,3 +214,77 @@ void test_pwm2()
 
 }
 
+static void generatePWM()
+{
+	//InitClock_FBI_Slow();
+	//MCG_Enable_MCGIRCLK(TRUE);
+	//SIM_Select_TPMSRC_MCGIRCLK();
+
+
+    GPIO_PORT* portA = GPIO_GetInstance(PORTA);
+    GPIO_EnableClock(portA, TRUE);
+    GPIO_PIN a5 = GPIO_GetPin(portA, GPIO_PIN5);
+    GPIO_SetAF(&a5, 3);
+
+	TPM* tpm = TPM_GetInstance(TPM0);
+	TPM_EnableClock(tpm, TRUE);
+	int period_us = 50;
+	int duty_us = 25;
+	TPM_Channel ch = TPM_GetChannel(tpm, 2);
+	TPM_Channel_SetupPWM(&ch, period_us, duty_us);
+	TPM_EnableCounter(tpm, TRUE);
+}
+
+uint16_t presc_array[] = {1,2,4,8,16,32,64,128};
+uint32_t g_val;
+uint32_t vals[1000];
+int n = 0;
+uint16_t g_mod = 65535;
+uint16_t g_presc = 1;
+static void tmp_capture_handler(uint32_t val)
+{
+	int32_t diff = val - g_val;
+	if (diff < 0)
+	{
+		diff += g_mod;
+	}
+	uint64_t val_us =  diff * presc_array[g_presc] * 1000000llu / CORE_FREQ;
+	if (n < 1000)
+	{
+		vals[n++] = val_us;
+	}
+	g_val = val;
+	// printf ("%u\n", diff);
+}
+
+void test_tpm_capture()
+{
+	InitClock_FEI_24Mhz_Bus_24Mhz();
+	SIM_Select_TPMSRC_MCGFLLCLK();
+	TPM_FREQ = CORE_FREQ;
+	SIM_Select_FLL();
+
+	generatePWM();
+
+    GPIO_PORT* portA = GPIO_GetInstance(PORTA);
+    GPIO_EnableClock(portA, TRUE);
+    GPIO_PIN a13 = GPIO_GetPin(portA, GPIO_PIN13);
+    GPIO_SetAF(&a13, 3);
+
+	TPM* tpm = TPM_GetInstance(TPM1);
+	tpm->CHF_handler = tmp_capture_handler;
+	TPM_EnableClock(tpm, TRUE);
+	uint16_t mod, presc;
+	TPM_CalculateTimerValues(200, &mod, &presc);
+	*tpm->TPM_CNT = 0;
+	TPM_SetModulo(tpm, mod);
+	g_mod = mod;
+	g_presc = presc;
+	TPM_SetPrescaler(tpm, presc);
+	TPM_Channel ch = TPM_GetChannel(tpm, 1);
+	TPM_Channel_EnableInterrupt(&ch, TRUE);
+	TPM_Channel_SetupInputCaptureEitherEdge(&ch);
+	TPM_EnableCounter(tpm, TRUE);
+	while(1)
+		;
+}
