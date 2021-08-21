@@ -14,6 +14,12 @@ void HardFault_Handler()
 		;
 }
 
+void SVC_Handler()
+{
+	while(1)
+		;
+
+}
 
 
 GPIO_PIN* g_pin;
@@ -79,7 +85,14 @@ static void test2()
 }
 
 void test_nokia5110();
+
+extern "C" void test_exti();
 extern "C" void test_lm74_2();
+extern "C" void test_tpm_capture();
+extern "C" void test_tpm_pwm();
+extern "C" void test_tpm_pwm2();
+extern "C" void test_tpm_pwm3();
+extern "C" void test_tpm_pwm4();
 
 #ifdef SEMIHOSTING
 extern "C" void initialise_monitor_handles(void);
@@ -99,7 +112,10 @@ int main(void)
 	//test_llwu();
 	//test_spi();
 
-	test_lm74_2();
+	//test_exti();
+	test_tpm_pwm4();
+	test_tpm_capture();
+	//test_lm74_2();
 	//test_nokia5110();
 
 	//test_uart6();

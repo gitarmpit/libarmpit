@@ -1,49 +1,73 @@
 #include "tpm.h"
 #include "sim.h"
 
-static void TPM_CalculateTimerValues (uint32_t us, uint16_t* count, uint16_t* presc);
 static TPM TPM_list[] =
 {
-    { &SIM_SCGC6, SIM_SCGC6_TPM0, &TPM0_SC, &TPM0_CNT, &TPM0_MOD, &TPM0_STATUS, &TPM0_CONF, TPM0_CnCS_BASE, TPM0_CnV_BASE, TPM0_IRQn, NULL },
-    { &SIM_SCGC6, SIM_SCGC6_TPM1, &TPM1_SC, &TPM1_CNT, &TPM1_MOD, &TPM1_STATUS, &TPM1_CONF, TPM1_CnCS_BASE, TPM1_CnV_BASE, TPM1_IRQn, NULL },
-    { &SIM_SCGC6, SIM_SCGC6_TPM2, &TPM2_SC, &TPM2_CNT, &TPM2_MOD, &TPM2_STATUS, &TPM2_CONF, TPM2_CnCS_BASE, TPM2_CnV_BASE, TPM2_IRQn, NULL },
+	// 6 channels
+    { &SIM_SCGC6, SIM_SCGC6_TPM0, &TPM0_SC, &TPM0_CNT, &TPM0_MOD, &TPM0_STATUS, &TPM0_CONF, TPM0_CnCS_BASE, TPM0_CnV_BASE, TPM0_IRQn, NULL, NULL },
+    // 2 channels
+	{ &SIM_SCGC6, SIM_SCGC6_TPM1, &TPM1_SC, &TPM1_CNT, &TPM1_MOD, &TPM1_STATUS, &TPM1_CONF, TPM1_CnCS_BASE, TPM1_CnV_BASE, TPM1_IRQn, NULL, NULL },
+    // 2 channels
+	{ &SIM_SCGC6, SIM_SCGC6_TPM2, &TPM2_SC, &TPM2_CNT, &TPM2_MOD, &TPM2_STATUS, &TPM2_CONF, TPM2_CnCS_BASE, TPM2_CnV_BASE, TPM2_IRQn, NULL, NULL },
 };
+
+static void TPM_Handler(TPM* tpm)
+{
+	if (*tpm->TPM_SC & TPM_SC_TOF)
+	{
+		*tpm->TPM_SC |= TPM_SC_TOF;
+		if (tpm->TOF_handler != NULL)
+		{
+			tpm->TOF_handler(tpm);
+		}
+	}
+
+	static uint32_t mask;
+
+	for (int i = 0; i <6; ++i)
+	{
+		mask = 1<<i;
+		if ((*tpm->TPM_STATUS & mask) == mask)
+		{
+			*tpm->TPM_STATUS |= mask;
+			if (tpm->CHF_handler != NULL)
+			{
+				volatile uint32_t* TPM_CnV = (volatile uint32_t*)(tpm->TPM_CnV_BASE + i*8);
+				tpm->CHF_handler(*TPM_CnV);
+			}
+		}
+	}
+
+/*
+	for (uint8_t ch = 0; ch < 6; ++ch)
+	{
+		volatile uint32_t* TPM_CnSC = (volatile uint32_t*)(tpm->TPM_CnCS_BASE + ch*8);
+		if (*TPM_CnSC & TPM_CnCS_CHF)
+		{
+			*TPM_CnSC |= TPM_CnCS_CHF;
+			if (tpm->CHF_handler != NULL)
+			{
+				volatile uint32_t* TPM_CnV = (volatile uint32_t*)(tpm->TPM_CnV_BASE + ch*8);
+				tpm->CHF_handler(*TPM_CnV);
+			}
+		}
+	}
+*/
+}
 
 void TPM0_IRQHandler()
 {
-	TPM* tpm = &TPM_list[0];
-	if (TPM_IsTOF(tpm))
-	{
-		TPM_ClearTOF(tpm);
-		if (tpm->handler != NULL)
-		{
-			tpm->handler(tpm);
-		}
-	}
-	for (uint8_t ch = 0; ch < 6; ++ch)
-	{
-
-	}
+	TPM_Handler(&TPM_list[0]);
 }
 
 void TPM1_IRQHandler()
 {
-	TPM* tpm = &TPM_list[1];
-	TPM_ClearTOF(tpm);
-	if (tpm->handler != NULL)
-	{
-		tpm->handler(tpm);
-	}
+	TPM_Handler(&TPM_list[1]);
 }
 
 void TPM2_IRQHandler()
 {
-	TPM* tpm = &TPM_list[2];
-	TPM_ClearTOF(tpm);
-	if (tpm->handler != NULL)
-	{
-		tpm->handler(tpm);
-	}
+	TPM_Handler(&TPM_list[2]);
 }
 
 
@@ -98,7 +122,7 @@ BOOL TPM_IsTOF(TPM* tpm)
 
 void TPM_SetInterruptHandler(TPM* tpm, void (*handler)(TPM*))
 {
-	tpm->handler = handler;
+	tpm->TOF_handler = handler;
 }
 
 void TPM_EnableInterrupt(TPM* tpm, BOOL enable)
@@ -145,7 +169,7 @@ void TPM_SetModulo(TPM* tpm, uint16_t mod)
 	*tpm->TPM_MOD = mod;
 }
 
-static void TPM_CalculateTimerValues (uint32_t us, uint16_t* count, uint16_t* presc)
+void TPM_CalculateTimerValues (uint32_t us, uint16_t* count, uint16_t* presc)
 {
     uint32_t tpmClk = TPM_FREQ;
     uint64_t count32 = (uint64_t)tpmClk  * (uint64_t)us / 1000000llu;
@@ -184,6 +208,7 @@ void TPM_Channel_SetupPWM(TPM_Channel* ch, uint32_t period_us, uint32_t duty_us)
 
     uint16_t duty_count = (uint16_t)((float)period_count * ((float)duty_us / (float)period_us));
 	TPM_SetPrescaler(ch->tpm, (TPM_PRESC)presc);
+	*ch->tpm->TPM_CNT = 0;
 	*ch->tpm->TPM_MOD = period_count;
 	*ch->TPM_CnV = duty_count;
 	TPM_Channel_EnablePWM(ch);
@@ -208,12 +233,14 @@ void TPM_Channel_UpdatePWMDuty(TPM_Channel* ch, uint32_t duty_us)
 
 void TPM_Channel_ClearCHF(TPM_Channel* ch)
 {
-
+	*ch->TPM_CnSC &= ~TPM_CnCS_CHF;
 }
+
 BOOL TPM_Channel_IsCHF(TPM_Channel* ch)
 {
-
+	return (*ch->TPM_CnSC & TPM_CnCS_CHF);
 }
+
 void TPM_Channel_EnableDMA(TPM_Channel* ch, BOOL enable)
 {
 
@@ -222,6 +249,30 @@ void TPM_Channel_EnablePWM(TPM_Channel* ch)
 {
 	*ch->TPM_CnSC &= ~(0xf<<2);
 	*ch->TPM_CnSC |= (TPM_CnCS_MSB | TPM_CnCS_ELSB);
+}
+
+void TPM_Channel_SetupInputCaptureRisingEdge(TPM_Channel* ch)
+{
+	*ch->tpm->TPM_SC &= ~ TPM_SC_CPWMS;
+	*ch->TPM_CnSC &= ~(0xf<<2);
+	*ch->TPM_CnSC |= TPM_CnCS_ELSA;
+}
+
+void TPM_Channel_SetupInputCaptureFallingEdge(TPM_Channel* ch)
+{
+	*ch->tpm->TPM_SC &= ~ TPM_SC_CPWMS;
+	*ch->TPM_CnSC &= ~(0xf<<2);
+	*ch->TPM_CnSC |= TPM_CnCS_ELSB;
+}
+void TPM_Channel_SetupInputCaptureEitherEdge(TPM_Channel* ch)
+{
+	*ch->tpm->TPM_SC &= ~ TPM_SC_CPWMS;
+	*ch->TPM_CnSC &= ~(0xf<<2);
+	*ch->TPM_CnSC |= (TPM_CnCS_ELSA | TPM_CnCS_ELSB);
+}
+void TPM_Channel_SetupInterruptHandler(TPM_Channel* ch, void(*handler)(uint32_t))
+{
+	ch->tpm->CHF_handler = handler;
 }
 
 void TPM_Channel_SetUpdatePeriod_us(TPM* tpm, uint32_t period_us)
@@ -240,3 +291,16 @@ void TPM_Channel_SetUpdatePeriod_ms(TPM* tpm, uint32_t period_ms)
 	TPM_Channel_SetUpdatePeriod_us(tpm, period_ms*1000);
 }
 
+void TPM_Channel_EnableInterrupt(TPM_Channel* ch, BOOL enable)
+{
+	if (enable)
+	{
+		*ch->TPM_CnSC |= TPM_CnCS_CHIE;
+		NVIC_SetEnable(ch->tpm->irq);
+	}
+	else
+	{
+		*ch->TPM_CnSC &= ~TPM_CnCS_CHIE;
+		NVIC_ClearEnable(ch->tpm->irq);
+	}
+}

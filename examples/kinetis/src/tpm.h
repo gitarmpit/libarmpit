@@ -79,9 +79,9 @@
 
 typedef enum
 {
-    TPM0 = 0,
-    TPM1 = 1,
-    TPM2 = 2,
+    TPM0 = 0, // 6 channels
+    TPM1 = 1, // 2 channels
+    TPM2 = 2, // 2 channels
     TPM3 = 3,
     TPM4 = 4,
 } TPM_N;
@@ -111,7 +111,8 @@ typedef struct _TPM
     uint32_t           TPM_CnCS_BASE;
     uint32_t           TPM_CnV_BASE;
     IRQn_Type          irq;
-    void               (*handler)(struct _TPM*);
+    void               (*TOF_handler)(struct _TPM*);
+    void               (*CHF_handler)(uint32_t us);
 
 } TPM;
 
@@ -120,7 +121,6 @@ typedef struct
 	volatile uint32_t* TPM_CnSC;
 	volatile uint32_t* TPM_CnV;
 	TPM*               tpm;
-    void               (*handler)(void);
 
 } TPM_Channel;
 
@@ -137,6 +137,7 @@ void TPM_SetPrescaler(TPM* tpm, TPM_PRESC presc);
 void TPM_ClearCounter (TPM* tpm);
 uint16_t TPM_GetCounterValue (TPM* tpm);
 void TPM_SetModulo(TPM* tpm, uint16_t mod);
+void TPM_CalculateTimerValues (uint32_t us, uint16_t* count, uint16_t* presc);
 void TPM_Channel_SetUpdatePeriod_us(TPM* tpm, uint32_t us);
 void TPM_Channel_SetUpdatePeriod_ms(TPM* tpm, uint32_t ms);
 void TPM_Channel_SetupPWM(TPM_Channel* ch, uint32_t period_us, uint32_t duty_us);
@@ -145,6 +146,12 @@ void TPM_Channel_ClearCHF(TPM_Channel* ch);
 BOOL TPM_Channel_IsCHF(TPM_Channel* ch);
 void TPM_Channel_EnableDMA(TPM_Channel* ch, BOOL enable);
 void TPM_Channel_EnablePWM(TPM_Channel* ch);
+
+void TPM_Channel_SetupInputCaptureRisingEdge(TPM_Channel* ch);
+void TPM_Channel_SetupInputCaptureFallingEdge(TPM_Channel* ch);
+void TPM_Channel_SetupInputCaptureEitherEdge(TPM_Channel* ch);
+void TPM_Channel_SetupInterruptHandler(TPM_Channel* ch, void(*handler)(uint32_t));
+void TPM_Channel_EnableInterrupt(TPM_Channel* ch, BOOL enable);
 
 
 #endif

@@ -106,13 +106,14 @@ typedef struct
 
     volatile uint32_t* PORT_ISFR;
     uint32_t           PORT_PCR_BASE;
+    void (*interrupt_handler)(GPIO_PORT_N, GPIO_PIN_N);
 
 } GPIO_PORT;
 
 
 typedef struct
 {
-    GPIO_PORT* GPIO_port;
+    GPIO_PORT* port;
     GPIO_PIN_N  pinN;
     uint32_t    pinMask;
     volatile uint32_t* PORT_PCR;
@@ -137,6 +138,11 @@ void GPIO_SetupAnalog(GPIO_PIN* pin);
 void GPIO_SetSlewRateFast(GPIO_PIN* pin);
 void GPIO_SetSlewRateSlow(GPIO_PIN* pin);
 
+void GPIO_EnableInterruptRisingEdge(GPIO_PIN* pin);
+void GPIO_EnableInterruptFallingEdge(GPIO_PIN* pin);
+void GPIO_EnableInterruptEitherEdge(GPIO_PIN* pin);
+
+void GPIO_SetInterruptHandler(GPIO_PORT* port, void (*handler)(GPIO_PORT_N, GPIO_PIN_N));
 BOOL GPIO_IsInterrupt(GPIO_PIN* pin);
 void GPIO_ClearInterrupt(GPIO_PIN* pin);
 
