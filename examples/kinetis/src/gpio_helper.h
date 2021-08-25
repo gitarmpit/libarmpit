@@ -7,17 +7,6 @@
 #include "i2c.h"
 #include "tpm.h"
 
-typedef enum
-{
-    TIM1_PA_8_9_10_11,
-    TIM2_PA_0_1_2_3,
-    TIM3_PC_6_7_8_9,
-    TIM3_PB_4_5_0_1,
-    TIM4_PD_12_13_14_15,
-    TIM4_PB_6_7_8_9,
-    TIM5_PA_0_1_2_3,
-    TIM8_PC_6_7_8_9
-} Timer_Pins;
 
 typedef enum
 {
@@ -98,7 +87,6 @@ typedef enum
 extern "C"
 {
 #endif
-
 
 SPI* GPIO_Helper_SetupSPI(SPI_Pins spi_no, BOOL isMaster, uint8_t presc, SPI_BRDIV div, BOOL isPhaseStart, BOOL isPolarityLow, BOOL isLSB);
 GPIO_PIN GPIO_Helper_GetPin (const char* pin);

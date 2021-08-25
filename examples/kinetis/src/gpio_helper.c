@@ -94,6 +94,8 @@ static TPM_Channel _GPIO_Helper_SetupTPM(TPM_N tpmN, uint8_t chN, const char* cp
     GPIO_SetAF(&pin, af);
 
 	TPM* tpm = TPM_GetInstance(tpmN);
+	TPM_EnableClock(tpm, TRUE);
+
 	return TPM_GetChannel(tpm, chN);
 }
 

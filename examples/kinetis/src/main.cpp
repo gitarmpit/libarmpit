@@ -93,7 +93,7 @@ extern "C" void test_tpm_pwm();
 extern "C" void test_tpm_pwm2();
 extern "C" void test_tpm_pwm3();
 extern "C" void test_tpm_pwm4();
-
+extern "C" void test_tpm_capture2();
 #ifdef SEMIHOSTING
 extern "C" void initialise_monitor_handles(void);
 #include <stdio.h>  //for printf
@@ -113,8 +113,8 @@ int main(void)
 	//test_spi();
 
 	//test_exti();
-	test_tpm_pwm4();
-	test_tpm_capture();
+	//test_tpm_pwm4();
+	test_tpm_capture2();
 	//test_lm74_2();
 	//test_nokia5110();
 

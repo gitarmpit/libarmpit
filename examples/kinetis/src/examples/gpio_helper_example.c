@@ -110,6 +110,7 @@ void test_tpm_pwm4()
 	SIM_Select_TPMSRC_MCGIRCLK();
 	TPM_FREQ = CORE_FREQ;
 	MCG_Enable_MCGIRCLK(TRUE);
+	delay_ms(1);
 
 	TPM_Channel ch0 = GPIO_Helper_SetupTPM(TPM2_CH0_A1);
 	GPIO_Helper_SetupTPM(TPM2_CH0_B18);

@@ -4,11 +4,14 @@
 static TPM TPM_list[] =
 {
 	// 6 channels
-    { &SIM_SCGC6, SIM_SCGC6_TPM0, &TPM0_SC, &TPM0_CNT, &TPM0_MOD, &TPM0_STATUS, &TPM0_CONF, TPM0_CnCS_BASE, TPM0_CnV_BASE, TPM0_IRQn, NULL, NULL },
+    { &SIM_SCGC6, SIM_SCGC6_TPM0, &TPM0_SC, &TPM0_CNT, &TPM0_MOD, &TPM0_STATUS, &TPM0_CONF, TPM0_CnCS_BASE, TPM0_CnV_BASE,
+      TPM0_IRQn, NULL, NULL, NULL, NULL },
     // 2 channels
-	{ &SIM_SCGC6, SIM_SCGC6_TPM1, &TPM1_SC, &TPM1_CNT, &TPM1_MOD, &TPM1_STATUS, &TPM1_CONF, TPM1_CnCS_BASE, TPM1_CnV_BASE, TPM1_IRQn, NULL, NULL },
+	{ &SIM_SCGC6, SIM_SCGC6_TPM1, &TPM1_SC, &TPM1_CNT, &TPM1_MOD, &TPM1_STATUS, &TPM1_CONF, TPM1_CnCS_BASE, TPM1_CnV_BASE,
+			TPM1_IRQn, NULL, NULL, NULL, NULL },
     // 2 channels
-	{ &SIM_SCGC6, SIM_SCGC6_TPM2, &TPM2_SC, &TPM2_CNT, &TPM2_MOD, &TPM2_STATUS, &TPM2_CONF, TPM2_CnCS_BASE, TPM2_CnV_BASE, TPM2_IRQn, NULL, NULL },
+	{ &SIM_SCGC6, SIM_SCGC6_TPM2, &TPM2_SC, &TPM2_CNT, &TPM2_MOD, &TPM2_STATUS, &TPM2_CONF, TPM2_CnCS_BASE, TPM2_CnV_BASE,
+			TPM2_IRQn, NULL, NULL, NULL, NULL },
 };
 
 static void TPM_Handler(TPM* tpm)
@@ -30,10 +33,10 @@ static void TPM_Handler(TPM* tpm)
 		if ((*tpm->TPM_STATUS & mask) == mask)
 		{
 			*tpm->TPM_STATUS |= mask;
-			if (tpm->CHF_handler != NULL)
+			if (tpm->CHF_handler != NULL && tpm->captureCtx != NULL)
 			{
-				volatile uint32_t* TPM_CnV = (volatile uint32_t*)(tpm->TPM_CnV_BASE + i*8);
-				tpm->CHF_handler(*TPM_CnV);
+				tpm->CHF_handler(tpm, *(volatile uint32_t*)(tpm->TPM_CnV_BASE + i*8));
+				break;
 			}
 		}
 	}
@@ -241,10 +244,10 @@ BOOL TPM_Channel_IsCHF(TPM_Channel* ch)
 	return (*ch->TPM_CnSC & TPM_CnCS_CHF);
 }
 
-void TPM_Channel_EnableDMA(TPM_Channel* ch, BOOL enable)
-{
+//void TPM_Channel_EnableDMA(TPM_Channel* ch, BOOL enable)
+//{
+//}
 
-}
 void TPM_Channel_EnablePWM(TPM_Channel* ch)
 {
 	*ch->TPM_CnSC &= ~(0xf<<2);
@@ -270,7 +273,7 @@ void TPM_Channel_SetupInputCaptureEitherEdge(TPM_Channel* ch)
 	*ch->TPM_CnSC &= ~(0xf<<2);
 	*ch->TPM_CnSC |= (TPM_CnCS_ELSA | TPM_CnCS_ELSB);
 }
-void TPM_Channel_SetupInterruptHandler(TPM_Channel* ch, void(*handler)(uint32_t))
+void TPM_Channel_SetupInterruptHandler(TPM_Channel* ch, void(*handler)(TPM* tpm, uint16_t))
 {
 	ch->tpm->CHF_handler = handler;
 }
