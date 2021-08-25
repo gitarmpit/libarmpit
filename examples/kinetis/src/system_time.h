@@ -17,8 +17,8 @@ uint32_t micros(void);
 
 
 #ifdef __cplusplus
- }
- #endif
+}
+#endif
 
 
 #endif

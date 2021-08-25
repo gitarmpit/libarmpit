@@ -27,10 +27,9 @@ void SystickSetReloadValue (uint32_t count);
 
 int32_t SystickGetValue(void);
 
-
 #ifdef __cplusplus
 }
- #endif
+#endif
 
 
 #endif

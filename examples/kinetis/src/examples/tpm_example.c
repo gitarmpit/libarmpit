@@ -156,7 +156,7 @@ void test_pwm()
 	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	int period_us = 2000;
-	int duty_us = 1000;
+	// int duty_us = 1000;
 	//*tpm->TPM_MOD = 48000;
 	TPM_SetPrescaler(tpm, TPM_DIV8);
 	//uint16_t cnt = period_us * BUS_FREQ / 8 / 1000000;

@@ -31,7 +31,6 @@ static void test1()
 {
 	GPIO_PORT* portD = GPIO_GetInstance(PORTD);
 	GPIO_PORT* portE = GPIO_GetInstance(PORTE);
-	int sz = sizeof(GPIO_PORT);
 
 	MCG_SetFLL_Freq_72(TRUE);
 	CORE_FREQ = 72000000;
@@ -93,12 +92,12 @@ extern "C" void test_tpm_pwm();
 extern "C" void test_tpm_pwm2();
 extern "C" void test_tpm_pwm3();
 extern "C" void test_tpm_pwm4();
-extern "C" void test_tpm_capture2();
 #ifdef SEMIHOSTING
 extern "C" void initialise_monitor_handles(void);
 #include <stdio.h>  //for printf
 #endif
 
+void test_tpm_cpp();
 
 int main(void)
 {
@@ -114,7 +113,7 @@ int main(void)
 
 	//test_exti();
 	//test_tpm_pwm4();
-	test_tpm_capture2();
+	//test_tpm_capture();
 	//test_lm74_2();
 	//test_nokia5110();
 
@@ -128,6 +127,7 @@ int main(void)
 	//test_delay2();
 	// delay_ms(2000);
 	//test_lptmr3();
+	test_tpm_cpp();
 
 	while(1)
 		;

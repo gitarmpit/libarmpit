@@ -42,6 +42,10 @@ typedef struct _PIT
     void (*interrupt_handler)(struct _PIT* pit);
 } PIT;
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 void     PIT_EnableClock(BOOL enable);
 void     PIT_EnableFreeze(BOOL enable);
 PIT*     PIT_GetInstance(PIT_N pitN);
@@ -54,6 +58,10 @@ void     PIT_EnableInterrupt(PIT* pit, BOOL enable);
 void     PIT_EnableTimer(PIT* pit, BOOL enable);
 BOOL     PIT_IsInterrupt(PIT* pit);
 void     PIT_ClearInterrupt(PIT* pit);
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

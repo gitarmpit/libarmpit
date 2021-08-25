@@ -48,10 +48,10 @@
 #define I2C_C1_TX     (1<<4)  // Transmit Mode Select. 0: receive, 1: transmit
 
 #define I2C_C1_TXAK   (1<<3)  // Transmit Acknowledge Enable
-							  // 0 : An acknowledge signal is sent to the bus on the following receiving byte (if FACK is cleared) or the
-							  //     current receiving byte (if FACK is set).
-							  // 1:  No acknowledge signal is sent to the bus on the following receiving data byte (if FACK is cleared) or
-							  //     the current receiving data byte (if FACK is set).
+                              // 0 : An acknowledge signal is sent to the bus on the following receiving byte (if FACK is cleared) or the
+                              //     current receiving byte (if FACK is set).
+                              // 1:  No acknowledge signal is sent to the bus on the following receiving data byte (if FACK is cleared) or
+                              //     the current receiving data byte (if FACK is set).
 
 #define I2C_C1_RSTA   (1<<2)  // Repeat START
 #define I2C_C1_WUEN   (1<<1)  // Wakeup Enable
@@ -109,8 +109,15 @@ typedef struct _I2C
 
 } I2C;
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 I2C*    I2C_GetInstance(I2C_N n);
 void    I2C_Enable(I2C* i2c, BOOL enable);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

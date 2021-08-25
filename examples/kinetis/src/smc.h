@@ -103,8 +103,17 @@ VLLS0 The core clock is gated off. System clocks to other masters and bus clocks
 #define SMC_PMSTAT_VLLS   0x01000000 
 
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 void SMC_AllowAllPowerModes();
 
 uint32_t SMC_GetRunMode();
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

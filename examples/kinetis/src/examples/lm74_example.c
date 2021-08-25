@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "TempLM74.h"
 #include "gpio_helper.h"
+#include <stdio.h>
 
 void test_lm74()
 {
@@ -28,7 +29,7 @@ void test_lm74()
 	SPI_Initialize(spi, TRUE, 2, SPI_DIV2, TRUE, TRUE, FALSE);
 
 	LM74_Init(spi, &ss);
-	uint16_t pc = LM74_GetProductCode();
+	// uint16_t pc = LM74_GetProductCode();
 	float temp = 0;
 	while(1)
 	{

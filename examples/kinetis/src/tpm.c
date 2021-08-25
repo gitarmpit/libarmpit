@@ -5,15 +5,16 @@ static TPM TPM_list[] =
 {
 	// 6 channels
     { &SIM_SCGC6, SIM_SCGC6_TPM0, &TPM0_SC, &TPM0_CNT, &TPM0_MOD, &TPM0_STATUS, &TPM0_CONF, TPM0_CnCS_BASE, TPM0_CnV_BASE,
-      TPM0_IRQn, NULL, NULL, NULL, NULL },
+      TPM0_IRQn, NULL, NULL, NULL },
     // 2 channels
 	{ &SIM_SCGC6, SIM_SCGC6_TPM1, &TPM1_SC, &TPM1_CNT, &TPM1_MOD, &TPM1_STATUS, &TPM1_CONF, TPM1_CnCS_BASE, TPM1_CnV_BASE,
-			TPM1_IRQn, NULL, NULL, NULL, NULL },
+			TPM1_IRQn, NULL, NULL, NULL },
     // 2 channels
 	{ &SIM_SCGC6, SIM_SCGC6_TPM2, &TPM2_SC, &TPM2_CNT, &TPM2_MOD, &TPM2_STATUS, &TPM2_CONF, TPM2_CnCS_BASE, TPM2_CnV_BASE,
-			TPM2_IRQn, NULL, NULL, NULL, NULL },
+			TPM2_IRQn, NULL, NULL, NULL },
 };
 
+#if defined (TPM_C_HANDLER)
 static void TPM_Handler(TPM* tpm)
 {
 	if (*tpm->TPM_SC & TPM_SC_TOF)
@@ -72,6 +73,7 @@ void TPM2_IRQHandler()
 {
 	TPM_Handler(&TPM_list[2]);
 }
+#endif
 
 
 TPM* TPM_GetInstance(TPM_N n)

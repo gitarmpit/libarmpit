@@ -8,7 +8,7 @@
 #define DWT_CYCCNT (*(volatile uint32_t*)(0xE0001004))
 
 
-#define DWT_CTRL_CYCCNTENA 1<<0
+#define DWT_CTRL_CYCCNTENA 1
 #define DWT_CTRL_NOCYCCNT  1<<25
 
 #ifdef __cplusplus

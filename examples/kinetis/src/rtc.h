@@ -35,6 +35,9 @@
 #define RTC_IER_TOIE (1<<1)
 #define RTC_IER_TIIE (1<<0)
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 void RTC_EnableOSC(BOOL enable);
 void RTC_EnableCounter(BOOL enable);
@@ -43,6 +46,9 @@ void RTC_SWReset();
 void RTC_EnableSecondsInt(BOOL enable, void (*handler)(void));
 void RTC_EnableAlarmInt(BOOL enable, void (*handler)(void));
 
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

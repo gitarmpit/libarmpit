@@ -87,13 +87,13 @@ typedef enum
 typedef enum
 {
     TPM_DIV1   = 0,
-	TPM_DIV2   = 1,
-	TPM_DIV4   = 2,
-	TPM_DIV8   = 3,
-	TPM_DIV16  = 4,
-	TPM_DIV32  = 5,
-	TPM_DIV64  = 6,
-	TPM_DIV128 = 7
+    TPM_DIV2   = 1,
+    TPM_DIV4   = 2,
+    TPM_DIV8   = 3,
+    TPM_DIV16  = 4,
+    TPM_DIV32  = 5,
+    TPM_DIV64  = 6,
+    TPM_DIV128 = 7
 } TPM_PRESC;
 
 struct _TPM;
@@ -101,21 +101,21 @@ struct _TPM_Channel;
 
 typedef struct _TPM_Channel
 {
-	volatile uint32_t* TPM_CnSC;
-	volatile uint32_t* TPM_CnV;
-	struct _TPM*        tpm;
+    volatile uint32_t* TPM_CnSC;
+    volatile uint32_t* TPM_CnV;
+    struct _TPM*        tpm;
 
 } TPM_Channel;
 
 typedef struct
 {
-	BOOL     isRising;
-	int32_t  val0;
-	int32_t  period_us;
-	int32_t  duty_us;
-	uint16_t mod;
-	uint16_t presc;
-	TPM_Channel* ch;
+    BOOL     isRising;
+    int32_t  val0;
+    int32_t  period_us;
+    int32_t  duty_us;
+    uint16_t mod;
+    uint16_t presc;
+    TPM_Channel* ch;
 
 } TPM_Capture_Context;
 
@@ -136,10 +136,13 @@ typedef struct _TPM
     IRQn_Type          irq;
     void               (*TOF_handler)(struct _TPM*);
     void               (*CHF_handler)(struct _TPM*, uint16_t val);
-
     TPM_Capture_Context* captureCtx;
 } TPM;
 
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 
 TPM* TPM_GetInstance(TPM_N n);
@@ -169,6 +172,10 @@ void TPM_Channel_SetupInputCaptureFallingEdge(TPM_Channel* ch);
 void TPM_Channel_SetupInputCaptureEitherEdge(TPM_Channel* ch);
 void TPM_Channel_SetupInterruptHandler(TPM_Channel* ch, void(*handler)(TPM* tpm, uint16_t));
 void TPM_Channel_EnableInterrupt(TPM_Channel* ch, BOOL enable);
+
+#ifdef __cplusplus
+    }
+#endif
 
 
 #endif

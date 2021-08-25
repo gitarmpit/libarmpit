@@ -21,6 +21,15 @@ extern uint32_t TPM_FREQ;
 extern uint32_t LPTMR_FREQ;
 extern uint32_t XTAL_FREQ;
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 void delay_ms (uint16_t ms);
+
+#ifdef __cplusplus
+    }
+#endif
+
 
 #endif

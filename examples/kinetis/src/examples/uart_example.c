@@ -1,9 +1,11 @@
 #include "uart.h"
 #include "gpio.h"
 #include "mcg.h"
+#include "sim.h"
+#include <stdio.h>
 
 // UART0
-test_uart()
+static void test_uart1()
 {
 	InitClock_FEI_24Mhz_Bus_24Mhz();
 	SIM_Select_UART0SRC_MCGFLLCLK();
@@ -31,7 +33,7 @@ test_uart()
 }
 
 // UART1
-test_uart2()
+static void test_uart2()
 {
 	InitClock_FEI_24Mhz_Bus_24Mhz();
 
@@ -55,7 +57,7 @@ test_uart2()
 }
 
 // UART1
-test_uart3()
+static void test_uart3()
 {
 	InitClock_FEI_24Mhz_Bus_24Mhz();
 
@@ -68,7 +70,7 @@ test_uart3()
 
 	UART* uart1 = UART_GetInstance(UART1);
 	UART_Initialize(uart1, (uint32_t)UART_BAUD_9600, TRUE, TRUE);
-	int8_t i = 0;
+	// int8_t i = 0;
 	while (1)
 	{
 		int8_t b = UART_ReceiveByte(uart1);
@@ -80,7 +82,7 @@ test_uart3()
 }
 
 // UART2
-test_uart4()
+static void test_uart4()
 {
 	InitClock_FEI_24Mhz_Bus_24Mhz();
 
@@ -93,7 +95,7 @@ test_uart4()
 
 	UART* uart2 = UART_GetInstance(UART2);
 	UART_Initialize(uart2, (uint32_t)UART_BAUD_9600, TRUE, TRUE);
-	int8_t i = 0;
+	// int8_t i = 0;
 	while (1)
 	{
 		int8_t b = UART_ReceiveByte(uart2);
@@ -106,7 +108,7 @@ test_uart4()
 
 // UART0
 // TODO : recv doesn't work may need a pullup?
-test_uart5()
+static void test_uart5()
 {
 	InitClock_FEI_24Mhz_Bus_24Mhz();
 	SIM_Select_UART0SRC_MCGFLLCLK();
@@ -123,7 +125,7 @@ test_uart5()
 
 	UART* uart0 = UART_GetInstance(UART0);
 	UART_Initialize(uart0, (uint32_t)UART_BAUD_9600, TRUE, TRUE);
-	int8_t i = 0;
+	//int8_t i = 0;
 	while (1)
 	{
 		int8_t b = UART_ReceiveByte(uart0);
@@ -136,7 +138,7 @@ test_uart5()
 
 
 // UART0
-test_uart6()
+static void test_uart6()
 {
 	InitClock_FEI_24Mhz_Bus_24Mhz();
 	SIM_Select_UART0SRC_MCGFLLCLK();
@@ -152,7 +154,7 @@ test_uart6()
 
 	UART* uart0 = UART_GetInstance(UART0);
 	UART_Initialize(uart0, (uint32_t)UART_BAUD_9600, TRUE, TRUE);
-	char c = 0;
+	//char c = 0;
 	while (1)
 	{
 		int8_t b = UART_ReceiveByte(uart0);
@@ -161,4 +163,9 @@ test_uart6()
 		//delay_ms(1000);
 	}
 	//uint8_t v = UART_ReceiveByte(uart0);
+}
+
+void test_uart()
+{
+	test_uart1();
 }

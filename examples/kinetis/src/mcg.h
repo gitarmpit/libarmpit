@@ -91,6 +91,10 @@
 
 #define MCG_C7_OSCSEL (1<<0)
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 // IRC is enabled in Stop mode
 //    if IRCLKEN is set or if MCG is in FEI, FBI, or BLPI
 //    modes before entering Stop mode.
@@ -199,6 +203,11 @@ void InitClock_FBI_Fast();
 // 32K internal
 void InitClock_FBI_Slow();
 void InitClock_BLPI();
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif
 

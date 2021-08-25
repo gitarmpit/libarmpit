@@ -52,6 +52,15 @@ typedef struct _RCM_SRC
 #define RCM_RPFC_RSTFLTSRW_LPO       2  // LPO clock filter enabled for normal operation
 #define RCM_RPFC_RSTFLTSRW_CLEARMASK 3
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 void RCM_GetResetSource(RCM_SRC_t* rstSrc);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

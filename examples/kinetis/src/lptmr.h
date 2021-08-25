@@ -61,6 +61,10 @@ typedef enum
 } LPTMR_PRESC;
 
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 BOOL LPTMPR_IsTCF();
 void LPTMPR_ClearTCF();
 void LPTMPR_EnableInterrupt(BOOL enable);
@@ -80,5 +84,10 @@ void LPTMR_SelectClock_OSCERCLK(uint32_t clockFreq);
 void LPTMR_SetTimer_ms (uint32_t ms);
 void LPTMR_SetTimer_sec (uint32_t sec);
 void LPTMR_SetTimer_hours (uint32_t hours);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

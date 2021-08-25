@@ -90,9 +90,18 @@ typedef enum
     LLWU_RTC_SEC   = 7  // RTC Seconds
 } LLWU_MOD;
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 void LLWU_SetWakeupPin_Rising     (LLWU_PIN in);
 void LLWU_SetWakeupPin_Falling    (LLWU_PIN in);
 void LLWU_SetWakeupPin_Any        (LLWU_PIN in);
 void LLWU_SetWakeupModule         (LLWU_MOD in);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

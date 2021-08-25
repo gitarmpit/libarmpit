@@ -136,10 +136,18 @@ typedef struct _UART
 
 } UART;
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 UART* UART_GetInstance(UART_N n);
 
 void UART_Initialize(UART* uart, uint32_t baudRate, BOOL enableRx, BOOL enableTx);
 void UART_SendByte(UART* uart, uint8_t val);
 uint8_t UART_ReceiveByte(UART* uart);
+#ifdef __cplusplus
+    }
+#endif
+
 
 #endif

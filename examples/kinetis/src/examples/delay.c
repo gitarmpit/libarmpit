@@ -1,6 +1,7 @@
 #include "gpio.h"
 #include "mcg.h"
 #include "osc.h"
+#include "sim.h"
 
 void test_delay()
 {
