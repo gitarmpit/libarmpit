@@ -69,9 +69,8 @@ void systick_enable(BOOL enable)
 {
     if (enable)
     {
-			  //TODO
-        us_per_tick = 22; //RCC_GetAHB_CLK()/1000000;
-        uint32_t count = us_per_tick*TIME_RES;
+        us_per_tick = CORE_FREQ / 1000000;
+        uint32_t count = us_per_tick * TIME_RES;
         SystickEnable(count, TRUE, FALSE, systick_handler);
     }
     else

@@ -8,8 +8,9 @@
 static GPIO_PIN* g_pin;
 
 
-void PIT_InterruptHandler(PIT* pit)
+void PIT_InterruptHandler(void* ctx)
 {
+	UNUSED(ctx);
 	if (g_pin != NULL)
 	{
 		GPIO_TogglePin(g_pin);

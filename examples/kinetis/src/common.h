@@ -13,7 +13,7 @@ typedef int BOOL;
 // Macros to extract selected bitmask from a register
 #define RANGE_MASK(e, s) ((1<<(e-s+1))-1)
 #define EXTRACT_VALUE(v, e, s) ( (v >> s) & (RANGE_MASK(e, s)) )
-
+#define UNUSED(arg)  ((void)arg)
 
 extern uint32_t CORE_FREQ;
 extern uint32_t BUS_FREQ;

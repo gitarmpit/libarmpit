@@ -7,6 +7,9 @@
 #include "i2c.h"
 #include "tpm.h"
 
+#ifdef __cplusplus
+#include "tpm_cpp.h"
+#endif
 
 typedef enum
 {
@@ -91,7 +94,11 @@ extern "C"
 SPI* GPIO_Helper_SetupSPI(SPI_Pins spi_no, BOOL isMaster, uint8_t presc, SPI_BRDIV div, BOOL isPhaseStart, BOOL isPolarityLow, BOOL isLSB);
 GPIO_PIN GPIO_Helper_GetPin (const char* pin);
 
-TPM_Channel GPIO_Helper_SetupTPM(TPM_Pins pin);
+TPM_Channel_t* GPIO_Helper_SetupTPM_Channel_t(TPM_Pins pin);
+
+#ifdef __cplusplus
+TPM_Channel* GPIO_Helper_SetupTPM_Channel(TPM_Pins pin);
+#endif
 
 #ifdef __cplusplus
 }

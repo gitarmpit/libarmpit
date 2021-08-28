@@ -38,8 +38,9 @@ typedef struct _PIT
     volatile uint32_t* PIT_LVAL;
     volatile uint32_t* PIT_TCTRL;
     volatile uint32_t* PIT_TFLG;
-    BOOL enabled;
-    void (*interrupt_handler)(struct _PIT* pit);
+    BOOL               enabled;
+    void               *ctx;
+    void (*interrupt_handler)(void* ctx);
 } PIT;
 
 #ifdef __cplusplus
@@ -53,7 +54,7 @@ void     PIT_Chain(PIT* pit);
 void     PIT_SetPeriod_us(PIT* pit, uint32_t val);
 void     PIT_SetLoadValue(PIT* pit, uint32_t val);
 uint32_t PIT_GetCurrentValue(PIT* pit);
-void     PIT_SetInterruptHandler (PIT* pit, void (*interrupt_handler)(struct _PIT* pit));
+void     PIT_SetInterruptHandler (PIT* pit, void (*interrupt_handler)(void*));
 void     PIT_EnableInterrupt(PIT* pit, BOOL enable);
 void     PIT_EnableTimer(PIT* pit, BOOL enable);
 BOOL     PIT_IsInterrupt(PIT* pit);

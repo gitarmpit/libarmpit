@@ -10,6 +10,7 @@ static PIT PIT_list[] =
 	  (volatile uint32_t*)(PIT_TCTRL_BASE + 16 * 1),
 	  (volatile uint32_t*)(PIT_TFLG_BASE + 16 * 1),
 	  FALSE,
+	  NULL,
 	  NULL
     },
     {
@@ -18,6 +19,7 @@ static PIT PIT_list[] =
 	  (volatile uint32_t*)(PIT_TCTRL_BASE + 16 * 2),
 	  (volatile uint32_t*)(PIT_TFLG_BASE + 16 * 2),
 	  FALSE,
+	  NULL,
 	  NULL
     },
 };
@@ -39,7 +41,7 @@ void PIT_IRQHandler()
 			PIT_ClearInterrupt(pit);
 			if (pit->interrupt_handler != NULL)
 			{
-				pit->interrupt_handler(pit);
+				pit->interrupt_handler(pit->ctx);
 			}
 		}
 	}
@@ -108,7 +110,7 @@ uint32_t PIT_GetCurrentValue(PIT* pit)
 	return *pit->PIT_CVAL;
 }
 
-void     PIT_SetInterruptHandler (PIT* pit, void (*interrupt_handler)(struct _PIT* pit))
+void     PIT_SetInterruptHandler (PIT* pit, void (*interrupt_handler)(void*))
 {
 	pit->interrupt_handler = interrupt_handler;
 }

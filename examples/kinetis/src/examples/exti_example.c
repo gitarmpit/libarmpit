@@ -34,12 +34,12 @@ static void generatePWM()
     GPIO_PIN a5 = GPIO_GetPin(portA, GPIO_PIN5);
     GPIO_SetAF(&a5, 3);
 
-	TPM* tpm = TPM_GetInstance(TPM0);
+	TPM* tpm = TPM_GetInstance(TPM0_INSTANCE);
 	TPM_EnableClock(tpm, TRUE);
 	int period_ms = 2000;
 	int duty_ms = 1000;
-	TPM_Channel ch = TPM_GetChannel(tpm, 2);
-	TPM_Channel_SetupPWM(&ch, period_ms * 1000, duty_ms * 1000);
+	TPM_Channel_t* ch = TPM_GetChannel(tpm, 2);
+	TPM_Channel_SetupPWM(ch, period_ms * 1000, duty_ms * 1000);
 	TPM_EnableCounter(tpm, TRUE);
 }
 

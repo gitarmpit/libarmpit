@@ -88,16 +88,24 @@ void test_nokia5110();
 extern "C" void test_exti();
 extern "C" void test_lm74_2();
 extern "C" void test_tpm_capture();
-extern "C" void test_tpm_pwm();
-extern "C" void test_tpm_pwm2();
-extern "C" void test_tpm_pwm3();
-extern "C" void test_tpm_pwm4();
+extern "C" void test_tpm_capture2();
+extern "C" void test_gpio_helper_pwm();
+extern "C" void test_gpio_helper_pwm2();
+extern "C" void test_gpio_helper_pwm3();
+extern "C" void test_gpio_helper_pwm4();
+
+extern "C" void test_pwm3();
+
 #ifdef SEMIHOSTING
 extern "C" void initialise_monitor_handles(void);
 #include <stdio.h>  //for printf
 #endif
 
 void test_tpm_cpp();
+void test_tpm_capture_cpp1();
+void test_button_handler();
+extern "C" void test_systick_millis();
+void test_rotary_encoder();
 
 int main(void)
 {
@@ -113,7 +121,15 @@ int main(void)
 
 	//test_exti();
 	//test_tpm_pwm4();
+
 	//test_tpm_capture();
+	//test_tpm_capture_cpp1();
+
+	//test_button_handler();
+	//test_systick_millis();
+
+	test_rotary_encoder();
+
 	//test_lm74_2();
 	//test_nokia5110();
 
@@ -127,7 +143,9 @@ int main(void)
 	//test_delay2();
 	// delay_ms(2000);
 	//test_lptmr3();
-	test_tpm_cpp();
+	//test_tpm_cpp();
+	//test_pwm3();
+
 
 	while(1)
 		;

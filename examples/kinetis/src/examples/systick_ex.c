@@ -3,6 +3,7 @@
 #include "sim.h"
 #include "gpio.h"
 #include "systick.h"
+#include "system_time.h"
 
 static GPIO_PIN* g_pin;
 
@@ -146,3 +147,15 @@ void test_systick4()
 
 }
 
+void test_systick_millis()
+{
+
+	systick_enable(TRUE);
+	int t0 = millis();
+	delay_ms(1);
+	int t1 = millis();
+	printf ("millis: %d\n", t1 - t0);
+
+
+	while(1);
+}

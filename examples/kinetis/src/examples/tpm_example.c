@@ -4,12 +4,14 @@
 #include "gpio.h"
 #include "tpm.h"
 #include "sim.h"
+#include "gpio_helper.h"
 
 static GPIO_PIN* g_pin;
 
 
-void tpm_handler(TPM* tpm)
+void tpm_handler(void* ctx)
 {
+	UNUSED(ctx);
     if (g_pin != NULL)
     {
         GPIO_TogglePin(g_pin);
@@ -40,7 +42,7 @@ void test_tpm()
 
 	SIM_Select_TPMSRC_OSCERCLK();
 
-	TPM* tpm = TPM_GetInstance(TPM0);
+	TPM* tpm = TPM_GetInstance(TPM0_INSTANCE);
 	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	*tpm->TPM_MOD = 32767;
@@ -62,7 +64,7 @@ void test_tpm2()
 
     InitClock_FEE_24Mhz_Bus_24Mhz(0, FALSE);
 
-	TPM* tpm = TPM_GetInstance(TPM0);
+	TPM* tpm = TPM_GetInstance(TPM0_INSTANCE);
 	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	*tpm->TPM_MOD = 48000;
@@ -87,7 +89,7 @@ void test_tpm_timer()
 
 	TPM_FREQ = CORE_FREQ;
 
-	TPM* tpm = TPM_GetInstance(TPM0);
+	TPM* tpm = TPM_GetInstance(TPM0_INSTANCE);
 	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 
@@ -114,7 +116,7 @@ void test_tpm_timer2()
 
 	TPM_FREQ = CORE_FREQ;
 
-	TPM* tpm = TPM_GetInstance(TPM0);
+	TPM* tpm = TPM_GetInstance(TPM0_INSTANCE);
 	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	// delay_ms(100);
@@ -152,7 +154,7 @@ void test_pwm()
 	MCG_Select_MCGOUTCLK_FLL_PLL();
 
 
-	TPM* tpm = TPM_GetInstance(TPM0);
+	TPM* tpm = TPM_GetInstance(TPM0_INSTANCE);
 	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	int period_us = 2000;
@@ -163,9 +165,9 @@ void test_pwm()
 	uint16_t cnt = (uint64_t)period_us * TPM_FREQ / 1000000;
 	*tpm->TPM_MOD = cnt;
 
-	TPM_Channel ch = TPM_GetChannel(tpm, 5);
-	*ch.TPM_CnV = cnt/2;
-	TPM_Channel_EnablePWM(&ch);
+	TPM_Channel_t* ch = TPM_GetChannel(tpm, 5);
+	*ch->TPM_CnV = cnt/2;
+	TPM_Channel_EnablePWM(ch);
 	TPM_EnableCounter(tpm, TRUE);
 	while(1)
 	{
@@ -198,17 +200,33 @@ void test_pwm2()
 
 	MCG_Select_MCGOUTCLK_FLL_PLL();
 
-	TPM* tpm = TPM_GetInstance(TPM0);
+	TPM* tpm = TPM_GetInstance(TPM0_INSTANCE);
 	tpm->TOF_handler = tpm_handler;
 	TPM_EnableClock(tpm, TRUE);
 	int period_us = 500000; //500ms but it will get capped at 350ms being the max at this clock speed (24Mhz)
 	int duty_us = 150000;
-	TPM_Channel ch = TPM_GetChannel(tpm, 5);
-	TPM_Channel_SetupPWM(&ch, period_us, duty_us);
+	TPM_Channel_t* ch = TPM_GetChannel(tpm, 5);
+	TPM_Channel_SetupPWM(ch, period_us, duty_us);
 	TPM_EnableCounter(tpm, TRUE);
 	delay_ms(50000);
-	TPM_Channel_UpdatePWMDuty(&ch, 100000);
+	TPM_Channel_UpdatePWMDuty(ch, 100000);
 	while(1);
 }
 
+void test_pwm3()
+{
+	InitClock_FBI_Slow();
+	MCG_Enable_MCGIRCLK(TRUE);
+	SIM_Select_TPMSRC_MCGIRCLK();
+	TPM_FREQ = CORE_FREQ;
+
+    TPM_Channel_t* ch = GPIO_Helper_SetupTPM_Channel_t(TPM0_CH3_E30);
+	int period_us = 1000000;
+	int duty_us = 500000;
+	TPM_Channel_SetupPWM(ch, period_us, duty_us);
+	TPM_EnableCounter(ch->tpm, TRUE);
+
+	while(1);
+
+}
 
