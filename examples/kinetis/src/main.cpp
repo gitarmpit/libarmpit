@@ -105,7 +105,7 @@ void test_tpm_cpp();
 void test_tpm_capture_cpp1();
 void test_button_handler();
 extern "C" void test_systick_millis();
-void test_rotary_encoder();
+void test_rotary_handler();
 
 int main(void)
 {
@@ -125,10 +125,12 @@ int main(void)
 	//test_tpm_capture();
 	//test_tpm_capture_cpp1();
 
-	//test_button_handler();
+	// test_button_handler();
+	test_rotary_handler();
+
 	//test_systick_millis();
 
-	test_rotary_encoder();
+	//test_rotary_encoder();
 
 	//test_lm74_2();
 	//test_nokia5110();

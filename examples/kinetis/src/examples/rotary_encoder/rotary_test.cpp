@@ -6,11 +6,11 @@
 
 GPIO_PIN ledPin;
 
-int cw, ccw;
+int cw, ccw, err;
 class MyRotaryHandler : public RotaryHandler
 {
 public:
-    MyRotaryHandler (PIT* pit, Button* A, GPIO_PIN* B) : RotaryHandler (pit, A, B)
+    MyRotaryHandler (PIT* pit, GPIO_PIN* A, GPIO_PIN* B) : RotaryHandler (pit, A, B)
     {
     }
 
@@ -28,9 +28,10 @@ public:
     	}
     	if (cw > 100 || ccw > 100)
     	{
-    		printf ("cw:%d, ccw:%d\n", cw, ccw);
+    		printf ("cw:%d, ccw:%d, err: %d\n", cw, ccw, err);
     		cw = 0;
     		ccw = 0;
+    		err = 0;
     	}
     }
 
@@ -48,13 +49,11 @@ void test_rotary_handler()
     GPIO_TogglePin(&ledPin);
 
     GPIO_PIN pinA = GPIO_Helper_GetPin("A12");
-    Button A (&pinA, 1);
     GPIO_PIN pinB = GPIO_Helper_GetPin("A5");
 
 
-    MyRotaryHandler bh (pit, &A, &pinB);
-    bh.SetUpdateIntervalUs(100);
-    bh.SetSettleTimeUs(100);
+    MyRotaryHandler bh (pit, &pinA, &pinB);
+    bh.SetUpdateIntervalUs(500);
     bh.Init(true);
     while(1)
         ;
