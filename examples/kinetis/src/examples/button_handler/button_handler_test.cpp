@@ -8,7 +8,7 @@ class MyButtonHandler : public ButtonHandler
 private:
 	GPIO_PIN* _ledPin;
 public:
-    MyButtonHandler (TPM_Base* tpm, GPIO_PIN* ledPin) : ButtonHandler (tpm)
+    MyButtonHandler (PIT* pit, GPIO_PIN* ledPin) : ButtonHandler (pit)
     {
     	_ledPin = ledPin;
     }
@@ -35,18 +35,19 @@ public:
 void test_button_handler()
 {
 	InitClock_FEI_48Mhz_Bus_24Mhz();
-	SIM_Select_TPMSRC_MCGFLLCLK();
-	TPM_FREQ = CORE_FREQ;
-	SIM_Select_FLL();
+	SIM_Enable_PIT(TRUE);
 
-	TPM2* tpm = TPM2::GetInstance();
+	PIT* pit = PIT_GetInstance(PIT0);
 	GPIO_PIN ledPin = GPIO_Helper_GetPin("D7");
 	GPIO_SetupOut(&ledPin);
 	GPIO_TogglePin(&ledPin);
-	MyButtonHandler bh (tpm, &ledPin);
+	MyButtonHandler bh (pit, &ledPin);
+	bh.SetUpdateIntervalUs(1000);
+	bh.SetSettleTimeUs(5000);
     GPIO_PIN pin = GPIO_Helper_GetPin("A12");
     Button b1 (&pin, 1);
     bh.AddButton (&b1);
+    bh.Init(true);
     while(1)
     	;
 }

@@ -13,6 +13,7 @@ class Button
 {
 
 friend class ButtonHandler;
+friend void ButtonHandleInterrupt(void* ctx);
 
 private:
 
@@ -23,12 +24,13 @@ private:
     bool _currentState;  //high or low
     bool _lastReadValue; //high or low
 
-    uint8_t n_same_state;
+    uint8_t   _n_same_state;
 
-    uint8_t _buttonId;
-    uint32_t _lastDown;
-    uint32_t _durDown;
-    uint32_t _lastClick;
+    uint8_t   _buttonId;
+    uint32_t  _lastDown;
+    uint32_t  _durDown;
+    uint32_t  _lastClick;
+    uint32_t  _n_retries;
 
     void Init();
 
@@ -37,6 +39,7 @@ public:
     Button(GPIO_PIN* pin, uint8_t buttonId);
     Button();
 
+    void SetRetries(uint32_t n_retries) { _n_retries = n_retries; }
     void Init(GPIO_PIN* pin, uint8_t buttonId);
 
     //Open: HIGH
@@ -51,7 +54,7 @@ public:
 
     bool IsDown();
     bool IsUp();
-
+    bool HasButtonStateChanged();
     GPIO_PIN* GetPin() const { return _pin; }
 
     bool IsPinSet();

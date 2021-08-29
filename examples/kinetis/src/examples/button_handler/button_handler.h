@@ -1,7 +1,7 @@
 #ifndef _BUTTON_HANDLER_H
 #define _BUTTON_HANDLER_H
 
-#include "tpm_cpp.h"
+#include "pit.h"
 #include "gpio.h"
 #include "button.h"
 #include "system_time.h"
@@ -11,41 +11,39 @@
  * Then pushing the switch will set it low: the IsOn method will return true
  *
  */
-class ButtonHandler : protected TPM_TOF_Handler
+class ButtonHandler
 {
 private:
     const static uint32_t DEFAULT_TIMER_UPDATE_INTERVAL_US = 1000;
-    const static uint32_t  DEFAULT_SETTLE_TIME_US = DEFAULT_TIMER_UPDATE_INTERVAL_US * 2;
+    const static uint32_t  DEFAULT_SETTLE_TIME_US = 2000;
 
     //Windows default is 500ms
     const static uint32_t  DOUBLE_CLICK_INTERVAL_MS = 300;
 
     const static uint32_t  SINGLE_CLICK_INTERVAL_MS = 1500;
 
-    uint32_t timer_update_interval_us;
-    uint32_t settle_time_us;
-    uint32_t n_retries;
+    uint32_t _timer_update_interval_us;
+    uint32_t _settle_time_us;
     const static uint8_t MAX_BUTTONS = 32;
 
-    TPM_Base* _timer;
+    PIT* _timer;
 
+    Button    _buttons[MAX_BUTTONS];
+    uint8_t   _totalButtons;
+    uint32_t  _timerHookInterval;
+    uint32_t  _lastTimerHookTime;
+    uint32_t  _n_retries;
 
-    Button  _buttons[MAX_BUTTONS];
-    uint8_t  _totalButtons;
-    uint32_t _timerHookInterval;
-    uint32_t _lastTimerHookTime;
-
-
-    void Init(bool initialize_timer);
-
-    bool HasButtonStateChanged(Button* b);
-    virtual void HandleInterrupt(TPM* tpm);
 protected:
-    ButtonHandler(TPM_Base* timer, bool initialize_timer = true);
+    ButtonHandler(PIT* timer);
     virtual ~ButtonHandler() {}
 
 public:
 
+    friend void ButtonHandleInterrupt(void* ctx);
+
+    // Should be called after adding all buttons
+    void Init(bool initialize_timer);
 
     void AddButton(Button* button);
 
