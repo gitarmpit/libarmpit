@@ -3,7 +3,6 @@
 
 #include "pit.h"
 #include "gpio.h"
-#include "button.h"
 #include "system_time.h"
 
 #define SETBIT(var,bit) (var |= (0x01 << (bit)))

@@ -125,8 +125,8 @@ int main(void)
 	//test_tpm_capture();
 	//test_tpm_capture_cpp1();
 
-	// test_button_handler();
-	test_rotary_handler();
+	test_button_handler();
+	//test_rotary_handler();
 
 	//test_systick_millis();
 

@@ -1,7 +1,5 @@
 #include "button_handler.h"
 
-void ButtonHandleInterrupt(void* ctx);
-
 ButtonHandler::ButtonHandler(PIT* timer)
 {
     _timer = timer;
@@ -24,7 +22,7 @@ void ButtonHandler::Init(bool initialize_timer)
     	_buttons[i]._n_retries = _n_retries;
     }
 
-    PIT_SetInterruptHandler(_timer, ButtonHandleInterrupt);
+    PIT_SetInterruptHandler(_timer, HandleInterrupt);
     _timer->ctx = this;
 
 	if (initialize_timer)
@@ -74,52 +72,55 @@ Button* ButtonHandler::GetButton(uint8_t id)
     return b;
 }
 
-
-void ButtonHandleInterrupt(void* ctx)
+void ButtonHandler::HandleInterrupt()
 {
-	ButtonHandler* bh = (ButtonHandler*)ctx;
 
 	bool callTimerHook =
-			(bh->_timerHookInterval && (millis() - bh->_lastTimerHookTime) > bh->_timerHookInterval);
+			(_timerHookInterval && (millis() - _lastTimerHookTime) > _timerHookInterval);
 
-	for (int i = 0; i < bh->_totalButtons; ++i)
+	for (int i = 0; i < _totalButtons; ++i)
 	{
 
-		if (bh->_buttons[i].HasButtonStateChanged())
+		if (_buttons[i].HasButtonStateChanged())
 		{
-			bh->OnStateChange(&bh->_buttons[i]);
-			bh->_buttons[i]._durDown = 0;
-			if (bh->_buttons[i].IsUp())
+			OnStateChange(&_buttons[i]);
+			_buttons[i]._durDown = 0;
+			if (_buttons[i].IsUp())
 			{
-				bh->OnButtonUp(&bh->_buttons[i]);
-				if ((millis() - bh->_buttons[i]._lastClick) <= bh->DOUBLE_CLICK_INTERVAL_MS)
+				OnButtonUp(&_buttons[i]);
+				if ((millis() - _buttons[i]._lastClick) <= DOUBLE_CLICK_INTERVAL_MS)
 				{
-					bh->OnDoubleClick(&bh->_buttons[i]);
+					OnDoubleClick(&_buttons[i]);
 				}
-				bh->OnClick(&bh->_buttons[i]);
-				bh->_buttons[i]._lastClick = millis();
-				bh->_buttons[i]._lastDown = 0;
+				OnClick(&_buttons[i]);
+				_buttons[i]._lastClick = millis();
+				_buttons[i]._lastDown = 0;
 			}
 			else
 			{
-				bh->OnButtonDown(&bh->_buttons[i]);
-				bh->_buttons[i]._lastDown = millis();
+				OnButtonDown(&_buttons[i]);
+				_buttons[i]._lastDown = millis();
 			}
 		}
-		else if (bh->_buttons[i].IsDown())
+		else if (_buttons[i].IsDown())
 		{
-			bh->_buttons[i]._durDown = millis() - bh->_buttons[i]._lastDown;
+			_buttons[i]._durDown = millis() - _buttons[i]._lastDown;
 		}
 		if (callTimerHook)
 		{
-			bh->TimerHook(&bh->_buttons[i]);
+			TimerHook(&_buttons[i]);
 		}
 	}
 	if (callTimerHook)
 	{
-		bh->_lastTimerHookTime = millis();
+		_lastTimerHookTime = millis();
 	}
 
+}
+
+void ButtonHandler::HandleInterrupt(void* ctx)
+{
+	((ButtonHandler*)ctx)->HandleInterrupt();
 }
 
 

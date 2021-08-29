@@ -34,13 +34,15 @@ private:
     uint32_t  _lastTimerHookTime;
     uint32_t  _n_retries;
 
+    void  HandleInterrupt();
+
 protected:
     ButtonHandler(PIT* timer);
     virtual ~ButtonHandler() {}
 
 public:
 
-    friend void ButtonHandleInterrupt(void* ctx);
+    static void HandleInterrupt(void* ctx);
 
     // Should be called after adding all buttons
     void Init(bool initialize_timer);

@@ -13,7 +13,6 @@ class Button
 {
 
 friend class ButtonHandler;
-friend void ButtonHandleInterrupt(void* ctx);
 
 private:
 
