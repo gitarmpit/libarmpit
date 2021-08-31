@@ -1,0 +1,1 @@
+-u _printf_float   in "other linker flags" (increases the binary size quite a bit)

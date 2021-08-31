@@ -50,6 +50,7 @@
 #define TPM_STATUS_CH1F (1<<1)
 #define TPM_STATUS_CH0F (1<<0)
 
+// Triggers
 // #define TPM_CONF_TRGSEL 
 #define TPM_CONF_TRGSEL_CLEARMASK (4<<24) 
 
@@ -101,7 +102,7 @@ struct _TPM_Channel;
 
 typedef struct _TPM_Channel
 {
-	int                channe_number;
+    int                channe_number;
     volatile uint32_t* TPM_CnSC;
     volatile uint32_t* TPM_CnV;
     struct _TPM*        tpm;
@@ -114,8 +115,8 @@ struct _TPM_Channel;
 
 typedef struct _TPM
 {
-	TPM_N              instance;
-	int                channel_count;
+    TPM_N              instance;
+    int                channel_count;
     volatile uint32_t* SIM_enableReg;
     uint32_t           SIM_enableMask;
 

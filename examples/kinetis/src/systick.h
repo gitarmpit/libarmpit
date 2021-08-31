@@ -3,6 +3,7 @@
 
 #include "common.h"
 
+// ARM
 
 #define  SYST_CSR   (*(volatile uint32_t*)(0xE000E010))    //control
 #define  SYST_LOAD (*(volatile uint32_t*)(0xE000E014))    //reload value

@@ -2,6 +2,8 @@
 #define _LLWU_H
 #include "common.h"
 
+// Low-Leakage Wake-up Unit
+
 #ifndef LLWU_BASE
 #define LLWU_BASE     0x4007C000 
 #endif

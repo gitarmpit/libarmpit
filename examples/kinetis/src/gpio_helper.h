@@ -6,6 +6,7 @@
 #include "uart.h"
 #include "i2c.h"
 #include "tpm.h"
+#include "adc.h"
 
 #ifdef __cplusplus
 #include "tpm_cpp.h"
@@ -99,6 +100,8 @@ TPM_Channel_t* GPIO_Helper_SetupTPM_Channel_t(TPM_Pins pin);
 #ifdef __cplusplus
 TPM_Channel* GPIO_Helper_SetupTPM_Channel(TPM_Pins pin);
 #endif
+
+ADC_Channel GPIO_Helper_SetupADC(ADC_N nADC, ADC_CH_N nCh);
 
 #ifdef __cplusplus
 }

@@ -2,6 +2,8 @@
 #define _SIM_H 
 #include "common.h"
 
+// System Integration Module
+
 #ifndef SIM_BASE
 #define SIM_BASE     0x40047000
 #endif

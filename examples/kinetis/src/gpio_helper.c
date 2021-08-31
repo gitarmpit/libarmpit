@@ -189,3 +189,136 @@ TPM_Channel_t* GPIO_Helper_SetupTPM_Channel_t(TPM_Pins pin)
     };
 }
 
+
+ADC_Channel GPIO_Helper_SetupADC(ADC_N nADC, ADC_CH_N nCh)
+{
+	ADC* adc = ADC_GetInstance(nADC);
+	ADC_EnableClock(adc, TRUE);
+
+	GPIO_PIN pin;
+	BOOL setPin = TRUE;
+
+    switch (nCh)
+    {
+    	case ADC_CH_SE0:
+    	{
+    		pin = GPIO_Helper_GetPin("E20");
+    		break;
+    	}
+
+    	case ADC_CH_SE1:
+    	{
+    		pin = GPIO_Helper_GetPin("E16");
+    		break;
+    	}
+    	case ADC_CH_SE2:
+    	{
+    		pin = GPIO_Helper_GetPin("E18");
+    		break;
+    	}
+    	case ADC_CH_SE3:
+    	{
+    		pin = GPIO_Helper_GetPin("E22");
+    		break;
+    	}
+    	case ADC_CH_SE4A:
+    	{
+    		pin = GPIO_Helper_GetPin("E21");
+    		break;
+    	}
+    	case ADC_CH_SE5A:
+    	{
+    		pin = GPIO_Helper_GetPin("E17");
+    		break;
+    	}
+    	case ADC_CH_SE6A:
+    	{
+    		pin = GPIO_Helper_GetPin("E19");
+    		break;
+    	}
+    	case ADC_CH_SE7A:
+    	{
+    		pin = GPIO_Helper_GetPin("E23");
+    		break;
+    	}
+    	case ADC_CH_SE8:
+    	{
+    		pin = GPIO_Helper_GetPin("B0");
+    		break;
+    	}
+    	case ADC_CH_SE9:
+    	{
+    		pin = GPIO_Helper_GetPin("B1");
+    		break;
+    	}
+    	case ADC_CH_SE11:
+    	{
+    		pin = GPIO_Helper_GetPin("C2");
+    		break;
+    	}
+    	case ADC_CH_SE12:
+    	{
+    		pin = GPIO_Helper_GetPin("B2");
+    		break;
+    	}
+    	case ADC_CH_SE13:
+    	{
+    		pin = GPIO_Helper_GetPin("B3");
+    		break;
+    	}
+    	case ADC_CH_SE14:
+    	{
+    		pin = GPIO_Helper_GetPin("C0");
+    		break;
+    	}
+    	case ADC_CH_SE15:
+    	{
+    		pin = GPIO_Helper_GetPin("C1");
+    		break;
+    	}
+    	case ADC_CH_SE23:
+    	{
+    		pin = GPIO_Helper_GetPin("E30");
+    		break;
+    	}
+    	case ADC_CH_SE4B:
+    	{
+    		pin = GPIO_Helper_GetPin("E29");
+    		break;
+    	}
+    	case ADC_CH_SE5B:
+    	{
+    		pin = GPIO_Helper_GetPin("D1");
+    		break;
+    	}
+    	case ADC_CH_SE6B:
+    	{
+    		pin = GPIO_Helper_GetPin("D5");
+    		break;
+    	}
+    	case ADC_CH_SE7B:
+    	{
+    		pin = GPIO_Helper_GetPin("D6");
+    		break;
+    	}
+    	case ADC_CH_TEMP:
+    	case ADC_CH_VREFSH:
+    	case ADC_CH_VREFSL:
+    	case ADC_CH_BANDGAP:
+    	{
+    		setPin = FALSE;
+    		break;
+    	}
+
+    	default:
+    		while(1);
+    };
+
+    if (setPin)
+    {
+    	GPIO_SetupAnalog(&pin);
+    }
+
+    return ADC_GetChannel(adc, nCh);
+}
+

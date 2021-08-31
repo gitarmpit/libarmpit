@@ -3,6 +3,8 @@
 
 #include "common.h"
 
+// Reset Control Module (get reset source)
+
 #ifndef RCM_BASE
 #define RCM_BASE     0x4007F000 
 #endif

@@ -3,6 +3,8 @@
 
 #include "common.h"
 
+// ARM
+
 #define  SCB_CPUID  (*(volatile uint32_t*)(0xE000ED00))   //CPU ID 
 #define  SCB_CPUID_REVISION_S      0
 #define  SCB_CPUID_REVISION_E      3

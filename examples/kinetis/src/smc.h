@@ -2,6 +2,8 @@
 #define SMC_H
 #include "common.h"
 
+// System Mode Controller
+
 /*
 
 RUN  The MCU can be run at full speed and the internal supply is fully regulated, that is, in run regulation.
