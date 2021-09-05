@@ -41,9 +41,147 @@ SPI* GPIO_Helper_SetupSPI(SPI_Pins spi_no, BOOL isMaster, uint8_t presc, SPI_BRD
                 GPIO_PIN17, GPIO_PIN18, GPIO_PIN19, SPI0, 2);
     };
 
+    while(1);
+
     return NULL;
 
 }
+
+static UART* GPIO_Helper_SetupUARTx(uint32_t baudRate, BOOL enableRx, BOOL enableTx,
+		GPIO_PORT_N portN,  GPIO_PIN_N rxPin, GPIO_PIN_N txPin, UART_N uartN, int af)
+{
+	GPIO_PORT* port = GPIO_GetInstance(portN);
+    GPIO_EnableClock(port, TRUE);
+
+    if (enableRx)
+    {
+    	GPIO_PIN RX_pin = GPIO_GetPin (port, rxPin);
+    	GPIO_SetAF(&RX_pin, af);
+    }
+
+    if (enableTx)
+    {
+        GPIO_PIN TX_pin = GPIO_GetPin (port, txPin);
+        GPIO_SetAF(&TX_pin, af);
+    }
+
+    UART* uart = UART_GetInstance(uartN);
+    UART_Initialize(uart, baudRate, enableRx, enableTx);
+    return uart;
+}
+
+
+UART* GPIO_Helper_SetupUART(UART_Pins pins, uint32_t baudRate, BOOL enableRx, BOOL enableTx)
+{
+	switch (pins)
+	{
+	case UART1_PE_1_0:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTE, GPIO_PIN1, GPIO_PIN0, UART1, 3);
+	case UART2_PE_17_16:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTE, GPIO_PIN17, GPIO_PIN16, UART2, 3);
+	case UART0_PE_21_20:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTE, GPIO_PIN21, GPIO_PIN20, UART0, 4);
+	case UART2_PE_23_22:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTE, GPIO_PIN23, GPIO_PIN22, UART2, 4);
+	case UART0_PA_1_2:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTA, GPIO_PIN1, GPIO_PIN2, UART0, 2);
+	case UART0_PB_16_17:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTB, GPIO_PIN16, GPIO_PIN17, UART0, 3);
+	case UART1_PC_3_4:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTC, GPIO_PIN3, GPIO_PIN4, UART1, 3);
+	case UART2_PD_2_3:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTD, GPIO_PIN2, GPIO_PIN3, UART2, 3);
+	case UART2_PD_4_5:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTD, GPIO_PIN4, GPIO_PIN5, UART2, 3);
+	case UART0_PD_6_7:
+		return GPIO_Helper_SetupUARTx(baudRate, enableRx, enableTx, PORTD, GPIO_PIN6, GPIO_PIN7, UART0, 3);
+	default:
+		while(1);
+
+	};
+
+	return NULL;
+}
+
+static I2C* GPIO_Helper_SetupI2Cx(BOOL master, uint8_t slaveAddr, uint32_t baudRate, GPIO_PORT_N portN,  GPIO_PIN_N sclPin, GPIO_PIN_N sdaPin, I2C_N i2cN, int af)
+{
+	GPIO_PORT* port = GPIO_GetInstance(portN);
+    GPIO_EnableClock(port, TRUE);
+
+    GPIO_PIN SCL_pin = GPIO_GetPin (port, sclPin);
+    GPIO_PullUp(&SCL_pin);
+    GPIO_SetAF(&SCL_pin, af);
+
+    GPIO_PIN SDA_pin = GPIO_GetPin (port, sdaPin);
+    GPIO_PullUp(&SDA_pin);
+    GPIO_SetAF(&SDA_pin, af);
+
+    I2C* i2c = I2C_GetInstance(i2cN);
+    if (master)
+    {
+    	I2C_MasterInit(i2c, baudRate);
+    }
+    else
+    {
+    	I2C_SlaveInit(i2c, slaveAddr);
+    }
+    return i2c;
+}
+
+
+I2C* GPIO_Helper_SetupI2C_Master(I2C_Pins pins, uint32_t baudRate)
+{
+	switch (pins)
+	{
+	case I2C1_PE_1_0:
+		return GPIO_Helper_SetupI2Cx(TRUE, 0, baudRate, PORTE, GPIO_PIN1, GPIO_PIN0, I2C1, 6);
+	case I2C0_PE_19_18:
+		return GPIO_Helper_SetupI2Cx(TRUE, 0, baudRate, PORTE, GPIO_PIN19, GPIO_PIN18, I2C0, 4);
+	case I2C0_PE_24_25:
+		return GPIO_Helper_SetupI2Cx(TRUE, 0, baudRate, PORTE, GPIO_PIN24, GPIO_PIN25, I2C0, 5);
+	case I2C1_PA_3_4:
+		return GPIO_Helper_SetupI2Cx(TRUE, 0, baudRate, PORTA, GPIO_PIN3, GPIO_PIN4, I2C1, 2);
+	case I2C0_PB_0_1:
+		return GPIO_Helper_SetupI2Cx(TRUE, 0, baudRate, PORTB, GPIO_PIN0, GPIO_PIN1, I2C0, 2);
+	case I2C0_PB_2_3:
+		return GPIO_Helper_SetupI2Cx(TRUE, 0, baudRate, PORTB, GPIO_PIN2, GPIO_PIN3, I2C0, 2);
+	case I2C1_PC_1_2:
+		return GPIO_Helper_SetupI2Cx(TRUE, 0, baudRate, PORTC, GPIO_PIN1, GPIO_PIN2, I2C1, 2);
+	default:
+		while(1);
+
+	};
+
+	return NULL;
+}
+
+I2C* GPIO_Helper_SetupI2C_Slave(I2C_Pins pins, uint8_t slaveAddr)
+{
+	switch (pins)
+	{
+	case I2C1_PE_1_0:
+		return GPIO_Helper_SetupI2Cx(FALSE, slaveAddr, 0, PORTE, GPIO_PIN1, GPIO_PIN0, I2C1, 6);
+	case I2C0_PE_19_18:
+		return GPIO_Helper_SetupI2Cx(FALSE, slaveAddr,  0, PORTE, GPIO_PIN19, GPIO_PIN18, I2C0, 4);
+	case I2C0_PE_24_25:
+		return GPIO_Helper_SetupI2Cx(FALSE, slaveAddr,  0, PORTE, GPIO_PIN24, GPIO_PIN25, I2C0, 5);
+	case I2C1_PA_3_4:
+		return GPIO_Helper_SetupI2Cx(FALSE, slaveAddr,  0, PORTA, GPIO_PIN3, GPIO_PIN4, I2C1, 2);
+	case I2C0_PB_0_1:
+		return GPIO_Helper_SetupI2Cx(FALSE, slaveAddr,  0, PORTB, GPIO_PIN0, GPIO_PIN1, I2C0, 2);
+	case I2C0_PB_2_3:
+		return GPIO_Helper_SetupI2Cx(FALSE, slaveAddr,  0, PORTB, GPIO_PIN2, GPIO_PIN3, I2C0, 2);
+	case I2C1_PC_1_2:
+		return GPIO_Helper_SetupI2Cx(FALSE, slaveAddr,  0, PORTC, GPIO_PIN1, GPIO_PIN2, I2C1, 2);
+	default:
+		while(1);
+
+	};
+
+	return NULL;
+}
+
+
 
 GPIO_PIN GPIO_Helper_GetPin (const char* pin) //A1,B1,C15 etc
 {

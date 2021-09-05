@@ -87,6 +87,36 @@ typedef enum
     I2C1 = 1,
 } I2C_N;
 
+#define I2C_ERROR_SUCCESS 0
+#define I2C_ERROR_BUSY    1
+#define I2C_ERROR_RXAK    2
+#define I2C_ERROR_ARBL    3
+#define I2C_ERROR_TIMEOUT  4
+#define I2C_ERROR_UNEXPECTED_STATE  5
+
+typedef enum
+{
+	I2C_ASYNC_STATE_INIT,
+	I2C_ASYNC_STATE_START_SENT,
+	I2C_ASYNC_STATE_REG_SENT,
+	I2C_ASYNC_STATE_REPEATSTART_SENT,
+	I2C_ASYNC_STATE_READ_STARTED,
+	I2C_ASYNC_STATE_DONE
+} I2C_Async_State;
+
+
+typedef struct
+{
+	uint8_t         slaveAddr;
+	uint8_t         reg;
+	uint8_t*        data;
+	uint8_t         dataSize;
+	BOOL            isMaster;
+	BOOL            isRead;
+	I2C_Async_State state;
+	uint32_t         waitRetry;
+	uint8_t error;
+} I2C_Async_Context;
 
 typedef struct _I2C
 {
@@ -105,17 +135,36 @@ typedef struct _I2C
     volatile uint8_t*  I2C_SLTL;
 
     IRQn_Type          irq;
-    void               (*handler)(struct _I2C*);
+    I2C_Async_Context  *ctx; // callback context
 
 } I2C;
+
+
+
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-I2C*    I2C_GetInstance(I2C_N n);
-void    I2C_Enable(I2C* i2c, BOOL enable);
+I2C* I2C_GetInstance(I2C_N n);
+void I2C_EnableClock(I2C* i2c, BOOL enable);
+void I2C_MasterInit(I2C* i2c, uint32_t baudRate_Bps);
+void I2C_Reset(I2C* i2c);
+void I2C_EnableInterrupt(I2C* i2c, BOOL enable);
 
+uint8_t I2C_MasterStart(I2C *i2c, uint8_t address, BOOL isRead);
+uint8_t I2C_MasterStop(I2C *i2c);
+
+uint8_t I2C_MasterWrite(I2C *i2c, const uint8_t *txBuff, size_t txSize);
+uint8_t I2C_MasterRead(I2C* i2c, uint8_t *rxBuff, size_t rxSize);
+uint8_t I2C_MasterReadRegister(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *rxBuff, size_t rxSize);
+uint8_t I2C_MasterReadRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *rxBuff, size_t rxSize, I2C_Async_Context* ctx, uint32_t timeout);
+
+uint8_t I2C_MasterWriteRegister(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *txBuff, size_t txSize);
+
+void I2C_SlaveInit(I2C *i2c, uint32_t slaveAddress);
+BOOL I2C_SlaveWrite(I2C *i2c, const uint8_t *txBuff, size_t txSize);
+BOOL I2C_SlaveRead(I2C *i2c, uint8_t *rxBuff, size_t rxSize);
 #ifdef __cplusplus
 }
 #endif

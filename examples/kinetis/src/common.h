@@ -15,6 +15,14 @@ typedef int BOOL;
 #define EXTRACT_VALUE(v, e, s) ( (v >> s) & (RANGE_MASK(e, s)) )
 #define UNUSED(arg)  ((void)arg)
 
+#define NOP() __asm volatile("nop")
+
+__attribute__( ( always_inline ) ) static inline void __nop()
+{
+  __asm volatile ("nop");
+}
+
+
 extern uint32_t CORE_FREQ;
 extern uint32_t BUS_FREQ;
 extern uint32_t TPM_FREQ;

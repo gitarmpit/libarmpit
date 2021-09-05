@@ -7,12 +7,6 @@ uint32_t LPTMR_FREQ = 32768;  //IRC Slow
 uint32_t XTAL_FREQ = 32768;
 
 
-#define NOP() __asm volatile("nop")
-
-__attribute__( ( always_inline ) ) static inline void __nop()
-{
-  __asm volatile ("nop");
-}
 
 // extern "C" void SystemInit()
 void SystemInit()

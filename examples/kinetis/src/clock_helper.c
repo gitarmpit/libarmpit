@@ -2,7 +2,7 @@
 #include "mcg.h"
 #include "osc.h"
 
-static void InitClock_FEI_Common()
+void InitClock_FEI_Common()
 {
 	MCG_Set_FLL_IRC32K();
 	MCG_Set_PLLS_FLL();

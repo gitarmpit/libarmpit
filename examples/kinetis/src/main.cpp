@@ -107,6 +107,7 @@ void test_button_handler();
 extern "C" void test_systick_millis();
 void test_rotary_handler();
 extern "C" void test_adc();
+extern "C" void test_i2c();
 
 int main(void)
 {
@@ -127,7 +128,8 @@ int main(void)
 	//test_tpm_capture_cpp1();
 
 	//test_button_handler();
-	test_adc();
+	//test_adc();
+	test_i2c();
 	//test_rotary_handler();
 
 	//test_systick_millis();

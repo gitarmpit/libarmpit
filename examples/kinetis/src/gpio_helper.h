@@ -14,11 +14,30 @@
 
 typedef enum
 {
-    I2C1_PB_6_9,
-    I2C1_PB_6_7,
-    I2C1_PB_8_9,
-    I2C2_PB_10_11
+	//SCL_SDA
+    I2C1_PE_1_0,
+	I2C0_PE_19_18,
+	I2C0_PE_24_25,
+	I2C1_PA_3_4,   // SWD_DIO, NMI
+	I2C0_PB_0_1,
+	I2C0_PB_2_3,
+	I2C1_PC_1_2,
+
 } I2C_Pins;
+
+typedef enum
+{  //RX_TX
+	UART1_PE_1_0,
+	UART2_PE_17_16,
+	UART0_PE_21_20,
+	UART2_PE_23_22,
+	UART0_PA_1_2,
+	UART0_PB_16_17,
+	UART1_PC_3_4,
+	UART2_PD_2_3,
+	UART2_PD_4_5,
+	UART0_PD_6_7,
+} UART_Pins;
 
 typedef enum
 {
@@ -28,14 +47,6 @@ typedef enum
     SPI0_PD_1_2_3,
     SPI1_PD_5_6_7,
 } SPI_Pins;
-
-typedef enum
-{
-    USART1_PA_9_10,
-    USART1_PB_6_7,
-    USART2_PA_2_3,
-    USART2_PD_5_6,
-} UART_Pins;
 
 
 typedef enum
@@ -95,6 +106,10 @@ extern "C"
 SPI* GPIO_Helper_SetupSPI(SPI_Pins spi_no, BOOL isMaster, uint8_t presc, SPI_BRDIV div, BOOL isPhaseStart, BOOL isPolarityLow, BOOL isLSB);
 GPIO_PIN GPIO_Helper_GetPin (const char* pin);
 
+UART* GPIO_Helper_SetupUART(UART_Pins pins, uint32_t baudRate, BOOL enableRx, BOOL enableTx);
+I2C* GPIO_Helper_SetupI2C_Master(I2C_Pins pins, uint32_t baudRate);
+I2C* GPIO_Helper_SetupI2C_Slave(I2C_Pins pins, uint8_t slaveAddr);
+
 TPM_Channel_t* GPIO_Helper_SetupTPM_Channel_t(TPM_Pins pin);
 
 #ifdef __cplusplus
@@ -102,6 +117,7 @@ TPM_Channel* GPIO_Helper_SetupTPM_Channel(TPM_Pins pin);
 #endif
 
 ADC_Channel GPIO_Helper_SetupADC(ADC_N nADC, ADC_CH_N nCh);
+I2C* GPIO_HelperSetupI2C();
 
 #ifdef __cplusplus
 }
