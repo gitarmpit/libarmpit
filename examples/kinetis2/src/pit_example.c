@@ -8,8 +8,6 @@
 static GPIO_PIN* g_pin;
 
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic push
 
 static void PIT_InterruptHandler(void* ctx)
 {
@@ -20,6 +18,7 @@ static void PIT_InterruptHandler(void* ctx)
 	}
 }
 
+#pragma GCC diagnostic ignored "-Wunused-function"
 static void pit_test1()
 {
 	SIM_SetOUTDIV4(1);
@@ -69,6 +68,7 @@ static void pit_test1()
 		;
 }
 
+#pragma GCC diagnostic ignored "-Wunused-function"
 static void pit_test2()
 {
 	//InitClock_FEI_48Mhz_Bus_24Mhz();

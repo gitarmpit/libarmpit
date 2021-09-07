@@ -7,6 +7,7 @@
 #include "pit.h"
 #include <stdio.h>
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 
 static void test1()
@@ -224,7 +225,7 @@ static void test_async2()
 
 		uint32_t t = micros() - t0;
 		uint64_t kbps = (uint64_t)1000000*n/t*5*8/1024;
-		printf ("u: %u, kbps:%u, id=%0x%x\n", t, kbps, sum/n);
+		printf ("u: %lu, kbps:%lu, id=0x%lx\n", t, (uint32_t)kbps, sum/n);
 		delay_ms(1000);
 	}
 }
@@ -308,8 +309,12 @@ static void test_slave()
 	while(1);
 }
 
+#pragma GCC diagnostic push
+
+
 void test_i2c()
 {
-	test_slave();
+	// test_slave();
+	test_async2();
 	while(1);
 }

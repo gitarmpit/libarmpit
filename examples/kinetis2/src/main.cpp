@@ -1,18 +1,19 @@
 #include "sim.h"
 
-void HardFault_Handler()
+extern "C" void HardFault_Handler()
 {
-	while(1)
-		;
+    while(1)
+        ;
 }
 
-void SVC_Handler()
+extern "C" void SVC_Handler()
 {
-	while(1)
-		;
+    while(1)
+        ;
 
 }
 
+extern "C" void test_i2c();
 extern "C" void test_pit();
 #ifdef SEMIHOSTING
     extern "C" void initialise_monitor_handles();
@@ -24,10 +25,10 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-	SIM_DisableWatchDog();
+    SIM_DisableWatchDog();
 
-	test_pit();
+    test_i2c();
 
-	while(1)
-		;
+    while(1)
+        ;
 }
