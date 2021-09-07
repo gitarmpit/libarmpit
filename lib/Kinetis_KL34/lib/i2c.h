@@ -125,6 +125,7 @@ typedef struct _I2C
 {
     volatile uint32_t* SIM_enableReg;
     uint32_t           SIM_enableMask;
+    BOOL               isBusClock;
 
     volatile uint8_t*  I2C_A1;  // Slave addr
     volatile uint8_t*  I2C_F;   // Freq div

@@ -4,11 +4,11 @@
 
 static I2C I2C_list[] =
 {
-		{ &SIM_SCGC4, SIM_SCGC4_I2C0, &I2C0_A1, &I2C0_F, &I2C0_C1, &I2C0_S,
+		{ &SIM_SCGC4, SIM_SCGC4_I2C0, TRUE, &I2C0_A1, &I2C0_F, &I2C0_C1, &I2C0_S,
 				&I2C0_D, &I2C0_C2, &I2C0_FLT, &I2C0_RA, &I2C0_SLTH, &I2C0_SLTL,
 				I2C0_IRQn, NULL },
 
-		{ &SIM_SCGC4, SIM_SCGC4_I2C1, &I2C1_A1, &I2C1_F, &I2C1_C1, &I2C1_S,
+		{ &SIM_SCGC4, SIM_SCGC4_I2C1, FALSE, &I2C1_A1, &I2C1_F, &I2C1_C1, &I2C1_S,
 				&I2C1_D, &I2C1_C2, &I2C1_FLT, &I2C1_RA, &I2C1_SLTH, &I2C1_SLTL,
 				I2C1_IRQn, NULL },
 
@@ -243,7 +243,7 @@ void I2C_MasterInit(I2C* i2c, uint32_t baudRate_Bps)
 	/* Disable I2C prior to configuring it. */
 	*i2c->I2C_C1 &= ~(I2C_C1_IICEN);
 
-	I2C_MasterSetBaudRate(i2c, baudRate_Bps, CORE_FREQ);
+	I2C_MasterSetBaudRate(i2c, baudRate_Bps, i2c->isBusClock ? BUS_FREQ : CORE_FREQ);
 
 	*i2c->I2C_C1 = (I2C_C1_IICEN | I2C_C1_IICIE);
 }
@@ -678,7 +678,7 @@ void I2C_SlaveInit(I2C *i2c, uint32_t slaveAddress)
 	//tmpReg |= I2C_C2_SBRC(slaveConfig->enableBaudRateCtl) | I2C_C2_GCAEN(slaveConfig->enableGeneralCall);
 	//*i2c->I2C_C2 = tmpReg;
 	uint32_t sclStopHoldTime_ns = 4000; // 4us, the spec minimum
-	I2C_SlaveSetHoldTime(i2c, sclStopHoldTime_ns, CORE_FREQ);
+	I2C_SlaveSetHoldTime(i2c, sclStopHoldTime_ns, i2c->isBusClock ? BUS_FREQ : CORE_FREQ);
 }
 
 BOOL I2C_SlaveWrite(I2C *i2c, const uint8_t *txBuff, size_t txSize)

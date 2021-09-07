@@ -31,7 +31,6 @@ private:
 protected:
     //A is CLK, B is DT
     RotaryHandler(PIT* timer, GPIO_PIN* A, GPIO_PIN* B);
-    virtual ~RotaryHandler() {}
 
 public:
 

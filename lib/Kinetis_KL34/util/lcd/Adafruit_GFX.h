@@ -99,8 +99,8 @@ public:
     void setTextWrap(bool w);
     void setFont(const GFXfont *f = 0);
 
-    int16_t height(void) const;
-    int16_t width(void) const;
+    //int16_t height(void) const;
+    //int16_t width(void) const;
 
     uint8_t getRotation(void) const;
 

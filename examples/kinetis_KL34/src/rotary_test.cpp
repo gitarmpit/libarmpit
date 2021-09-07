@@ -1,8 +1,7 @@
-#include "rotary_encoder_handler.h"
+#include "rotary_encoder/rotary_encoder_handler.h"
 #include "gpio_helper.h"
 #include "mcg.h"
 #include "sim.h"
-#include <stdio.h>
 
 GPIO_PIN ledPin;
 
@@ -17,22 +16,24 @@ public:
     virtual void OnStateChange(int8_t dir)
     {
         //GPIO_TogglePin(&ledPin);
-        //printf ("dir:%d\n", dir);
-    	if (dir == 1)
-    	{
-    		++cw;
-    	}
-    	else
-    	{
-    		++ccw;
-    	}
-    	if (cw > 100 || ccw > 100)
-    	{
-    		printf ("cw:%d, ccw:%d, err: %d\n", cw, ccw, err);
-    		cw = 0;
-    		ccw = 0;
-    		err = 0;
-    	}
+        //_printf ("dir:%d\n", dir);
+        if (dir == 1)
+        {
+            ++cw;
+        }
+        else
+        {
+            ++ccw;
+        }
+        if (cw > 100 || ccw > 100)
+        {
+#ifdef SEMIHOSTING
+            _printf ("cw:%d, ccw:%d, err: %d\n", cw, ccw, err);
+#endif
+            cw = 0;
+            ccw = 0;
+            err = 0;
+        }
     }
 
 };

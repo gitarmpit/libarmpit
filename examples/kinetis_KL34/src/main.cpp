@@ -13,11 +13,22 @@ extern "C" void SVC_Handler()
 
 }
 
-extern "C" void test_i2c();
-extern "C" void test_pit();
+extern "C"
+{
+	void test_i2c();
+	void test_pit();
+	void test_adc();
+}
+
 #ifdef SEMIHOSTING
     extern "C" void initialise_monitor_handles();
 #endif
+
+void testSSD1306();
+void test_nokia5110();
+void test_tpm_cpp_pwm();
+void test_rotary_handler();
+
 
 int main(void)
 {
@@ -27,7 +38,14 @@ int main(void)
 
     SIM_DisableWatchDog();
 
-    test_i2c();
+
+    //test_i2c();
+    testSSD1306();
+    //test_nokia5110();
+    //test_tpm_cpp_pwm();
+    //test_nokia5110();
+    //test_rotary_handler();
+    //test_adc();
 
     while(1)
         ;

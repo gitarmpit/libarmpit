@@ -38,7 +38,6 @@ private:
 
 protected:
     ButtonHandler(PIT* timer);
-    virtual ~ButtonHandler() {}
 
 public:
 

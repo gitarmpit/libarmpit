@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#ifdef SEMIHOSTING
+#include <stdio.h>
+#define _printf  printf 
+#else
+inline int _printf (const char* arg, ...) { (void)arg; return 0; }
+#endif
 
 typedef int BOOL;
 
