@@ -1,68 +1,0 @@
-Dependencies for Project 'mkl32z4', Target 'Target 1': (DO NOT MODIFY !)
-CompilerVersion: 6160000::V6.16::ARMCLANG
-F (.\startup_MKL34Z4.s)(0x5B4F42C0)(--target=arm-arm-none-eabi -mcpu=cortex-m0plus -masm=auto -c-gdwarf-3 -Wa,armasm,--pd,"__EVAL SETA 1"-IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-Wa,armasm,--pd,"__UVISION_VERSION SETA 534" -Wa,armasm,--pd,"CPU_MKL34Z64VLH4 SETA 1"-o ./objects/startup_mkl34z4.o)
-F (..\src\common.h)(0x60DFCFF0)()
-F (..\src\debug.c)(0x60CD5B75)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/debug.o -MD)
-I (..\src\debug.h)(0x60CD5D42)
-I (..\src\common.h)(0x60DFCFF0)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stddef.h)(0x60364D68)
-I (..\src\system_control.h)(0x60CF9E81)
-F (..\src\debug.h)(0x60CD5D42)()
-F (..\src\gpio.c)(0x60E3C9A5)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/gpio.o -MD)
-I (..\src\gpio.h)(0x60E3C4EA)
-I (..\src\common.h)(0x60DFCFF0)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stddef.h)(0x60364D68)
-I (..\src\port.h)(0x60D509A4)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdlib.h)(0x60364D68)
-F (..\src\gpio.h)(0x60E3C4EA)()
-F (..\src\irq_MKL34Z4.h)(0x60CC11D1)()
-F (..\src\main.c)(0x60E3C7A2)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/main.o -MD)
-I (..\src\system_control.h)(0x60CF9E81)
-I (..\src\common.h)(0x60DFCFF0)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stddef.h)(0x60364D68)
-I (..\src\sim.h)(0x60E1E0C4)
-I (..\src\gpio.h)(0x60E3C4EA)
-I (..\src\port.h)(0x60D509A4)
-I (..\src\systick.h)(0x60DFC260)
-I (..\src\mcg.h)(0x60E1D9C2)
-I (C:\Keil_v5\ARM\ARMCLANG\include\time.h)(0x60364D68)
-F (..\src\mcg.c)(0x60E1DC75)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/mcg.o -MD)
-I (..\src\mcg.h)(0x60E1D9C2)
-I (..\src\common.h)(0x60DFCFF0)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stddef.h)(0x60364D68)
-F (..\src\mcg.h)(0x60E1D9C2)()
-F (..\src\nvic.c)(0x60B3D562)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/nvic.o -MD)
-I (..\src\nvic.h)(0x60CF9B99)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (..\src\irq_MKL34Z4.h)(0x60CC11D1)
-F (..\src\nvic.h)(0x60CF9B99)()
-F (..\src\port.h)(0x60D509A4)()
-F (..\src\sim.c)(0x60E1E0B5)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/sim.o -MD)
-I (..\src\sim.h)(0x60E1E0C4)
-I (..\src\common.h)(0x60DFCFF0)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stddef.h)(0x60364D68)
-F (..\src\sim.h)(0x60E1E0C4)()
-F (..\src\system_control.c)(0x60CE5A09)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/system_control.o -MD)
-I (..\src\system_control.h)(0x60CF9E81)
-I (..\src\common.h)(0x60DFCFF0)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stddef.h)(0x60364D68)
-F (..\src\system_control.h)(0x60CF9E81)()
-F (..\src\system_time.c)(0x60E22BFA)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/system_time.o -MD)
-I (..\src\systick.h)(0x60DFC260)
-I (..\src\common.h)(0x60DFCFF0)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stddef.h)(0x60364D68)
-I (..\src\system_time.h)(0x5D0473CB)
-F (..\src\system_time.h)(0x5D0473CB)()
-F (..\src\systick.c)(0x60DFCDF3)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m0plus -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -IC:/Keil_v5/Packs/NXP/MKL34Z4_DFP/10.0.3-D__UVISION_VERSION="534" -DCPU_MKL34Z64VLH4-o ./objects/systick.o -MD)
-I (..\src\systick.h)(0x60DFC260)
-I (..\src\common.h)(0x60DFCFF0)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60364D68)
-I (C:\Keil_v5\ARM\ARMCLANG\include\stddef.h)(0x60364D68)
-F (..\src\systick.h)(0x60DFC260)()
