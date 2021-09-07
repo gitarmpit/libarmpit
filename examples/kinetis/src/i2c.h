@@ -97,10 +97,12 @@ typedef enum
 typedef enum
 {
 	I2C_ASYNC_STATE_INIT,
-	I2C_ASYNC_STATE_START_SENT,
-	I2C_ASYNC_STATE_REG_SENT,
-	I2C_ASYNC_STATE_REPEATSTART_SENT,
-	I2C_ASYNC_STATE_READ_STARTED,
+	I2C_ASYNC_STATE_START,
+	I2C_ASYNC_STATE_WRITE_REG,
+	I2C_ASYNC_STATE_WRITE_DATA,
+	I2C_ASYNC_STATE_REPEATSTART,
+	I2C_ASYNC_STATE_BEGIN_READ,
+	I2C_ASYNC_STATE_READ_DATA,
 	I2C_ASYNC_STATE_DONE
 } I2C_Async_State;
 
@@ -108,14 +110,15 @@ typedef enum
 typedef struct
 {
 	uint8_t         slaveAddr;
-	uint8_t         reg;
-	uint8_t*        data;
-	uint8_t         dataSize;
+	uint8_t*        tx_buf;
+	uint8_t         tx_size;
+	uint8_t*        data_buf;
+	uint8_t         data_size;
 	BOOL            isMaster;
 	BOOL            isRead;
 	I2C_Async_State state;
-	uint32_t         waitRetry;
-	uint8_t error;
+	uint32_t        waitRetry;
+	uint8_t         error;
 } I2C_Async_Context;
 
 typedef struct _I2C
@@ -158,7 +161,13 @@ uint8_t I2C_MasterStop(I2C *i2c);
 uint8_t I2C_MasterWrite(I2C *i2c, const uint8_t *txBuff, size_t txSize);
 uint8_t I2C_MasterRead(I2C* i2c, uint8_t *rxBuff, size_t rxSize);
 uint8_t I2C_MasterReadRegister(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *rxBuff, size_t rxSize);
-uint8_t I2C_MasterReadRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *rxBuff, size_t rxSize, I2C_Async_Context* ctx, uint32_t timeout);
+uint8_t I2C_MasterReadRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg,
+		uint8_t *rx_buf, size_t rx_size, I2C_Async_Context* ctx, uint32_t timeout);
+uint8_t I2C_MasterWriteRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg,
+		uint8_t *tx_buf, size_t tx_size, I2C_Async_Context* ctx, uint32_t timeout);
+
+uint8_t I2C_MasterTransferAsync(I2C* i2c, uint8_t addr, uint8_t* tx_buf, uint8_t tx_size,
+		uint8_t *rx_buf, size_t rx_size, I2C_Async_Context* ctx, BOOL isRead, uint32_t timeout);
 
 uint8_t I2C_MasterWriteRegister(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *txBuff, size_t txSize);
 

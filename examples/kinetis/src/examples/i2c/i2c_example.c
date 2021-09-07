@@ -4,6 +4,7 @@
 #include "barometer_bmp280.h"
 #include "sim.h"
 #include "system_time.h"
+#include "pit.h"
 
 static void test1()
 {
@@ -139,22 +140,23 @@ static void I2C_ReleaseBus(void)
 
 static void test_async()
 {
-	InitClock_FEI_24Mhz_Bus_24Mhz();
-	// InitClock_FEI_48Mhz_Bus_24Mhz();
+	//InitClock_FEI_24Mhz_Bus_24Mhz();
+	 InitClock_FEI_48Mhz_Bus_24Mhz();
+	//InitClock_FBI_Slow();
 
 	// Lowest tested: about 2-3k
 	// Upper limit: 800k - 1MB
-	I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C1_PE_1_0, 800000);
+	I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C1_PE_1_0, 400000);
 	I2C_Async_Context ctx;
 	ctx.waitRetry = 1000;
 
 	uint8_t buf;
 	uint8_t rc;
 
+	// rc = I2C_MasterReadRegisterAsync(i2c, BMP280_I2C_ADDR, BMP280_CHIP_ID_REG, &buf, 1, &ctx, 100000);
 
 	while(1)
 	{
-
 		rc = I2C_MasterReadRegister(i2c, BMP280_I2C_ADDR, BMP280_CHIP_ID_REG, &buf, 1);
 		if (rc == I2C_ERROR_SUCCESS)
 		{
@@ -162,7 +164,7 @@ static void test_async()
 		}
 		else
 		{
-			printf ("error: %d\n", ctx.error);
+			printf ("error: %d\n", rc);
 			//I2C_ReleaseBus();
 			I2C_MasterStop(i2c);
 		}
@@ -175,7 +177,7 @@ static void test_async()
 		}
 		else
 		{
-			printf ("error: %d\n", ctx.error);
+			printf ("error: %d\n", rc);
 			//I2C_ReleaseBus();
 			I2C_MasterStop(i2c);
 		}
@@ -185,14 +187,8 @@ static void test_async()
 
 static void test_async2()
 {
-	SIM_SetOUTDIV1(1);
-	SIM_SetOUTDIV4(1);
-
-	InitClock_FEI_Common();
-
-	MCG_SetFLL_Freq_24(TRUE);
-	CORE_FREQ = 24000000;
-	BUS_FREQ = 24000000;
+	//InitClock_FBI_Slow();
+	InitClock_FEI_48Mhz_Bus_24Mhz();
 
 	// max speed seems to be around 560kbps at 1.2kkbps
 	I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C1_PE_1_0, 1200000);
@@ -202,23 +198,115 @@ static void test_async2()
 	uint8_t buf;
 	systick_enable(TRUE);
 
-	uint32_t n = 100000;
-
-	for (uint32_t i = 0; i < n; ++i)
+	uint32_t n = 1000;
+	while(1)
 	{
-		uint8_t rc = I2C_MasterReadRegisterAsync(i2c, BMP280_I2C_ADDR, BMP280_CHIP_ID_REG, &buf, 1, &ctx, 100000);
-	}
+		uint32_t t0 = micros();
+		uint32_t sum = 0;
+		for (uint32_t i = 0; i < n; ++i)
+		{
+			uint8_t rc = I2C_MasterReadRegisterAsync(i2c, BMP280_I2C_ADDR, BMP280_CHIP_ID_REG,
+					&buf, 1, &ctx, 100000);
+			if (rc != I2C_ERROR_SUCCESS)
+			{
+				printf ("error: %d\n", rc);
+				I2C_ReleaseBus();
+				I2C_MasterStop(i2c);
+			}
+			else
+			{
+				sum += buf;
+			}
+		}
 
-	uint32_t t = micros();
-	uint64_t kbps = (uint64_t)1000000*n/t*5*8/1024;
-	printf ("u: %u, kbps:%u\n", t, kbps);
+		uint32_t t = micros() - t0;
+		uint64_t kbps = (uint64_t)1000000*n/t*5*8/1024;
+		printf ("u: %u, kbps:%u, id=%0x%x\n", t, kbps, sum/n);
+		delay_ms(1000);
+	}
+}
+
+
+static void test_write()
+{
+	InitClock_FEI_24Mhz_Bus_24Mhz();
+	I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C1_PE_1_0, 100000);
+
+	uint8_t buf;
+	uint8_t rc;
+
+	rc = I2C_MasterReadRegister(i2c, BMP280_I2C_ADDR, BMP280_CTRL_MEAS_REG, &buf, 1);
+	printf ("read reg: rc=%d, ctrl:%0x\n", rc, buf);
+
+	buf = 0x30;
+	rc = I2C_MasterWriteRegister(i2c, BMP280_I2C_ADDR, BMP280_CTRL_MEAS_REG, &buf, 1);
+	printf ("write: %d\n", rc);
+
+	rc = I2C_MasterReadRegister(i2c, BMP280_I2C_ADDR, BMP280_CTRL_MEAS_REG, &buf, 1);
+	printf ("read reg: rc=%d, ctrl:%0x\n", rc, buf);
+
 
 	while(1);
 }
 
+static void test_write_async()
+{
+	InitClock_FEI_24Mhz_Bus_24Mhz();
+	I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C1_PE_1_0, 100000);
+	I2C_Async_Context ctx;
+	ctx.waitRetry = 1000;
+
+	uint8_t buf;
+	uint8_t rc;
+
+	int cnt = 0;
+
+	while (1)
+	{
+		buf = (cnt++ % 8) << 5;
+		rc = I2C_MasterWriteRegisterAsync(i2c, BMP280_I2C_ADDR, BMP280_CTRL_MEAS_REG, &buf, 1, &ctx, 10000);
+		printf ("write: %d\n", rc);
+
+		rc = I2C_MasterReadRegister(i2c, BMP280_I2C_ADDR, BMP280_CTRL_MEAS_REG, &buf, 1);
+		printf ("read reg: rc=%d, ctrl:%0x\n", rc, buf);
+
+		delay_ms(1000);
+	}
+
+}
+
+static uint8_t test_addr = 0x12;
+
+static void PIT_InterruptHandler(void* ctx)
+{
+	UNUSED(ctx);
+	I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C1_PE_1_0, 100000);
+	uint8_t rc = I2C_MasterStart(i2c, test_addr, FALSE);
+	if (rc == I2C_ERROR_SUCCESS)
+	{
+
+	}
+	else
+	{
+		printf ("Start error: %d\n", rc);
+	}
+}
+
+static void test_slave()
+{
+	InitClock_FEI_48Mhz_Bus_24Mhz();
+	SIM_Enable_PIT(TRUE);
+	PIT_EnableClock(TRUE);
+	PIT* pit = PIT_GetInstance(PIT0);
+	PIT_SetPeriod_us(pit, 1000000);
+	pit->interrupt_handler = PIT_InterruptHandler;
+	PIT_EnableInterrupt(pit, TRUE);
+	PIT_EnableTimer(pit, TRUE);
+	while(1);
+}
 
 void test_i2c()
 {
-	test_async2();
+	test_slave();
 	while(1);
 }

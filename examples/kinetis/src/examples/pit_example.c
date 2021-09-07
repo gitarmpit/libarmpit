@@ -8,7 +8,7 @@
 static GPIO_PIN* g_pin;
 
 
-void PIT_InterruptHandler(void* ctx)
+static void PIT_InterruptHandler(void* ctx)
 {
 	UNUSED(ctx);
 	if (g_pin != NULL)
@@ -17,7 +17,7 @@ void PIT_InterruptHandler(void* ctx)
 	}
 }
 
-void pit_test1()
+static void pit_test1()
 {
 	SIM_SetOUTDIV4(1);
 #if 0
@@ -64,4 +64,43 @@ void pit_test1()
 	delay_ms(200);
 	while(1)
 		;
+}
+
+static void pit_test2()
+{
+	//InitClock_FEI_48Mhz_Bus_24Mhz();
+
+	SIM_SetOUTDIV1(1);
+	SIM_SetOUTDIV4(8);
+
+	InitClock_FEI_Common();
+
+	MCG_SetFLL_Freq_48(TRUE);
+	CORE_FREQ = 48000000;
+	BUS_FREQ = 48000000 / 8;
+
+	GPIO_PORT* portE = GPIO_GetInstance(PORTE);
+	GPIO_EnableClock(portE, TRUE);
+	GPIO_PIN e0 = GPIO_GetPin(portE, GPIO_PIN0);
+	GPIO_SetupOut(&e0);
+	GPIO_SetSlewRateFast(&e0);
+	GPIO_SetPin(&e0);
+	g_pin = &e0;
+
+	SIM_Enable_PIT(TRUE);
+	PIT_EnableClock(TRUE);
+	PIT* pit = PIT_GetInstance(PIT0);
+	PIT_SetPeriod_us(pit, 125000);
+	PIT_EnableFreeze(FALSE);
+	pit->interrupt_handler = PIT_InterruptHandler;
+	PIT_EnableInterrupt(pit, TRUE);
+	PIT_EnableTimer(pit, TRUE);
+	delay_ms(200);
+	while(1)
+		;
+}
+
+void test_pit()
+{
+	pit_test2();
 }

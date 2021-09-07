@@ -8,6 +8,7 @@
 
 static GPIO_PIN* g_pin;
 
+#pragma GCC diagnostic ignored "-Wunused-function"
 
 void tpm_handler(void* ctx)
 {
@@ -30,7 +31,7 @@ static GPIO_PIN setup_pin()
 }
 
 //OSC32K clock
-void test_tpm()
+static void test_tpm1()
 {
 	GPIO_PIN pin = setup_pin();
     g_pin = &pin;
@@ -54,7 +55,7 @@ void test_tpm()
 }
 
 //24Mhz External FLL clock
-void test_tpm2()
+static void test_tpm2()
 {
 	SIM_Select_FLL();
 	SIM_Select_TPMSRC_MCGFLLCLK();
@@ -77,7 +78,7 @@ void test_tpm2()
 }
 
 //24Mhz internal FLL clock
-void test_tpm_timer()
+static void test_tpm_timer()
 {
 	SIM_Select_FLL();
 	SIM_Select_TPMSRC_MCGFLLCLK();
@@ -103,7 +104,7 @@ void test_tpm_timer()
 }
 
 //Internal 32K
-void test_tpm_timer2()
+static void test_tpm_timer2()
 {
 	SIM_Select_TPMSRC_MCGIRCLK();
 
@@ -130,9 +131,7 @@ void test_tpm_timer2()
 
 }
 
-
-
-void test_pwm()
+static void test_pwm()
 {
 	SIM_Select_FLL();
 	SIM_Select_TPMSRC_MCGFLLCLK();
@@ -179,7 +178,7 @@ void test_pwm()
 }
 
 // FLL, external OSC
-void test_pwm2()
+static void test_pwm2()
 {
 	SIM_Select_FLL();
 	SIM_Select_TPMSRC_MCGFLLCLK();
@@ -213,7 +212,7 @@ void test_pwm2()
 	while(1);
 }
 
-void test_pwm3()
+static void test_pwm3()
 {
 	InitClock_FBI_Slow();
 	MCG_Enable_MCGIRCLK(TRUE);
@@ -228,5 +227,10 @@ void test_pwm3()
 
 	while(1);
 
+}
+
+void test_tpm()
+{
+	while(1);
 }
 

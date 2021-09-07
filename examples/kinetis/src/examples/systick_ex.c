@@ -4,10 +4,13 @@
 #include "gpio.h"
 #include "systick.h"
 #include "system_time.h"
+#include <stdio.h>
 
 static GPIO_PIN* g_pin;
 
-void MySysTickHandler()
+#pragma GCC diagnostic ignored "-Wunused-function"
+
+static void MySysTickHandler()
 {
 	if (g_pin != NULL)
 	{
@@ -15,7 +18,7 @@ void MySysTickHandler()
 	}
 }
 
-void test_systick1()
+static void test_systick1()
 {
 	GPIO_PORT* portE = GPIO_GetInstance(PORTE);
 
@@ -49,7 +52,7 @@ void test_systick1()
 }
 
 // Fast IRC 4Mhz
-void test_systick2()
+static void test_systick2()
 {
 	GPIO_PORT* portE = GPIO_GetInstance(PORTE);
 
@@ -78,7 +81,7 @@ void test_systick2()
 }
 
 // Slow IRC 32768  internal
-void test_systick3()
+static void test_systick3()
 {
 	CORE_FREQ = 32768;
 	MCG_Set_FCRDIV1();
@@ -112,7 +115,7 @@ void test_systick3()
 }
 
 // OSC32K
-void test_systick4()
+static void test_systick4()
 {
 	CORE_FREQ = 32768;
 	MCG_Set_FCRDIV1();
@@ -147,7 +150,7 @@ void test_systick4()
 
 }
 
-void test_systick_millis()
+static void test_systick_millis()
 {
 
 	systick_enable(TRUE);
@@ -158,4 +161,9 @@ void test_systick_millis()
 
 
 	while(1);
+}
+
+void test_systick()
+{
+
 }

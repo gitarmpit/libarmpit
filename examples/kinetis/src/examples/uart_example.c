@@ -4,6 +4,8 @@
 #include "sim.h"
 #include <stdio.h>
 
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 // UART0
 static void test_uart1()
 {

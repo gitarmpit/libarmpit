@@ -25,76 +25,125 @@ static uint8_t I2C_MasterStartAsync(I2C *i2c, uint8_t address, BOOL isRead);
 static void I2C_MasterSetBaudRate(I2C* i2c, uint32_t baudRate_Bps,
 		uint32_t srcClock_Hz);
 
-static void I2C_Handler(I2C* i2c)
+static uint8_t I2C_WaitForState(I2C* i2c, uint8_t mask, BOOL expectSet)
 {
-	*i2c->I2C_S = I2C_S_IICIF;
-	if (!i2c->ctx)
+	uint32_t retry = i2c->ctx->waitRetry;
+	if (retry < 100)
 	{
-		return;
+		retry = 100;
+	}
+
+	BOOL rc = I2C_ERROR_TIMEOUT;
+
+	while(1)
+	{
+		BOOL isSet = (*i2c->I2C_S & mask) == mask;
+		if (expectSet == isSet)
+		{
+			rc = I2C_ERROR_SUCCESS;
+			break;
+		}
+		__nop();
+		if (retry-- == 0)
+		{
+			break;
+		}
+	}
+
+	return rc;
+}
+
+static uint8_t I2C_RunStateMachine(I2C* i2c)
+{
+	uint8_t rc = I2C_ERROR_SUCCESS;
+
+	if (i2c->ctx->state == I2C_ASYNC_STATE_START)
+	{
+	    if (*i2c->I2C_S & I2C_S_RXAK)
+	    {
+	        *i2c->I2C_S = I2C_S_RXAK;
+	        rc = I2C_ERROR_RXAK;
+	    }
+		else if (*i2c->I2C_S & I2C_S_ARBL)
+		{
+			*i2c->I2C_S = I2C_S_ARBL;
+			rc = I2C_ERROR_ARBL;
+		}
+
+		// Prepare for writing;
+	    if (rc == I2C_ERROR_SUCCESS)
+	    {
+	    	rc =  I2C_WaitForState(i2c, I2C_S_TCF, TRUE);
+	    }
+
+	    if (rc != I2C_ERROR_SUCCESS)
+		{
+			return rc;
+		}
+
+	    i2c->ctx->state = I2C_ASYNC_STATE_WRITE_REG;
+		*i2c->I2C_C1 |= I2C_C1_TX;
+	}
+	else if (i2c->ctx->state == I2C_ASYNC_STATE_WRITE_REG && i2c->ctx->tx_size == 0)
+	{
+		if (i2c->ctx->isRead)
+		{
+			 i2c->ctx->state = I2C_ASYNC_STATE_REPEATSTART;
+		}
+		else
+		{
+			i2c->ctx->state = I2C_ASYNC_STATE_WRITE_DATA;
+			i2c->ctx->tx_buf = i2c->ctx->data_buf;
+			i2c->ctx->tx_size = i2c->ctx->data_size;
+		}
 	}
 
 	switch (i2c->ctx->state)
 	{
-	case I2C_ASYNC_STATE_START_SENT:
+	case I2C_ASYNC_STATE_WRITE_DATA:
+	case I2C_ASYNC_STATE_WRITE_REG:
 	{
-		if (*i2c->I2C_S & I2C_S_RXAK)
+		if (i2c->ctx->state == I2C_ASYNC_STATE_WRITE_DATA && i2c->ctx->tx_size == 0)
+		{
+			rc = I2C_MasterStop(i2c);
+			i2c->ctx->state = I2C_ASYNC_STATE_DONE;
+		}
+		else if ((*i2c->I2C_S & I2C_S_RXAK) && i2c->ctx->tx_size)
 		{
 			*i2c->I2C_S = I2C_S_RXAK;
-			i2c->ctx->error = I2C_ERROR_RXAK;
+			rc = I2C_ERROR_RXAK;
 		}
 		else if (*i2c->I2C_S & I2C_S_ARBL)
 		{
 			*i2c->I2C_S = I2C_S_ARBL;
-			i2c->ctx->error = I2C_ERROR_ARBL;
+			rc = I2C_ERROR_ARBL;
 		}
 		else
 		{
-			i2c->ctx->state = I2C_ASYNC_STATE_REG_SENT;
-			uint32_t retry = i2c->ctx->waitRetry;
-			if (retry < 100)
-			{
-				retry = 100;
-			}
-			i2c->ctx->error = I2C_ERROR_SUCCESS;
-			while (!(*i2c->I2C_S & I2C_S_TCF))
-			{
-				__nop();
-				if (retry-- == 0)
-				{
-					i2c->ctx->error = I2C_ERROR_TIMEOUT;
-				}
-			}
-			if (i2c->ctx->error == I2C_ERROR_SUCCESS)
-			{
-				*i2c->I2C_C1 |= I2C_C1_TX;
-				*i2c->I2C_D = i2c->ctx->reg;
-			}
-			//        	return;
+			*i2c->I2C_C1 |= I2C_C1_TX;
+			*i2c->I2C_D = *i2c->ctx->tx_buf++;
+			i2c->ctx->tx_size--;
 		}
 		break;
 	}
-	case I2C_ASYNC_STATE_REG_SENT:
+	case I2C_ASYNC_STATE_REPEATSTART:
 	{
 		if (*i2c->I2C_S & I2C_S_ARBL)
 		{
 			*i2c->I2C_S = I2C_S_ARBL;
-			i2c->ctx->error = I2C_ERROR_ARBL;
+			rc = I2C_ERROR_ARBL;
 		}
-		else if (i2c->ctx->isRead)
+		rc = I2C_MasterStartAsync(i2c, i2c->ctx->slaveAddr, TRUE);
+		if (rc == I2C_ERROR_SUCCESS)
 		{
-			i2c->ctx->error = I2C_MasterStartAsync(i2c, i2c->ctx->slaveAddr, TRUE);
-			if (i2c->ctx->error == I2C_ERROR_SUCCESS)
-			{
-				i2c->ctx->state = I2C_ASYNC_STATE_REPEATSTART_SENT;
-				//return;
-			}
+			i2c->ctx->state = I2C_ASYNC_STATE_BEGIN_READ;
 		}
 		break;
 	}
-	case I2C_ASYNC_STATE_REPEATSTART_SENT:
+	case I2C_ASYNC_STATE_BEGIN_READ:
 	{
 		*i2c->I2C_C1 &= ~(I2C_C1_TX | I2C_C1_TXAK);
-		if (i2c->ctx->dataSize == 1)
+		if (i2c->ctx->data_size == 1)
 		{
 			/* Issue NACK on read. */
 			*i2c->I2C_C1 |= I2C_C1_TXAK;
@@ -103,38 +152,52 @@ static void I2C_Handler(I2C* i2c)
 		UNUSED(dummy);
 		// Dummy read to clear TCF
 		dummy = *i2c->I2C_D;
-		i2c->ctx->state = I2C_ASYNC_STATE_READ_STARTED;
-		//return;
+		i2c->ctx->state = I2C_ASYNC_STATE_READ_DATA;
 		break;
 	}
-	case I2C_ASYNC_STATE_READ_STARTED:
+	case I2C_ASYNC_STATE_READ_DATA:
 	{
-		i2c->ctx->error = I2C_ERROR_SUCCESS;
-		i2c->ctx->dataSize--;
-		if (i2c->ctx->dataSize == 0)
+		i2c->ctx->data_size--;
+		if (i2c->ctx->data_size == 0)
 		{
-			i2c->ctx->error = I2C_MasterStop(i2c);
+			rc = I2C_MasterStop(i2c);
 			i2c->ctx->state = I2C_ASYNC_STATE_DONE;
 		}
-		else if (i2c->ctx->dataSize == 1)
+		else if (i2c->ctx->data_size == 1)
 		{
 			/* Issue NACK on read. */
 			*i2c->I2C_C1 |= I2C_C1_TXAK;
 		}
 
-		*i2c->ctx->data++ = *i2c->I2C_D;
+		*i2c->ctx->data_buf++ = *i2c->I2C_D;
 		break;
 	}
 	case I2C_ASYNC_STATE_INIT:
 		break;
 	default:
 	{
-		i2c->ctx->error = I2C_ERROR_UNEXPECTED_STATE;
+		rc = I2C_ERROR_UNEXPECTED_STATE;
 		break;
 	}
 	}
 
-	if (i2c->ctx->error != I2C_ERROR_SUCCESS)
+	return rc;
+
+}
+
+static void I2C_Handler(I2C* i2c)
+{
+	*i2c->I2C_S = I2C_S_IICIF;
+	if (!i2c->ctx)
+	{
+		return;
+	}
+
+
+	BOOL rc = I2C_RunStateMachine(i2c);
+	i2c->ctx->error = rc;
+
+	if (rc != I2C_ERROR_SUCCESS)
 	{
 		i2c->ctx->state = I2C_ASYNC_STATE_DONE;
 	}
@@ -246,7 +309,6 @@ static void I2C_MasterSetBaudRate(I2C* i2c, uint32_t baudRate_Bps,
 		}
 	}
 
-	printf ("mul: %u, icr: %u\n", bestMult, bestIcr);
 	*i2c->I2C_F = (bestMult << I2C_F_MULT_POS) | bestIcr;
 }
 
@@ -454,26 +516,61 @@ uint8_t I2C_MasterReadRegister(I2C* i2c, uint8_t addr, uint8_t reg,
 }
 
 uint8_t I2C_MasterReadRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg,
-		uint8_t *rxBuff, size_t rxSize, I2C_Async_Context* ctx, uint32_t timeout)
+		uint8_t *rx_buf, size_t rx_size, I2C_Async_Context* ctx, uint32_t timeout)
 {
-	if (*i2c->I2C_S & I2C_S_BUSY)
-	{
-		return I2C_ERROR_BUSY;
-	}
+	return I2C_MasterTransferAsync(i2c, addr, &reg, 1, rx_buf, rx_size, ctx, TRUE, timeout);
+}
+
+uint8_t I2C_MasterWriteRegister(I2C* i2c, uint8_t addr, uint8_t reg,
+		uint8_t *txBuff, size_t txSize)
+{
+	uint8_t rc = I2C_MasterStart(i2c, addr, FALSE);
+	if (rc != I2C_ERROR_SUCCESS)
+		return rc;
+
+	rc = I2C_MasterWrite(i2c, &reg, 1);
+	if (rc != I2C_ERROR_SUCCESS)
+		return rc;
+
+	rc = I2C_MasterWrite(i2c, txBuff, txSize);
+	if (rc != I2C_ERROR_SUCCESS)
+		return rc;
+
+	return I2C_MasterStop(i2c);
+
+}
+
+uint8_t I2C_MasterWriteRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg,
+		uint8_t *tx_buf, size_t tx_size, I2C_Async_Context* ctx, uint32_t timeout)
+{
+	return I2C_MasterTransferAsync(i2c, addr, &reg, 1, tx_buf, tx_size, ctx, FALSE, timeout);
+}
+
+
+uint8_t I2C_MasterTransferAsync(I2C* i2c, uint8_t addr, uint8_t* tx_buf, uint8_t tx_size,
+		uint8_t *rx_buf, size_t rx_size, I2C_Async_Context* ctx, BOOL isRead, uint32_t timeout)
+{
 
 	*i2c->I2C_S = I2C_S_IICIF;
 
 	ctx->isMaster = TRUE;
 	ctx->slaveAddr = addr;
-	ctx->reg = reg;
-	ctx->data = rxBuff;
-	ctx->dataSize = rxSize;
+	ctx->tx_buf = tx_buf;
+	ctx->tx_size = tx_size;
+	ctx->data_buf = rx_buf;
+	ctx->data_size = rx_size;
 	ctx->error = I2C_ERROR_SUCCESS;
 	ctx->state = I2C_ASYNC_STATE_INIT;
-	ctx->isRead = TRUE;
+	ctx->isRead = isRead;
+
+	if (*i2c->I2C_S & I2C_S_BUSY)
+	{
+		ctx->error = I2C_ERROR_BUSY;
+		return ctx->error;
+	}
 
 	i2c->ctx = ctx;
-	ctx->state = I2C_ASYNC_STATE_START_SENT;
+	ctx->state = I2C_ASYNC_STATE_START;
 	I2C_EnableInterrupt(i2c, TRUE);
 	uint8_t rc = I2C_MasterStartAsync(i2c, addr, FALSE);
 
@@ -503,24 +600,6 @@ uint8_t I2C_MasterReadRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg,
 	return rc;
 }
 
-uint8_t I2C_MasterWriteRegister(I2C* i2c, uint8_t addr, uint8_t reg,
-		uint8_t *txBuff, size_t txSize)
-{
-	uint8_t rc = I2C_MasterStart(i2c, addr, FALSE);
-	if (rc != I2C_ERROR_SUCCESS)
-		return rc;
-
-	rc = I2C_MasterWrite(i2c, &reg, 1);
-	if (rc != I2C_ERROR_SUCCESS)
-		return rc;
-
-	rc = I2C_MasterWrite(i2c, txBuff, txSize);
-	if (rc != I2C_ERROR_SUCCESS)
-		return rc;
-
-	return I2C_MasterStop(i2c);
-
-}
 
 /////////////////////////// SLAVE ///////////////////////////////////////////
 

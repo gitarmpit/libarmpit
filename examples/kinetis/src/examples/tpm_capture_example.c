@@ -6,6 +6,8 @@
 #include "gpio_helper.h"
 #include <stdio.h>
 
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 static void generatePWM()
 {
 	//InitClock_FBI_Slow();

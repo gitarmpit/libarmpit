@@ -3,6 +3,8 @@
 #include "sim.h"
 #include "gpio.h"
 
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 
 static void SetupClkoutPin()
 {
@@ -12,7 +14,7 @@ static void SetupClkoutPin()
 	GPIO_SetAF(&c3, 5);
 }
 
-void TestClockout1()
+static void TestClockout1()
 {
 	SetupClkoutPin();
 	InitClock_FEI_24Mhz_Bus_24Mhz();
@@ -21,7 +23,7 @@ void TestClockout1()
 		;
 }
 
-void TestClockout2()
+static void TestClockout2()
 {
 	SetupClkoutPin();
 	SIM_SelectCLKOUT_BUS();
@@ -34,7 +36,7 @@ void TestClockout2()
 		;
 }
 
-void TestClockout3()
+static void TestClockout3()
 {
 	SetupClkoutPin();
 	InitClock_FBI_Fast();
@@ -49,7 +51,7 @@ void TestClockout3()
 
 
 
-void test_clockout_PLL()
+static void test_clockout_PLL()
 {
 	SetupClkoutPin();
 
@@ -62,7 +64,7 @@ void test_clockout_PLL()
 
 
 // MCGIRCLK / LPO / OSCERCLK
-void test_clockout()
+static void test_clockout4()
 {
 	OSC_CR |= OSC_CR_SC8P;
 	MCG_Set_ExternalClock_OSC();
@@ -98,3 +100,7 @@ void test_clockout()
 		;
 }
 
+void test_clockout()
+{
+
+}

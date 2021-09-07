@@ -108,11 +108,12 @@ extern "C" void test_systick_millis();
 void test_rotary_handler();
 extern "C" void test_adc();
 extern "C" void test_i2c();
+extern "C" void test_pit();
 
 int main(void)
 {
 #ifdef SEMIHOSTING
-    initialise_monitor_handles();
+    //initialise_monitor_handles();
 #endif
 
 	SIM_DisableWatchDog();
@@ -129,7 +130,7 @@ int main(void)
 
 	//test_button_handler();
 	//test_adc();
-	test_i2c();
+	//test_i2c();
 	//test_rotary_handler();
 
 	//test_systick_millis();
@@ -152,6 +153,7 @@ int main(void)
 	//test_tpm_cpp();
 	//test_pwm3();
 
+	//test_pit();
 
 	while(1)
 		;

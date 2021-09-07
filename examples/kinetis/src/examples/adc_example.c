@@ -3,7 +3,10 @@
 #include "pmc.h"
 #include "system_time.h"
 #include "mcg.h"
+#include <stdio.h>
 //#include "lcd/ee_printf.h"
+
+#pragma GCC diagnostic ignored "-Wunused-function"
 
 static void test_adc_1()
 {
@@ -106,7 +109,7 @@ static void speed_test()
 	ADC_SetMode_12bit(adc);
 
 	ADC_SetChannel(&ch);
-	uint16_t res;
+	//uint16_t res;
 	systick_enable(TRUE);
 	uint32_t t0 = micros();
 
@@ -122,7 +125,7 @@ static void speed_test()
 	}
 
 	uint32_t t1 = micros();
-	printf ("1mil conversions: %d ms, 1 conv, usec:", (t1-t0)/1000);
+	printf ("1mil conversions: %lu ms, 1 conv, usec:", (t1-t0)/1000);
 	printDouble((t1-t0) / 1000000., 3);
 	printf ("\n");
 	while(1);

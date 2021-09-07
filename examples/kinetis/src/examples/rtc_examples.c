@@ -7,7 +7,9 @@
 
 static GPIO_PIN* g_pin;
 
-void secondsHandler1()
+#pragma GCC diagnostic ignored "-Wunused-function"
+
+static void secondsHandler1()
 {
 	if (g_pin != NULL)
 	{
@@ -15,7 +17,7 @@ void secondsHandler1()
 	}
 }
 
-void secondsHandler2()
+static void secondsHandler2()
 {
 	if (g_pin != NULL)
 	{
@@ -27,7 +29,7 @@ void secondsHandler2()
 	RTC_EnableCounter(TRUE);
 }
 
-void alarmHandler()
+static void alarmHandler()
 {
 	if (g_pin != NULL)
 	{
@@ -40,8 +42,7 @@ void alarmHandler()
 	RTC_EnableCounter(TRUE);
 }
 
-
-void test_clockout_RTC()
+static void test_clockout_RTC()
 {
 	SIM_SetOUTDIV1(1);
 	SIM_SetOUTDIV4(1);
@@ -72,7 +73,7 @@ void test_clockout_RTC()
 
 }
 
-void test_clockout_RTC_LPO()
+static void test_clockout_RTC_LPO()
 {
 	SIM_SetOUTDIV1(1);
 	SIM_SetOUTDIV4(1);
@@ -98,7 +99,7 @@ void test_clockout_RTC_LPO()
 
 }
 
-void test_clockout_RTC_LPO_1hz()
+static void test_clockout_RTC_LPO_1hz()
 {
 	SIM_SetOUTDIV1(1);
 	SIM_SetOUTDIV4(1);
@@ -130,8 +131,7 @@ void test_clockout_RTC_LPO_1hz()
 
 }
 
-
-void test_RTC_alarm()
+static void test_RTC_alarm()
 {
 	SIM_SetOUTDIV1(1);
 	SIM_SetOUTDIV4(1);
@@ -172,7 +172,7 @@ void test_RTC_alarm()
 }
 
 // Feed 32k MCGIRCLK to RTCIN
-void test_RTCIN()
+static void test_RTCIN()
 {
 	SIM_SetOUTDIV1(1);
 	SIM_SetOUTDIV4(2);
@@ -228,3 +228,7 @@ void test_RTCIN()
 		;
 }
 
+void test_RTC()
+{
+	while(1);
+}
