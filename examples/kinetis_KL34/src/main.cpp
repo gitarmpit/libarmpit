@@ -40,8 +40,8 @@ int main(void)
 
 
     //test_i2c();
-    testSSD1306();
-    //test_nokia5110();
+    //testSSD1306();
+    test_nokia5110();
     //test_tpm_cpp_pwm();
     //test_nokia5110();
     //test_rotary_handler();
