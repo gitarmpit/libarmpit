@@ -61,15 +61,6 @@ void Adafruit_Nokia5110::drawPixel(int16_t x, int16_t y, uint16_t color) {
   if ((x < 0) || (x >= _width) || (y < 0) || (y >= _height))
     return;
 
-//  if (color == 0)
-//  {
-//      color = 1;
-//  }
-//  else
-//  {
-//      color = 0;
-//  }
-
   int16_t t;
   switch(rotation){
     case 1:

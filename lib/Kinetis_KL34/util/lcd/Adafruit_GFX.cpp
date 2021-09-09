@@ -36,7 +36,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <wchar.h>
-#include "ee_printf.h"
+#include <stdio.h>
 
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
@@ -696,13 +696,15 @@ uint8_t Adafruit_GFX::write(const char *str)
 
 }
 
-uint8_t Adafruit_GFX::write(const char *str, int16_t x, int16_t y, uint8_t size)
+uint8_t Adafruit_GFX::write(int16_t x, int16_t y, const char *str, uint8_t size)
 {
 	if (size != 0)
 		setTextSize(size);
 	setCursor(x, y);
 	return write(str);
 }
+
+
 
 void Adafruit_GFX::setTextSize(uint8_t textSize) {
     if (gfxFont == 0) {
@@ -800,7 +802,7 @@ uint8_t Adafruit_GFX::printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    uint8_t size = printf(fmt, args);
+    uint8_t size = this->printf(fmt, args);
     va_end(args);
     return size;
 }
@@ -810,7 +812,7 @@ uint8_t Adafruit_GFX::printf(uint8_t x, uint8_t y, const char *fmt, ...)
     setCursor(x, y);
     va_list args;
     va_start(args, fmt);
-    int size = printf(fmt, args);
+    int size = this->printf(fmt, args);
     va_end(args);
     return size;
 }
@@ -818,7 +820,7 @@ uint8_t Adafruit_GFX::printf(uint8_t x, uint8_t y, const char *fmt, ...)
 
 uint8_t Adafruit_GFX::printf(const char *fmt, va_list args)
 {
-    ee_vsprintf(buf, fmt, args);
+    vsprintf(buf, fmt, args);
     size_t size = strlen(buf);
     char* p = buf;
     while (size--)

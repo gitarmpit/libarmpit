@@ -114,7 +114,7 @@ public:
 
     uint8_t write(const wchar_t *str);
     uint8_t write(const char *str);
-    uint8_t write(const char *str, int16_t x, int16_t y, uint8_t size = 0);
+    uint8_t write(int16_t x, int16_t y, const char *str, uint8_t size = 0);
     uint8_t printf(const char *fmt, ...);
     uint8_t printf(uint8_t x, uint8_t y, const char *fmt, ...);
     void drawBmp(int16_t x, int16_t y, const uint8_t *bmp);

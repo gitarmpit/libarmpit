@@ -231,6 +231,72 @@ void Adafruit_SSD1306::display(void)
 	I2C_MasterWriteRegister(_i2c, 0x3c, 0x40, buffer, SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8);
 }
 
+
+// TODO one line update for speed
+void Adafruit_SSD1306::display3(int line)
+{
+    ssd1306_command(SSD1306_COLUMNADDR);
+    ssd1306_command(0);   // Column start address (0 = reset)
+    ssd1306_command(SSD1306_LCDWIDTH - 1); // Column end address (127 = reset)
+
+    ssd1306_command(SSD1306_PAGEADDR);
+    ssd1306_command(line); // Page start address (0 = reset)
+    ssd1306_command(line); // Page end address
+
+	I2C_MasterWriteRegister(_i2c, 0x3c, 0x40, &buffer[SSD1306_LCDWIDTH*line], SSD1306_LCDWIDTH);
+}
+
+uint8_t Adafruit_SSD1306::write2(int16_t x, int16_t y, const char *str, uint8_t size)
+{
+	uint8_t rc = write(x, y, str, size);
+	display3(y);
+	return rc;
+}
+
+void Adafruit_SSD1306::display2(void)
+{
+	uint16_t txSize = SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8;
+	ssd1306_command(SSD1306_COLUMNADDR);
+	ssd1306_command(0);   // Column start address (0 = reset)
+	ssd1306_command(SSD1306_LCDWIDTH - 1); // Column end address (127 = reset)
+
+	ssd1306_command(SSD1306_PAGEADDR);
+	ssd1306_command(0); // Page start address (0 = reset)
+	ssd1306_command(7); // Page end address
+
+	*_i2c->I2C_S = I2C_S_IICIF;
+	*_i2c->I2C_C1 |= I2C_C1_MST | I2C_C1_TX;
+	*_i2c->I2C_D = (0x3c << 1U);
+
+	while (!(*_i2c->I2C_S & I2C_S_IICIF))
+		;
+
+	*_i2c->I2C_S = I2C_S_IICIF;
+
+	*_i2c->I2C_D = 0x40;
+	while (!(*_i2c->I2C_S & I2C_S_IICIF))
+		;
+
+	*_i2c->I2C_S = I2C_S_IICIF;
+
+	uint8_t* txBuff = buffer;
+	while (txSize--)
+	{
+		*_i2c->I2C_D = *txBuff++;
+
+		while (!(*_i2c->I2C_S & I2C_S_IICIF))
+			;
+
+		*_i2c->I2C_S = I2C_S_IICIF;
+	}
+
+	*_i2c->I2C_S = I2C_S_IICIF;
+
+	*_i2c->I2C_C1 &= ~(I2C_C1_MST | I2C_C1_TX | I2C_C1_TXAK);
+
+}
+
+
 // clear everything
 void Adafruit_SSD1306::clearDisplay(void)
 {
