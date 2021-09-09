@@ -18,6 +18,7 @@ extern "C"
 	void test_i2c();
 	void test_pit();
 	void test_adc();
+	void testSSD1306_c();
 }
 
 #ifdef SEMIHOSTING
@@ -41,6 +42,7 @@ int main(void)
 
     //test_i2c();
     //testSSD1306();
+    //testSSD1306_c();
     test_nokia5110();
     //test_tpm_cpp_pwm();
     //test_nokia5110();
