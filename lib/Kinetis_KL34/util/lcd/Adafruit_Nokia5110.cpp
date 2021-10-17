@@ -22,7 +22,7 @@ All text above, and the splash screen below must be included in any redistributi
 #include "Adafruit_Nokia5110.h"
 
 // the memory buffer for the LCD
-uint8_t pcd8544_buffer[LCDWIDTH * LCDHEIGHT / 8] = {0};
+static uint8_t pcd8544_buffer[LCDWIDTH * LCDHEIGHT / 8] = {0};
 
 // reduces how much is refreshed, which speeds it up!
 // originally derived from Steve Evans/JCW's mod but cleaned up and
@@ -88,7 +88,7 @@ void Adafruit_Nokia5110::drawPixel(int16_t x, int16_t y, uint16_t color) {
   else
     pcd8544_buffer[x+ (y/8)*LCDWIDTH] &= ~(1<<(y%8));
 
-  updateBoundingBox(x,y,x,y);
+  //updateBoundingBox(x,y,x,y);
 }
 
 
@@ -145,7 +145,19 @@ void Adafruit_Nokia5110::setContrast(uint8_t val) {
   
  }
 
+void Adafruit_Nokia5110::fillScreen(uint16_t color)
+{
 
+	int16_t size = LCDWIDTH * LCDHEIGHT / 8;
+	for (int16_t i = 0; i < size; ++i)
+	{
+		pcd8544_buffer[i] = color > 0 ? 0xff : 0;
+	}
+
+
+	//memset(pcd8544_buffer, 0xff, LCDWIDTH*LCDHEIGHT/8);
+
+}
 
 void Adafruit_Nokia5110::display(void) {
   uint8_t col, maxcol, p;
@@ -197,7 +209,7 @@ void Adafruit_Nokia5110::display(void) {
 // clear everything
 void Adafruit_Nokia5110::clearDisplay(void) {
   memset(pcd8544_buffer, 0, LCDWIDTH*LCDHEIGHT/8);
-  updateBoundingBox(0, 0, LCDWIDTH-1, LCDHEIGHT-1);
+  //updateBoundingBox(0, 0, LCDWIDTH-1, LCDHEIGHT-1);
   cursor_y = cursor_x = 0;
 }
 

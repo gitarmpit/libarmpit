@@ -1,0 +1,31 @@
+0 0x40000000 POWER POWER Power control
+0 0x40000000 CLOCK CLOCK Clock control
+1 0x40001000 RADIO RADIO 2.4 GHz Radio
+2 0x40002000 UART UART0 Universal Asynchronous Receiver/Transmitter 0
+3 0x40003000 SPI SPI0 Serial Peripheral Interface
+3 0x40003000 TWI TWI0 I2C compatible Two-Wire Interface
+4 0x40004000 SPI SPI1 Serial Peripheral Interface
+4 0x40004000 TWI TWI1 I2C compatible Two-Wire Interface 1
+4 0x40004000 SPIS SPIS1 SPI slave
+6 0x40006000 GPIOTE GPIOTE GPIO Tasks and Events
+7 0x40007000 ADC ADC Analog-to-Digital Converter
+8 0x40008000 TIMER TIMER0 Timer/counter 0
+9 0x40009000 TIMER TIMER1 Timer/counter 1
+10 0x4000A000 TIMER TIMER2 Timer/counter 2
+11 0x4000B000 RTC RTC0 Real Time Counter 0
+12 0x4000C000 TEMP TEMP Temperature sensor
+13 0x4000D000 RNG RNG Random number generator
+14 0x4000E000 ECB ECB Crypto ECB
+15 0x4000F000 CCM CCM AES CCM mode encryption
+15 0x4000F000 AAR AAR Accelerated Address Resolver
+16 0x40010000 WDT WDT Watchdog timer
+17 0x40011000 RTC RTC1 Real Time Counter 1
+18 0x40012000 QDEC QDEC Quadrature Decoder
+19 0x40013000 LPCOMP LPCOMP Low power comparator
+
+
+30 0x4001E000 NVMC NVMC Non-volatile memory controller
+31 0x4001F000 PPI PPI Programmable Peripheral Interconnect
+NA 0x50000000 GPIO P0 General purpose input and output
+NA 0x10000000 FICR FICR Factory Information Configuration Registers
+NA 0x10001000 UICR UICR User Information Configuration Registers

@@ -97,15 +97,15 @@ typedef struct
     volatile uint32_t* SIM_enableReg;
     uint32_t           SIM_enableMask;
 
-    volatile uint32_t* GPIO_PDOR;
-    volatile uint32_t* GPIO_PSOR;
-    volatile uint32_t* GPIO_PCOR;
-    volatile uint32_t* GPIO_PTOR;
-    volatile uint32_t* GPIO_PDIR;
-    volatile uint32_t* GPIO_PDDR;
+    volatile uint32_t* GPIO_PDOR; // Data Output
+    volatile uint32_t* GPIO_PSOR; // Port Set Output
+    volatile uint32_t* GPIO_PCOR; // Port Clear Output
+    volatile uint32_t* GPIO_PTOR; // Port Toggle Output
+    volatile uint32_t* GPIO_PDIR; // Port Data Input
+    volatile uint32_t* GPIO_PDDR; // Port Data Direction
 
     volatile uint32_t* PORT_ISFR;
-    uint32_t           PORT_PCR_BASE;
+    uint32_t           PORT_PCR_BASE; // Pin Control Register
     void (*interrupt_handler)(GPIO_PORT_N, GPIO_PIN_N);
 
 } GPIO_PORT;

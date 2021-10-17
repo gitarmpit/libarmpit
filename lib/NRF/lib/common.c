@@ -38,7 +38,6 @@ void delay_ms (uint16_t ms) {
 
 extern int  __end__;
 
-/*
 __attribute__ ((used))
  caddr_t _sbrk ( int incr )
 {
@@ -54,7 +53,7 @@ __attribute__ ((used))
 
     return (caddr_t) prev_heap;
 }
-*/
+
 #endif
 
 
