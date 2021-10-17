@@ -7,6 +7,43 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 
+Adafruit_SSD1306* SSD1306_GetInstance()
+{
+	I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C0_PB_0_1, 1200000);
+	Adafruit_SSD1306* lcd = new Adafruit_SSD1306 (i2c);
+	//lcd->setRotation(2);
+	lcd->setTextColor(1, 0);
+	return lcd;
+}
+
+static void testLCD0()
+{
+	InitClock_FEI_48Mhz_Bus_24Mhz();
+	//InitClock_FBI_Slow();
+	I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C0_PB_0_1, 1200000);
+	//I2C* i2c = GPIO_Helper_SetupI2C_Master(I2C0_PE_24_25, 5000);
+
+	Adafruit_SSD1306 display (i2c);
+	//display.setRotation(2);
+	display.setTextColor(1, 0);
+	display.clearDisplay();
+	display.write(0,0, "Hello, World0! 00000");
+	display.write(0,1, "Hello, World1! 11111");
+	display.write(0,2, "Hello, World2! 22222");
+	display.write(0,3, "Hello, World3! 33333");
+	display.write(0,4, "Hello, World4! 44444");
+	display.write(0,5, "Hello, World5! 55555");
+	display.write(0,6, "Hello, World6! 66666");
+	display.write(0,7, "Hello, World7! 77777");
+	display.display();
+	//delay_ms(5000);
+	//display.fillScreen(1);
+	//display.display();
+
+	while(1)
+		;
+}
+
 static void testLCD1()
 {
 	InitClock_FEI_48Mhz_Bus_24Mhz();
@@ -157,5 +194,6 @@ static void testLCD4()
 
 void testSSD1306()
 {
-	testLCD2();
+	testLCD0();
+	while(1);
 }
