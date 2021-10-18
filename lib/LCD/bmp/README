@@ -1,0 +1,3 @@
+Generates C-style array from a bmp file 
+Usage: bmp.exe <*.bmp>
+will generate *.cpp 

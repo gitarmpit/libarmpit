@@ -27,7 +27,6 @@
 
 #define TFTWIDTH   176
 #define TFTHEIGHT  220
-#define TFTLCD_DELAY 0xFF
 
 
 class ILI9225: public Adafruit_GFX {
@@ -79,15 +78,12 @@ private:
     {
         *_dataPort->GPIO_PDOR = d;
         GPIO_ResetPin(_wr);
-        //__nop(); __nop(); __nop();
-        //__nop(); __nop(); __nop();
-        //__nop(); __nop(); __nop();
-        //may need delay
+        //__nop();    __nop();     __nop();
         GPIO_SetPin(_wr);
     }
 
-
-    void writeRegister16(uint16_t addr, uint16_t data);
+    void writeCommand(uint16_t addr);
+    void writeData(uint16_t data);
 
     // Fast block fill operation for fillScreen, fillRect, H/V line, etc.
     // Requires setAddrWindow() has previously been called to set the fill
@@ -101,6 +97,8 @@ private:
 public:
 
     // TODO make private
+    uint16_t readRegister16(uint16_t addr);
+    void writeRegister16(uint16_t addr, uint16_t data);
     void flood(uint16_t color, uint32_t len);
     uint16_t readID();
     void reset();
@@ -110,16 +108,6 @@ public:
     void drawFastVLine(int16_t x, int16_t y, int16_t length, uint16_t color);
     void drawPixel(int16_t x, int16_t y, uint16_t color);
     void fillRect(int16_t x1, int16_t y1, int16_t w, int16_t h, uint16_t fillcolor);
-
-    void startPushColors();
-
-    // Call setWindowAddr() + startPushColors() first
-    // No difference in speed, can just use the default one
-    void pushColors(uint16_t *data, int len);
-    void pushColors2(uint16_t *data, int len);
-    //inline void pushColors3(uint16_t *data, uint16_t len) {
-    //    pushColorsAsm(data, len, _brr_addr, _bsrr_addr, _odr_addr, _csMask, _wrMask, _rsMask);
-    //}
 
     //TODO: private
     // Sets the LCD address window (and address counter, on 932X).

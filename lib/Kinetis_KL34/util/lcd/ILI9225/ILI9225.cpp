@@ -32,15 +32,106 @@ ILI9225::ILI9225(GPIO_PIN* cs, GPIO_PIN* rs, GPIO_PIN* wr, GPIO_PIN* rd,
 
 }
 
+uint8_t ILI9225::read8() {
+    GPIO_ResetPin(_rd);
+    //__nop();    __nop();     __nop();
+    uint8_t rc = *_dataPort->GPIO_PDIR & 0xff;
+    GPIO_SetPin(_rd);
+    return rc;
+}
+
+void ILI9225::writeCommand(uint16_t addr)
+{
+    GPIO_ResetPin(_cs);
+
+    // Set  Addr
+    GPIO_ResetPin(_rs);
+
+    *_dataPort->GPIO_PDOR = 0;
+    GPIO_ResetPin(_wr);
+    //__nop();    __nop();     __nop();
+    GPIO_SetPin(_wr);
+
+    *_dataPort->GPIO_PDOR = addr & 0xff;
+    GPIO_ResetPin(_wr);
+    GPIO_SetPin(_wr);
+
+    GPIO_SetPin(_cs);
+}
+
+void ILI9225::writeRegister16(uint16_t addr, uint16_t data)
+{
+    GPIO_ResetPin(_cs);
+
+    // Set  Addr
+    GPIO_ResetPin(_rs);
+
+    *_dataPort->GPIO_PDOR = 0;
+    GPIO_ResetPin(_wr);
+    //__nop();    __nop();     __nop();
+    GPIO_SetPin(_wr);
+
+    *_dataPort->GPIO_PDOR = addr & 0xff;
+    GPIO_ResetPin(_wr);
+    //__nop();    __nop();     __nop();
+    GPIO_SetPin(_wr);
+
+    // Set Data
+    GPIO_SetPin(_rs);
+
+    *_dataPort->GPIO_PDOR = data >> 8;
+    GPIO_ResetPin(_wr);
+    //__nop();    __nop();     __nop();
+    GPIO_SetPin(_wr);
+
+    *_dataPort->GPIO_PDOR = data;
+    GPIO_ResetPin(_wr);
+    //__nop();    __nop();     __nop();
+    GPIO_SetPin(_wr);
+
+    GPIO_SetPin(_cs);
+}
+
+uint16_t ILI9225::readRegister16(uint16_t addr)
+{
+    GPIO_ResetPin(_cs);
+
+    // Set  Addr
+    GPIO_ResetPin(_rs);
+
+    write8(0);
+    write8(addr);
+
+    setReadDir();
+
+    // Set Data
+    GPIO_SetPin(_rs);
+
+    uint16_t result = read8() << 8;
+    result |= read8();
+
+    setWriteDir();
+    GPIO_SetPin(_cs);
+
+    return result;
+}
+
+uint16_t ILI9225::readID()
+{
+	return readRegister16(0);
+}
+
+
 void ILI9225::init(void) {
 
     reset();
+    //delay_ms(100); //50
     writeRegister16(ILI9225_POWER_CTRL1, 0x0000); // Set SAP,DSTB,STB
     writeRegister16(ILI9225_POWER_CTRL2, 0x0000); // Set APON,PON,AON,VCI1EN,VC
     writeRegister16(ILI9225_POWER_CTRL3, 0x0000); // Set BT,DC1,DC2,DC3
     writeRegister16(ILI9225_POWER_CTRL4, 0x0000); // Set GVDD
     writeRegister16(ILI9225_POWER_CTRL5, 0x0000); // Set VCOMH/VCOML voltage
-    delay_ms(40);
+    delay_ms(1); //40
 
     // Power-on sequence
     writeRegister16(ILI9225_POWER_CTRL2, 0x0018); // Set APON,PON,AON,VCI1EN,VC
@@ -48,34 +139,44 @@ void ILI9225::init(void) {
     writeRegister16(ILI9225_POWER_CTRL4, 0x006F); // Set GVDD   /*007F 0088 */
     writeRegister16(ILI9225_POWER_CTRL5, 0x495F); // Set VCOMH/VCOML voltage
     writeRegister16(ILI9225_POWER_CTRL1, 0x0800); // Set SAP,DSTB,STB
-    delay_ms(10);
+    delay_ms(1); //10
 
     writeRegister16(ILI9225_POWER_CTRL2, 0x103B); // Set APON,PON,AON,VCI1EN,VC
-    delay_ms(50);
+    delay_ms(1); //50
 
     writeRegister16(ILI9225_DRIVER_OUTPUT_CTRL, 0x011C); // set the display line number and display direction
     writeRegister16(ILI9225_LCD_AC_DRIVING_CTRL, 0x0100); // set 1 line inversion
-    writeRegister16(ILI9225_ENTRY_MODE, 0x1038); // set GRAM write direction and BGR=1.
     writeRegister16(ILI9225_DISP_CTRL1, 0x0000); // Display off
     writeRegister16(ILI9225_BLANK_PERIOD_CTRL1, 0x0808); // set the back porch and front porch
     writeRegister16(ILI9225_FRAME_CYCLE_CTRL, 0x1100); // set the clocks number per line
     writeRegister16(ILI9225_INTERFACE_CTRL, 0x0000); // CPU interface
-    writeRegister16(ILI9225_OSC_CTRL, 0x0D01); // Set Osc  /*0e01*/
+    writeRegister16(ILI9225_OSC_CTRL, 0x0E01); // Set Osc  /*0e01*/
     writeRegister16(ILI9225_VCI_RECYCLING, 0x0020); // Set VCI recycling
-    writeRegister16(ILI9225_RAM_ADDR_SET1, 0x0000); // RAM Address
-    writeRegister16(ILI9225_RAM_ADDR_SET2, 0x0000); // RAM Address
+
 
     /* Set GRAM area */
-    writeRegister16(ILI9225_GATE_SCAN_CTRL, 0x0000);
-    writeRegister16(ILI9225_VERTICAL_SCROLL_CTRL1, 0x00DB);
+    writeRegister16(ILI9225_GATE_SCAN_CTRL, 0x0000);         // 0x30
+    writeRegister16(ILI9225_VERTICAL_SCROLL_CTRL1, TFTHEIGHT-1);  //0xDB 220-1
     writeRegister16(ILI9225_VERTICAL_SCROLL_CTRL2, 0x0000);
     writeRegister16(ILI9225_VERTICAL_SCROLL_CTRL3, 0x0000);
-    writeRegister16(ILI9225_PARTIAL_DRIVING_POS1, 0x00DB);
-    writeRegister16(ILI9225_PARTIAL_DRIVING_POS2, 0x0000);
-    writeRegister16(ILI9225_HORIZONTAL_WINDOW_ADDR1, 0x00AF);
-    writeRegister16(ILI9225_HORIZONTAL_WINDOW_ADDR2, 0x0000);
-    writeRegister16(ILI9225_VERTICAL_WINDOW_ADDR1, 0x00DB);
-    writeRegister16(ILI9225_VERTICAL_WINDOW_ADDR2, 0x0000);
+
+    //writeRegister16(ILI9225_PARTIAL_DRIVING_POS1, TFTHEIGHT-1);  //0xDB 220-1
+    //writeRegister16(ILI9225_PARTIAL_DRIVING_POS2, 0x0000);
+
+    // Write direction: Horizontal
+    writeRegister16(ILI9225_ENTRY_MODE, 0x1030);
+    //writeRegister16(ILI9225_ENTRY_MODE, 0x1028);
+    //writeRegister16(ILI9225_ENTRY_MODE, 0x1000);
+    //writeRegister16(ILI9225_ENTRY_MODE, 0x1018);
+
+    writeRegister16(ILI9225_RAM_ADDR_SET1, 0x0000); // RAM Address 0x20
+    writeRegister16(ILI9225_RAM_ADDR_SET2, 0x0000); // RAM Address 0x21
+
+    // 0x36 0x37 0x38 0x39
+    writeRegister16(ILI9225_HORIZONTAL_WINDOW_START, 0x0000);
+    writeRegister16(ILI9225_HORIZONTAL_WINDOW_END, TFTWIDTH-1);
+    writeRegister16(ILI9225_VERTICAL_WINDOW_START, 0x0000);
+    writeRegister16(ILI9225_VERTICAL_WINDOW_END, TFTHEIGHT-1);
 
     /* Set GAMMA curve */
     writeRegister16(ILI9225_GAMMA_CTRL1, 0x0000);
@@ -89,68 +190,19 @@ void ILI9225::init(void) {
     writeRegister16(ILI9225_GAMMA_CTRL9, 0x0710);
     writeRegister16(ILI9225_GAMMA_CTRL10, 0x0710);
 
-    writeRegister16(ILI9225_DISP_CTRL1, 0x0012);
-    delay_ms(50);
+    //writeRegister16(ILI9225_DISP_CTRL1, 0x0012);
+    //delay_ms(10); //50
 
     writeRegister16(ILI9225_DISP_CTRL1, 0x1017);
     // setRotation();
 
 }
 
-uint8_t ILI9225::read8() {
-    GPIO_ResetPin(_rd);
-    //__nop(); __nop();  __nop(); __nop();
-    //__nop(); __nop(); __nop(); __nop();
-    //__nop(); __nop(); __nop(); __nop();
-    uint8_t rc = *_dataPort->GPIO_PDIR & 0xff;
-    GPIO_SetPin(_rd);
-    return rc;
-}
-
-void ILI9225::writeRegister16(uint16_t addr, uint16_t data) 
-{
-    GPIO_ResetPin(_cs);
-
-    // Set  Addr
-    GPIO_ResetPin(_rs);
-
-    *_dataPort->GPIO_PDOR = 0;
-    GPIO_ResetPin(_wr);
-    __nop();    __nop();     __nop();
-    //__nop();    __nop();     __nop();
-    GPIO_SetPin(_wr);
-
-    *_dataPort->GPIO_PDOR = addr & 0xff;
-    GPIO_ResetPin(_wr);
-    __nop();    __nop();     __nop();
-    //__nop();    __nop();     __nop();
-
-    GPIO_SetPin(_wr);
-
-    // Set Data
-    GPIO_SetPin(_rs);
-
-    *_dataPort->GPIO_PDOR = data >> 8;
-    GPIO_ResetPin(_wr);
-    __nop();    __nop();     __nop();
-    //__nop();    __nop();     __nop();
-    GPIO_SetPin(_wr);
-
-    *_dataPort->GPIO_PDOR = data;
-    GPIO_ResetPin(_wr);
-    __nop();    __nop();     __nop();
-    //__nop();    __nop();     __nop();
-    GPIO_SetPin(_wr);
-
-    GPIO_SetPin(_cs);
-}
 
 void ILI9225::flood(uint16_t color, uint32_t len)
 {
     uint16_t blocks;
     uint8_t i, hi = color >> 8, lo = color;
-    uint8_t wrMask = _wr->pinMask;
-    volatile uint32_t* psor = _wr->port->GPIO_PSOR;
 
     GPIO_ResetPin(_cs);
 
@@ -175,15 +227,7 @@ void ILI9225::flood(uint16_t color, uint32_t len)
             do {
                 for (uint8_t s = 0; s < 8; ++s) {
                     GPIO_ResetPin(_wr);
-                    //__nop(); __nop(); __nop();
-                    //GPIO_SetPin(_wr);
-                    __asm volatile(
-                            "str  %[wr], [%[_psor]]   \n\t"
-                            ::
-                            [_psor] "r" (psor),
-                            [wr]   "r" (wrMask)
-                    );
-
+                    GPIO_SetPin(_wr);
                 }
             } while (--i);
         }
@@ -219,39 +263,6 @@ void ILI9225::flood(uint16_t color, uint32_t len)
 
 }
 
-uint16_t ILI9225::readID() {
-    setWriteDir();
-    // delay_ms(1);
-    GPIO_ResetPin(_cs);
-
-    //command
-    GPIO_ResetPin(_rs);
-
-    write8(0);
-    write8(0);
-
-    GPIO_SetPin(_cs);
-
-    /////read data
-    setReadDir();
-    // delay_ms(1);
-    GPIO_ResetPin(_cs);
-
-    // GPIO_ResetPin(_cs);
-
-    //data
-    GPIO_SetPin(_rs);
-
-    uint16_t result = read8() << 8;
-    result |= read8();
-
-    GPIO_SetPin(_cs);
-    setWriteDir();
-    // delay_ms(1);
-
-    return result;
-
-}
 
 void ILI9225::reset()
 {
@@ -259,14 +270,14 @@ void ILI9225::reset()
     GPIO_SetPin(_wr);
     GPIO_SetPin(_rd);
 
-    GPIO_SetPin(_rst);
-    delay_ms(2);
+    // GPIO_SetPin(_rst);
+    // delay_ms(2); // 2
 
-    GPIO_ResetPin(_rst);
-    delay_ms(20);
+    //GPIO_ResetPin(_rst);
+    //delay_ms(1); // 20
 
     GPIO_SetPin(_rst);
-    delay_ms(50);
+    //delay_ms(1); // 50
 
     setWriteDir();
 }
@@ -292,12 +303,34 @@ void ILI9225::setRotation(uint8_t x)
         t = 0x1018;
         break;
     }
-    //writeRegister16(0x0003, t); // MADCTL
-    // For 932X, init default full-screen address window:
+    writeRegister16(ILI9225_ENTRY_MODE, t); // MADCTL
     setAddrWindow(0, 0, _width - 1, _height - 1);
 }
 
-void ILI9225::fillScreen(uint16_t color) {
+void ILI9225::fillScreen(uint16_t color)
+{
+    uint16_t x, y;
+    switch (rotation) {
+    default:
+        x = 0;
+        y = 0;
+        break;
+    case 1:
+        x = TFTWIDTH - 1;
+        y = 0;
+        break;
+    case 2:
+        x = TFTWIDTH - 1;
+        y = TFTHEIGHT - 1;
+        break;
+    case 3:
+        x = 0;
+        y = TFTHEIGHT - 1;
+        break;
+    }
+    writeRegister16(ILI9225_RAM_ADDR_SET1, x);
+    writeRegister16(ILI9225_RAM_ADDR_SET2, y);
+    flood(color, (long) TFTWIDTH * (long) TFTHEIGHT);
 }
 
 void ILI9225::drawFastHLine(int16_t x, int16_t y, int16_t length,
@@ -377,24 +410,36 @@ void ILI9225::drawPixel(int16_t x, int16_t y, uint16_t color) {
 void ILI9225::fillRect(int16_t x1, int16_t y1, int16_t w, int16_t h,
         uint16_t fillcolor)
 {
-}
+    int16_t x2, y2;
 
-//TODO: private
-// Issues 'raw' an array of 16-bit color values to the LCD; used
-// externally by BMP examples.  Assumes that setWindowAddr() has
-// previously been set to define the bounds.  Max 255 pixels at
-// a time (BMP examples read in small chunks due to limited RAM).
-void ILI9225::pushColors(uint16_t *data, int len)
-{
-    uint16_t color;
-}
+    // Initial off-screen clipping
+    if ((w <= 0) || (h <= 0) || (x1 >= _width) || (y1 >= _height)
+            || ((x2 = x1 + w - 1) < 0) || ((y2 = y1 + h - 1) < 0))
+        return;
+    if (x1 < 0) { // Clip left
+        w += x1;
+        x1 = 0;
+    }
+    if (y1 < 0) { // Clip top
+        h += y1;
+        y1 = 0;
+    }
+    if (x2 >= _width) { // Clip right
+        x2 = _width - 1;
+        w = x2 - x1 + 1;
+    }
+    if (y2 >= _height) { // Clip bottom
+        y2 = _height - 1;
+        h = y2 - y1 + 1;
+    }
 
-void ILI9225::startPushColors() {
+    setAddrWindow(x1, y1, x2, y2);
+    flood(fillcolor, (uint32_t) w * (uint32_t) h);
+    setAddrWindow(0, 0, _width - 1, _height - 1);
 }
 
 void ILI9225::setAddrWindow(int x1, int y1, int x2, int y2)
 {
-	/*
     int x, y, t;
     switch (rotation) {
     default:
@@ -430,27 +475,14 @@ void ILI9225::setAddrWindow(int x1, int y1, int x2, int y2)
         y = y2;
         break;
     }
-*/
-    // writeRegister16(ILI9225_ENTRY_MODE, 0x1000 | ( mode<<3) );
 
-    writeRegister16(ILI9225_HORIZONTAL_WINDOW_ADDR1,x1);
-    writeRegister16(ILI9225_HORIZONTAL_WINDOW_ADDR2,x2);
+    writeRegister16(ILI9225_HORIZONTAL_WINDOW_START,x1);
+    writeRegister16(ILI9225_HORIZONTAL_WINDOW_END,x2);
 
-    writeRegister16(ILI9225_VERTICAL_WINDOW_ADDR1,y1);
-    writeRegister16(ILI9225_VERTICAL_WINDOW_ADDR2,y2);
+    writeRegister16(ILI9225_VERTICAL_WINDOW_START,y1);
+    writeRegister16(ILI9225_VERTICAL_WINDOW_END,y2);
 
     writeRegister16(ILI9225_RAM_ADDR_SET1,x1);
     writeRegister16(ILI9225_RAM_ADDR_SET2,y1);
 
-    //_writeCommand16( ILI9225_GRAM_DATA_REG );
-    GPIO_ResetPin(_cs);
-
-    //command
-    GPIO_ResetPin(_rs);
-
-    write8(0);
-    write8(ILI9225_GRAM_DATA_REG);
-
-    GPIO_SetPin(_cs);
-
-}
+ }

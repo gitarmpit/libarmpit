@@ -1,3 +1,12 @@
+Converts windows ttf fonts to Adafruit font file 
+Example: 
+
+fc.exe C:\Windows\Fonts\calibri.ttf  48 
+
+dpi doesn't affect anything, it defaults to 72
+
+
+
 hacked fontconvert to calculate xadvance (width).
 const GFXfont j8514oem = 
 {
