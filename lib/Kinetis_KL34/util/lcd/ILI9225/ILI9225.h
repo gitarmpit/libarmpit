@@ -1,5 +1,5 @@
-#ifndef _ILI932x_H
-#define _ILI932x_H
+#ifndef _ILI9225_H
+#define _ILI9225_H
 
 #define MCU_FREQ 100
 
@@ -45,11 +45,11 @@ private:
 
      void setWriteDir()
      {
-    	 *_dataPort->GPIO_PDDR = 0xff;
+         *_dataPort->GPIO_PDDR = 0xff;
      }
 
     void setReadDir() {
-    	*_dataPort->GPIO_PDDR = 0;
+        *_dataPort->GPIO_PDDR = 0;
     }
 
     uint8_t read8();
@@ -61,9 +61,9 @@ private:
                 "str  %[data], [%[odr]]   \n\t"
                 "str  %[wrst],   [%[bsrr]]   \n\t"
 
-        		__DELAY__
+                __DELAY__
 
-        		"str  %[wr], [%[bsrr]]   \n\t"
+                "str  %[wr], [%[bsrr]]   \n\t"
                 ::
                 [bsrr] "r" (_bsrr_addr),
                 [odr]  "r" (_odr_addr),
@@ -110,9 +110,6 @@ public:
     void fillRect(int16_t x1, int16_t y1, int16_t w, int16_t h, uint16_t fillcolor);
 
     //TODO: private
-    // Sets the LCD address window (and address counter, on 932X).
-    // Relevant to rect/screen fills and H/V lines.  Input coordinates are
-    // assumed pre-sorted (e.g. x2 >= x1).
     void setAddrWindow(int x1, int y1, int x2, int y2);
  };
 

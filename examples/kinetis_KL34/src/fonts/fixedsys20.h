@@ -300,7 +300,7 @@ const GFXfont fixedsys20 =
 {
   (uint8_t  *)fixedsys16Bitmaps,
   (GFXglyph *)fixedsys16Glyphs,
-  0x20, 0x7E, 20, 10
+  0x20, 0x7E, 20, 9
 };
 
 // Approx. 3047 bytes

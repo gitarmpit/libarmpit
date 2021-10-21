@@ -5,6 +5,8 @@ fc.exe C:\Windows\Fonts\calibri.ttf  48
 
 dpi doesn't affect anything, it defaults to 72
 
+in theory, DPI = width in pixels / size in in, for example 220 / 2.2" = 100
+
 
 
 hacked fontconvert to calculate xadvance (width).

@@ -32,6 +32,8 @@ void test_tpm_cpp_pwm();
 void test_rotary_handler();
 void pwm_gen();
 void LCD_9225_test();
+void LCD_932x_test();
+void LCD_HX8357_test();
 
 int main(void)
 {
@@ -52,7 +54,9 @@ int main(void)
     //test_adc();
     //pwm_gen();
 
-    LCD_9225_test();
+    // LCD_9225_test();
+    //LCD_932x_test();
+    LCD_HX8357_test();
 
     while(1)
         ;

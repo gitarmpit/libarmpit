@@ -1,25 +1,24 @@
 #include "lcd/ILI9225/ILI9225.h"
 #include "gpio_helper.h"
 #include "mcg.h"
-//#include "consola24.h"
-//#include "fonts/cour20.h"
-//#include "fonts/coure12.h"
-//#include "fonts/fixedsys20.h"
-//#include "fonts/FreeSerif24pt7b.h"
-//#include "fonts/12/arial12.h"
-//#include "fonts/12/calibri12.h"
-//#include "fonts/12/consola12.h"
-//#include "fonts/12/Urbanist_Regular12.h"
-//#include "fonts/12/tahoma12.h"
-//#include "fonts/12/verdana12.h"
-//#include "fonts/12/SourceCodePro_Regular12.h"
-//#include "fonts/12/corbel12.h"
-//#include "fonts/12/UbuntuCondensed_Regular18.h"
-#include "fonts/36/consola36.h"
+
+#include "fonts/small13.h"
+#include "fonts/consola42.h"
 
 // Good
-//#include "fonts/18/cour18.h"
-//#include "fonts/8/consola8.h"
+//#include "fonts/cour18.h"
+//#include "fonts/consola8.h"
+//#include "fonts/consola36.h"
+//#include "fonts/Lucida_Console18.h"
+//#include "fonts/Lucida_Sans16.h"  //more compact, proportional
+//#include "fonts/LucidaBright18.h" //proportional
+//#include "fonts/SourceHanMonoK_Regular18.h"
+//#include "fonts/dos8.h"
+//#include "fonts/fixedsys20.h"
+//#include "fonts/term6.h"
+
+
+
 
 //extern "C" void initialise_monitor_handles();
 //#include <stdio.h>
@@ -75,17 +74,26 @@ void LCD_9225_test()
     GPIO_EnableClock(portD, TRUE);
 	ILI9225 lcd (&cs, &rs, &wr, &rd, &rst, portD);
 	//uint16_t id = lcd.readRegister16(0);
-	//id = lcd.readID();
+	uint16_t id = lcd.readID();
 	lcd.init();
 	//delay_ms(1000);
 	lcd.setRotation(1);
 	lcd.fillScreen(0);
 
+	/*
+	lcd.setFont(&small13);
+	lcd.printf (0, 1, "abcdefghij");
+	lcd.printf (0, 2, "ABCDEFGH");
+	lcd.printf (0, 3, "1234567890");
+*/
+
 	lcd.setFont(&consola);
 	lcd.printf (0, 1, "abcdefghij");
 	lcd.printf (0, 2, "ABCDEFGH");
 	lcd.printf (0, 3, "1234567890");
-	//lcd.printf(0, 0, "12:34");
+	lcd.printf (0, 4, "abcdefghij");
+	lcd.printf (0, 5, "ABCDEFGH");
+	lcd.printf (0, 6, "1234567890");
 	while(1);
 
 }
