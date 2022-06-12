@@ -3,12 +3,12 @@
 #include "mcg.h"
 #include "sim.h"
 
-class MyButtonHandler : public ButtonHandler
+class ButtonHandlerExample : public ButtonHandler
 {
 private:
 	GPIO_PIN* _ledPin;
 public:
-    MyButtonHandler (PIT* pit, GPIO_PIN* ledPin) : ButtonHandler (pit)
+    ButtonHandlerExample (PIT* pit, GPIO_PIN* ledPin) : ButtonHandler (pit)
     {
     	_ledPin = ledPin;
     }
@@ -41,7 +41,7 @@ void test_button_handler()
 	GPIO_PIN ledPin = GPIO_Helper_GetPin("D7");
 	GPIO_SetupOut(&ledPin);
 	GPIO_TogglePin(&ledPin);
-	MyButtonHandler bh (pit, &ledPin);
+	ButtonHandlerExample bh (pit, &ledPin);
 	bh.SetUpdateIntervalUs(1000);
 	bh.SetSettleTimeUs(5000);
     GPIO_PIN pin = GPIO_Helper_GetPin("A12");

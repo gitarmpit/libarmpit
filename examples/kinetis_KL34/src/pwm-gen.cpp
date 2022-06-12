@@ -46,11 +46,13 @@ public:
 
 Adafruit_SSD1306* SSD1306_GetInstance();
 
-ADC* adc;
-ADC_Channel adc_ch;
-Adafruit_SSD1306* lcd;
-TPM_Channel_t* tpm_ch;
-MyButtonHandler2* bh;
+static ADC* adc;
+static ADC_Channel adc_ch;
+static Adafruit_SSD1306* lcd;
+static TPM_Channel_t* tpm_ch;
+static MyButtonHandler2* bh;
+static Button* button;
+static GPIO_PIN button_pin;
 
 static void setup()
 {
@@ -63,8 +65,8 @@ static void setup()
 	TPM_FREQ = CORE_FREQ;
 
     tpm_ch = GPIO_Helper_SetupTPM_Channel_t(TPM0_CH3_E30);
-	int period_us = 1000;
-	int duty_us = 500;
+	int period_us = 128000;
+	int duty_us = 32000;
 	TPM_Channel_SetupPWM(tpm_ch, period_us, duty_us);
 	TPM_EnableCounter(tpm_ch->tpm, TRUE);
 
@@ -95,9 +97,9 @@ static void setup()
 	bh = new MyButtonHandler2(pit);
 	bh->SetUpdateIntervalUs(1000);
 	bh->SetSettleTimeUs(5000);
-    GPIO_PIN pin = GPIO_Helper_GetPin("A12");
-    Button b1 (&pin, 1);
-    bh->AddButton (&b1);
+    button_pin = GPIO_Helper_GetPin("A13");
+    button = new Button (&button_pin, 1);
+    bh->AddButton (button);
     bh->Init(true);
 
 }
@@ -263,8 +265,52 @@ static void pwm_gen1()
 		;
 }
 
+// only change the duty cycle
+// period is 128ms
+
+static void pwm_duty()
+{
+	setup();
+    int duty_min = 16000;
+    int duty_max = 128000;
+
+    uint16_t res;
+    uint16_t ema_s = 0;
+    float 	ema_a = 0.3;
+    int val0 = 0;
+    bool once = false;
+
+    while(1)
+    {
+        res = ADC_SingleConversion(&adc_ch);
+        ema_s = ema_a*res + (1.0-ema_a)*(float)ema_s;
+        if (ema_s < 5)
+        {
+        	ema_s = 5;
+        }
+        if (ema_s > 4090)
+        {
+        	ema_s = 4090;
+        }
+        int16_t val = ema_s - 5;
+    	int32_t duty_us = duty_min + (float)val*(duty_max - duty_min)/4085;
+        if (!once || val0 != val)
+        {
+        	once = true;
+    		lcd->printf(0,5, "%7d", duty_us);
+    		lcd->display();
+    		TPM_Channel_UpdatePWMDuty(tpm_ch, duty_us);
+        }
+        delay_ms(10);
+        val0 = val;
+    }
+
+	while(1)
+		;
+}
+
 void pwm_gen()
 {
-	pwm_gen1();
+	pwm_duty();
 	while(1);
 }

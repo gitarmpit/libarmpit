@@ -2,6 +2,9 @@
 #include "gpio.h"
 #include "mcg.h"
 #include "sim.h"
+#include "lcd/Adafruit_SSD1306.h"
+
+Adafruit_SSD1306* SSD1306_GetInstance();
 
 #pragma GCC diagnostic ignored "-Wunused-function"
 
@@ -33,10 +36,15 @@ static void test_uart1()
     //uint8_t v = UART_ReceiveByte(uart0);
 }
 
-// UART1
+// UART1, send recv
 static void test_uart2()
 {
     InitClock_FEI_24Mhz_Bus_24Mhz();
+
+	Adafruit_SSD1306* lcd = SSD1306_GetInstance();
+	lcd->setTextColor(1, 0);
+	lcd->clearDisplay();
+
 
     GPIO_PORT* portE = GPIO_GetInstance(PORTE);
     GPIO_EnableClock(portE, TRUE);
@@ -46,13 +54,15 @@ static void test_uart2()
     GPIO_SetAF(&e1, 3);
 
     UART* uart1 = UART_GetInstance(UART1);
-    UART_Initialize(uart1, (uint32_t)UART_BAUD_9600, TRUE, TRUE);
+    UART_Initialize(uart1, (uint32_t)UART_BAUD_115200, TRUE, TRUE);
     int8_t i = 0;
     while (1)
     {
-        //UART_ReceiveByte(uart0);
-        UART_SendByte(uart1, i++);
+        uint8_t r = UART_ReceiveByte(uart1);
+        lcd->printf(0,5, "%8x\n", r);
+        lcd->display();
         delay_ms(1000);
+        UART_SendByte(uart1, i++);
     }
     //uint8_t v = UART_ReceiveByte(uart0);
 }
@@ -168,5 +178,5 @@ static void test_uart6()
 
 void test_uart()
 {
-    test_uart1();
+    test_uart2();
 }

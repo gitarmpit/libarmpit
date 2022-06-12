@@ -13,6 +13,14 @@ extern "C" void SVC_Handler()
 
 }
 
+extern "C" void NMI_Handler()
+{
+    while(1)
+        ;
+
+}
+
+
 extern "C"
 {
 	void test_i2c();
@@ -20,6 +28,8 @@ extern "C"
 	void test_adc();
 	void testSSD1306_c();
 }
+
+void test_button_handler();
 
 #ifdef SEMIHOSTING
     extern "C" void initialise_monitor_handles();
@@ -34,6 +44,9 @@ void pwm_gen();
 void LCD_9225_test();
 void LCD_932x_test();
 void LCD_HX8357_test();
+void test_thermocouple();
+void pwm_gen();
+void test_uart();
 
 int main(void)
 {
@@ -56,7 +69,13 @@ int main(void)
 
     // LCD_9225_test();
     //LCD_932x_test();
-    LCD_HX8357_test();
+    //LCD_HX8357_test();
+
+    //test_button_handler();
+
+    //test_thermocouple();
+    pwm_gen();
+    //test_uart();
 
     while(1)
         ;

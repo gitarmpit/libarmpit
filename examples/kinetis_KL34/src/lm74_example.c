@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "LM74/TempLM74.h"
 #include "gpio_helper.h"
+//#include "lcd/ee_printf.h"
 
 void test_lm74()
 {

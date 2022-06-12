@@ -74,7 +74,6 @@ Button* ButtonHandler::GetButton(uint8_t id)
 
 void ButtonHandler::HandleInterrupt()
 {
-
 	bool callTimerHook =
 			(_timerHookInterval && (millis() - _lastTimerHookTime) > _timerHookInterval);
 
@@ -115,7 +114,6 @@ void ButtonHandler::HandleInterrupt()
 	{
 		_lastTimerHookTime = millis();
 	}
-
 }
 
 void ButtonHandler::HandleInterrupt(void* ctx)
