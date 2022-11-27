@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+        schemaVersion="1.3"
+        xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ARM-software/CMSIS_5/develop/CMSIS/Utilities/CMSIS-SVD.xsd">
+  <vendor>ARM Ltd.</vendor>
+  <vendorID>ARM</vendorID>
+  <name>Cortex_M0</name>
+  <series>M</series>
+  <version>2020-08-22T15:13:24.354567-05:00</version>
+  <description>Cortex-M0 core descriptions, generated from ARM Development studio</description>
+  <cpu>
+     <name>CM4</name>
+     <revision>r0p0</revision>
+     <endian>little</endian>
+     <nvicPrioBits>8</nvicPrioBits>
+     <vendorSystickConfig>true</vendorSystickConfig>
+  </cpu>
+  <addressUnitBits>8</addressUnitBits>
+  <width>32</width>
+  <peripherals>
+  <peripheral>
+    <name>SysTick</name>
+    <description>System Timer registers</description>
+    <baseAddress>0xe000e010</baseAddress>
+    <addressBlock><offset>0x00000000</offset><size>0x00000010</size><usage>registers</usage></addressBlock>
+    <registers>
+      <register>
+        <name>SYST_CSR</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Controls the system timer and provides status data</description>
+        <fields>
+          <field>
+            <name>COUNTFLAG</name>
+            <description>Indicates whether the counter has counted to 0 since the last read of this register</description>
+            <bitOffset>16</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>SYST_CSR_COUNTFLAG</name>
+              <headerEnumName>SYST_CSR_COUNTFLAG</headerEnumName>
+              <enumeratedValue><name>not_counted_to_0</name><description>not counted to 0</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>counted_to_0</name><description>counted to 0</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>CLKSOURCE</name>
+            <description>Indicates the SysTick clock source</description>
+            <bitOffset>2</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>SYST_CSR_CLKSOURCE</name>
+              <headerEnumName>SYST_CSR_CLKSOURCE</headerEnumName>
+              <enumeratedValue><name>External_clock</name><description>External clock</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Processor_clock</name><description>Processor clock</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>TICKINT</name>
+            <description>Indicates whether counting to 0 causes the status of the SysTick exception to change to pending</description>
+            <bitOffset>1</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>SYST_CSR_TICKINT</name>
+              <headerEnumName>SYST_CSR_TICKINT</headerEnumName>
+              <enumeratedValue><name>Does_not_affect_exception_status</name><description>Does not affect exception status</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Changes_exception_status</name><description>Changes exception status</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>ENABLE</name>
+            <description>Indicates the enabled status of the SysTick counter</description>
+            <bitOffset>0</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>SYST_CSR_ENABLE</name>
+              <headerEnumName>SYST_CSR_ENABLE</headerEnumName>
+              <enumeratedValue><name>Counter_disabled</name><description>Counter disabled</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Counter_operating</name><description>Counter operating</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+        </fields>
+        <addressOffset>0x0</addressOffset>
+        <addressOffset>0x0</addressOffset>
+      </register>
+      <register>
+        <name>SYST_RVR</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads the reload value of the SYST_CVR register</description>
+        <fields>
+          <field>
+            <name>RELOAD</name>
+            <description>The value to load into the SYST_CVR register when the counter reaches 0</description>
+            <bitRange>[23:0]</bitRange>
+          </field>
+        </fields>
+        <addressOffset>0x4</addressOffset>
+        <addressOffset>0x4</addressOffset>
+      </register>
+      <register>
+        <name>SYST_CVR</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Reads or clears the current counter value</description>
+        <fields>
+          <field>
+            <name>CURRENT</name>
+            <description>This is the value of the counter at the time it is sampled</description>
+            <bitRange>[23:0]</bitRange>
+          </field>
+        </fields>
+        <addressOffset>0x8</addressOffset>
+        <addressOffset>0x8</addressOffset>
+      </register>
+      <register>
+        <name>SYST_CALIB</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Reads the calibration value and parameters for SysTick</description>
+        <fields>
+          <field>
+            <name>NOREF</name>
+            <description>Indicates whether the IMPLEMENTATION DEFINED reference clock is provided</description>
+            <bitOffset>31</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>SYST_CALIB_NOREF</name>
+              <headerEnumName>SYST_CALIB_NOREF</headerEnumName>
+              <enumeratedValue><name>Implemented</name><description>Implemented</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Not_implemented</name><description>Not implemented</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>SKEW</name>
+            <description>Indicates whether the 10ms calibration value is exact</description>
+            <bitOffset>30</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>SYST_CALIB_SKEW</name>
+              <headerEnumName>SYST_CALIB_SKEW</headerEnumName>
+              <enumeratedValue><name>Exact</name><description>Exact</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Inexact</name><description>Inexact</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>TENMS</name>
+            <description>Optionally, holds a reload value to be used for 10ms (100Hz) timing, subject to system clock skew errors</description>
+            <bitRange>[23:0]</bitRange>
+          </field>
+        </fields>
+        <addressOffset>0x12</addressOffset>
+        <addressOffset>0xc</addressOffset>
+      </register>
+    </registers>
+  </peripheral>
+  <peripheral>
+    <name>Control</name>
+    <description>System Control registers</description>
+    <baseAddress>0xe000ed04</baseAddress>
+    <addressBlock><offset>0x00000000</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <addressBlock><offset>0x00000008</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <addressBlock><offset>0x00000010</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <addressBlock><offset>0x00000018</offset><size>0x0000000c</size><usage>registers</usage></addressBlock>
+    <registers>
+      <register>
+        <name>ICSR</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Controls and provides status information</description>
+        <fields>
+          <field>
+            <name>NMIPENDSET</name>
+            <description>Activates an NMI exception or reads back the current state</description>
+            <bitOffset>31</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>ICSR_NMIPENDSET</name>
+              <headerEnumName>ICSR_NMIPENDSET</headerEnumName>
+              <enumeratedValue><name>Do_not_activate</name><description>Do not activate</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Activate_NMI_exception</name><description>Activate NMI exception</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>PENDSVSET</name>
+            <description>Sets a pending PendSV interrupt or reads back the current state</description>
+            <bitOffset>28</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>ICSR_PENDSET</name>
+              <headerEnumName>ICSR_PENDSET</headerEnumName>
+              <enumeratedValue><name>Do_not_set</name><description>Do not set</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Set_pending</name><description>Set pending</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>PENDSVCLR</name>
+            <description>Clears a pending PendSV interrupt</description>
+            <bitOffset>27</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>ICSR_PENDCLR</name>
+              <headerEnumName>ICSR_PENDCLR</headerEnumName>
+              <enumeratedValue><name>Do_not_clear</name><description>Do not clear</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Clear_pending</name><description>Clear pending</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>PENDSTSET</name>
+            <description>Sets a pending SysTick or reads back the current state</description>
+            <bitOffset>26</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues derivedFrom="ICSR_PENDSET"/>
+          </field>
+          <field>
+            <name>PENDSTCLR</name>
+            <description>Clears a pending SysTick, whether set here or by the timer hardware</description>
+            <bitOffset>25</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues derivedFrom="ICSR_PENDCLR"/>
+          </field>
+          <field>
+            <name>ISRPREEMPT</name>
+            <description>Indicates whether a pending exception will be serviced on exit from debug halt state</description>
+            <bitOffset>23</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>ICSR_PREEMPT</name>
+              <headerEnumName>ICSR_PREEMPT</headerEnumName>
+              <enumeratedValue><name>Will_not_service</name><description>Will not service</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Will_service_pending_exception</name><description>Will service pending exception</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>ISRPENDING</name>
+            <description>Indicates if an external configurable, NVIC generated, interrupt is pending</description>
+            <bitOffset>22</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>ICSR_PENDING</name>
+              <headerEnumName>ICSR_PENDING</headerEnumName>
+              <enumeratedValue><name>Interrupt_not_pending</name><description>Interrupt not pending</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Interrupt_pending</name><description>Interrupt pending</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>VECTPENDING</name>
+            <description>The exception number for the highest priority pending exception. 0 indicates no pending exceptions</description>
+            <bitRange>[20:12]</bitRange>
+          </field>
+          <field>
+            <name>VECTACTIVE</name>
+            <description>The exception number for the current executing exception</description>
+            <bitRange>[8:0]</bitRange>
+          </field>
+        </fields>
+        <addressOffset>0x0</addressOffset>
+        <addressOffset>0x0</addressOffset>
+      </register>
+      <register>
+        <name>AIRCR</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or returns interrupt control data</description>
+        <fields>
+          <field>
+            <name>VECTKEY</name>
+            <description>Vector Key</description>
+            <bitRange>[31:16]</bitRange>
+          </field>
+          <field>
+            <name>VECTKEYSTAT</name>
+            <description>UNKNOWN</description>
+            <bitRange>[31:16]</bitRange>
+          </field>
+          <field>
+            <name>ENDIANNESS</name>
+            <description>Indicates the memory system data endianness</description>
+            <bitOffset>15</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>AIRCR_ENDIANNESS</name>
+              <headerEnumName>AIRCR_ENDIANNESS</headerEnumName>
+              <enumeratedValue><name>Little_endian</name><description>Little endian</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Big_endian</name><description>Big endian</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>SYSRESETREQ</name>
+            <description>System Reset Request</description>
+            <bitOffset>2</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>AIRCR_RESETREQ</name>
+              <headerEnumName>AIRCR_RESETREQ</headerEnumName>
+              <enumeratedValue><name>Do_not_request_reset</name><description>Do not request reset</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Request_reset</name><description>Request reset</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+          <field>
+            <name>VECTCLRACTIVE</name>
+            <description>Clears all active state information for fixed and configurable exceptions</description>
+            <bitOffset>1</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>AIRCR_VECTCLR</name>
+              <headerEnumName>AIRCR_VECTCLR</headerEnumName>
+              <enumeratedValue><name>Do_not_clear</name><description>Do not clear</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Clear_state_information</name><description>Clear state information</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+        </fields>
+        <addressOffset>0x8</addressOffset>
+        <addressOffset>0x8</addressOffset>
+      </register>
+      <register>
+        <name>CCR</name>
+        <size>32</size>
+        <access>read-only</access>
+        <description>Returns configuration and control data</description>
+        <fields>
+          <field>
+            <name>STKALIGN</name>
+            <description>On exception entry, the SP used prior to the exception is adjusted to be 8-byte aligned and the context to restore it is saved. The SP is restored on the associated exception return</description>
+            <bitOffset>9</bitOffset>
+            <bitWidth>1</bitWidth>
+          </field>
+          <field>
+            <name>UNALIGN_TRP</name>
+            <description>Unaligned word and halfword accesses generate a HardFault exception</description>
+            <bitOffset>3</bitOffset>
+            <bitWidth>1</bitWidth>
+          </field>
+        </fields>
+        <addressOffset>0x16</addressOffset>
+        <addressOffset>0x10</addressOffset>
+      </register>
+      <register>
+        <name>SHPR2</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or returns priority for system handler 11</description>
+        <fields>
+          <field>
+            <name>PRI_11</name>
+            <description>Priority of system handler 11, SVCall</description>
+            <bitRange>[31:30]</bitRange>
+          </field>
+        </fields>
+        <addressOffset>0x24</addressOffset>
+        <addressOffset>0x18</addressOffset>
+      </register>
+      <register>
+        <name>SHPR3</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or returns priority for system handlers 14-15</description>
+        <fields>
+          <field>
+            <name>PRI_15</name>
+            <description>Priority of system handler 15, SysTick</description>
+            <bitRange>[31:30]</bitRange>
+          </field>
+          <field>
+            <name>PRI_14</name>
+            <description>Priority of system handler 14, PendSV</description>
+            <bitRange>[23:22]</bitRange>
+          </field>
+        </fields>
+        <addressOffset>0x28</addressOffset>
+        <addressOffset>0x1c</addressOffset>
+      </register>
+      <register>
+        <name>SHCSR</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Controls and provides the status of system handlers</description>
+        <fields>
+          <field>
+            <name>SVCALLPENDED</name>
+            <description>This bit reflects the pending state on a read, and updates the pending state, to the value written, on a write</description>
+            <bitOffset>15</bitOffset>
+            <bitWidth>1</bitWidth>
+            <enumeratedValues>
+              <name>SHCSR_SVCCALLPEND</name>
+              <headerEnumName>SHCSR_SVCCALLPEND</headerEnumName>
+              <enumeratedValue><name>Not_pending</name><description>Not pending</description><value>0</value></enumeratedValue>
+              <enumeratedValue><name>Pending</name><description>Pending</description><value>1</value></enumeratedValue>
+            </enumeratedValues>
+          </field>
+        </fields>
+        <addressOffset>0x32</addressOffset>
+        <addressOffset>0x20</addressOffset>
+      </register>
+    </registers>
+  </peripheral>
+  <peripheral>
+    <name>ID</name>
+    <description>ID registers</description>
+    <baseAddress>0xe000ed00</baseAddress>
+    <addressBlock><offset>0x00000000</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <registers>
+      <register>
+        <name>CPUID</name>
+        <size>32</size>
+        <access>read-only</access>
+        <description>Provides identification information for the processor</description>
+        <fields>
+          <field>
+            <name>Implementer</name>
+            <description>Implementer code</description>
+            <bitRange>[31:24]</bitRange>
+          </field>
+          <field>
+            <name>Variant</name>
+            <description>Implementation defined</description>
+            <bitRange>[23:20]</bitRange>
+          </field>
+          <field>
+            <name>Constant</name>
+            <description>Indicates the architecture</description>
+            <bitRange>[19:16]</bitRange>
+          </field>
+          <field>
+            <name>Partno</name>
+            <description>Indicates part number</description>
+            <bitRange>[15:4]</bitRange>
+          </field>
+          <field>
+            <name>Revision</name>
+            <description>Indicates revision</description>
+            <bitRange>[3:0]</bitRange>
+          </field>
+        </fields>
+        <addressOffset>0x0</addressOffset>
+        <addressOffset>0x0</addressOffset>
+      </register>
+    </registers>
+  </peripheral>
+  <peripheral>
+    <name>NVIC</name>
+    <description>Nested Vectored Interrupt Controller registers</description>
+    <baseAddress>0xe000e100</baseAddress>
+    <addressBlock><offset>0x00000000</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <addressBlock><offset>0x00000080</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <addressBlock><offset>0x00000100</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <addressBlock><offset>0x00000180</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <addressBlock><offset>0x00000200</offset><size>0x00000004</size><usage>registers</usage></addressBlock>
+    <addressBlock><offset>0x00000300</offset><size>0x00000020</size><usage>registers</usage></addressBlock>
+    <registers>
+      <register>
+        <name>NVIC_ISER0</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Enables, or reads the enable state of a group of interrupts</description>
+        <addressOffset>0x0</addressOffset>
+        <addressOffset>0x0</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_ICER0</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Disables, or reads the enable state of a group of interrupts</description>
+        <addressOffset>0x128</addressOffset>
+        <addressOffset>0x80</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_ISPR0</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>For a group of interrupts, changes interrupt status to pending, or shows the current pending
+status</description>
+        <addressOffset>0x256</addressOffset>
+        <addressOffset>0x100</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_ICPR0</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>For a group of interrupts, clears the interrupt pending status, or shows the current pending
+status</description>
+        <addressOffset>0x384</addressOffset>
+        <addressOffset>0x180</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IABR0</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>For a group of 32 interrupts, shows whether each interrupt is active</description>
+        <addressOffset>0x512</addressOffset>
+        <addressOffset>0x200</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IPR0</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads interrupt priorities</description>
+        <addressOffset>0x768</addressOffset>
+        <addressOffset>0x300</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IPR1</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads interrupt priorities</description>
+        <addressOffset>0x772</addressOffset>
+        <addressOffset>0x304</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IPR2</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads interrupt priorities</description>
+        <addressOffset>0x776</addressOffset>
+        <addressOffset>0x308</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IPR3</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads interrupt priorities</description>
+        <addressOffset>0x780</addressOffset>
+        <addressOffset>0x30c</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IPR4</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads interrupt priorities</description>
+        <addressOffset>0x784</addressOffset>
+        <addressOffset>0x310</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IPR5</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads interrupt priorities</description>
+        <addressOffset>0x788</addressOffset>
+        <addressOffset>0x314</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IPR6</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads interrupt priorities</description>
+        <addressOffset>0x792</addressOffset>
+        <addressOffset>0x318</addressOffset>
+      </register>
+      <register>
+        <name>NVIC_IPR7</name>
+        <size>32</size>
+        <access>read-write</access>
+        <description>Sets or reads interrupt priorities</description>
+        <addressOffset>0x796</addressOffset>
+        <addressOffset>0x31c</addressOffset>
+      </register>
+    </registers>
+  </peripheral>
+</peripherals>
+</device>
