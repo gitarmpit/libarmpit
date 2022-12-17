@@ -190,14 +190,30 @@ function procReg(r, group) {
                         var fullregname = regname + "_" + j;
                         group.lines.push("#define " + fullregname.padEnd(pad) + util.format(" (%d<<%s)", j, bitOffset));
                         group.lines.push(" // " + desc + "\n");
+                        if (f.enumeratedValues != undefined) {
+                            len = f.enumeratedValues.length;
+                        }
                     }
                 }
                 else {
                     group.lines.push("#define " + (regname + "_OFFSET").padEnd(pad) + util.format(" %d", bitOffset));
                     group.lines.push(" // " + desc + "\n");
                 }
+                group.lines.push("#define " + (regname + "_BITWIDTH").padEnd(pad) + util.format(" %d\n", bitWidth));
                 group.lines.push("#define " + (regname + "_CLEARMASK").padEnd(pad) + util.format(" (0x%s<<%s)\n", len.toString(16), bitOffset));
             }
+            if (f.enumeratedValues != undefined) {
+                if (f.enumeratedValues.enumeratedValue != undefined) {
+                    len = f.enumeratedValues.enumeratedValue.length;
+                    for (let i = 0; i < len; ++i) {
+                        group.lines.push(" ".repeat(10 + pad) + " // " + i + " : " + f.enumeratedValues.enumeratedValue[i].name + "\n");
+                    }
+                }
+                else {
+                    console.log("undef");
+                }
+            }
+
         }
     }
 }
