@@ -782,7 +782,6 @@ private:
     TIMER_With_SlaveMode(TIM12_BASE, 2, IRQn_TIM12, &RCC_APB1ENR, &RCC_APB1RSTR, RCC_APB1ENR_TIM12EN, true),
     TIMER_With_OnePulseMode(TIM12_BASE),
     TIMER_With_MMS(TIM12_BASE)
-    //TIMER_With_SlaveMode(TIM12_BASE)
     {
 #if defined(STM32F2) || defined(STM32F4)
         _af = AF9;
@@ -841,21 +840,20 @@ public:
 #endif
 
 #if defined(VALUE_LINE)
-class TIM15 : public TIMER_With_Channels,
+class TIM15 :
+public TIMER_With_SlaveMode,
 public TIMER_With_DMAControl,
 public TIMER_With_OnePulseMode,
 public TIMER_With_MMS,
-public TIMER_With_SlaveMode,
 public TIMER_With_BDTR_RCR,
 public TIMER_With_Complementary_Outputs
 {
 private:
     TIM15() :
-    TIMER_With_Channels(TIM15_BASE, 2, IRQn_TIM1_BRK_TIM15, &RCC_APB2ENR, &RCC_APB2RSTR, RCC_APB2ENR_TIM15EN, false),
+    TIMER_With_SlaveMode(TIM15_BASE, 2, IRQn_TIM1_BRK_TIM15, &RCC_APB2ENR, &RCC_APB2RSTR, RCC_APB2ENR_TIM15EN, false),
     TIMER_With_DMAControl(TIM15_BASE),
     TIMER_With_OnePulseMode(TIM15_BASE),
     TIMER_With_MMS(TIM15_BASE),
-    TIMER_With_SlaveMode(TIM15_BASE),
     TIMER_With_BDTR_RCR(TIM15_BASE)
     {
     }

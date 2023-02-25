@@ -51,9 +51,14 @@ SPI* GPIO_Helper::SetupSPI(SPI_Pins spi_no, bool isMasterMode, bool isClockPhase
         return SetupSPIx(isMasterMode, isClockPhase2, isClockPolarity1, baudRate, GPIOB::GetInstance(),
                 GPIO_PIN3, GPIO_PIN4, GPIO_PIN5, SPI1::GetInstance());
 
+ #if defined(STM32F10X_MD) || defined(STM32F10X_MD_VL) || defined(STM32F10X_HD)\
+        || defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F10X_CL)\
+        || defined(STM32F4) || defined(STM32F2)
+
     case SPI2_PB_13_14_15:
         return SetupSPIx(isMasterMode, isClockPhase2, isClockPolarity1, baudRate, GPIOB::GetInstance(),
                 GPIO_PIN13, GPIO_PIN14, GPIO_PIN15, SPI2::GetInstance());
+#endif
 
 #if defined(STM32F10X_HD) || defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
     case SPI3_PB_3_4_5:
@@ -142,12 +147,16 @@ TIMER_With_Channels* GPIO_Helper::SetupTimer (Timer_Pins t)
         SetupTIMx(GPIOD::GetInstance(), GPIO_PIN12, GPIO_PIN13, GPIO_PIN14, GPIO_PIN15);
         return timer;
 #endif
-    case TIM4_PB_6_7_8_9:
+
+#if !defined(STM32F10X_LD) && !defined(STM32F10X_LD_VL)
+   case TIM4_PB_6_7_8_9:
         AFIO_Remap_TIM4(false);
         timer = TIM4::GetInstance();
         timer->EnablePeripheralClock(true);
         SetupTIMx(GPIOB::GetInstance(), GPIO_PIN6, GPIO_PIN7, GPIO_PIN8, GPIO_PIN9);
         return timer;
+#endif
+
 #if defined(STM32F10X_HD) || defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
     case TIM5_PA_0_1_2_3:
         timer = TIM5::GetInstance();

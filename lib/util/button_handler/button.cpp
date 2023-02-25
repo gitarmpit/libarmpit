@@ -5,6 +5,8 @@ Button::Button(GPIO_PIN* pin, uint8_t buttonId) : _pin(pin)
 {
     _buttonId = buttonId;
    _lastClick = 0;
+   _currentState = false;
+   _lastReadValue = false;
 
     Init();
 
