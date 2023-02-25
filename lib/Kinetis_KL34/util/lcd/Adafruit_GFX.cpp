@@ -566,7 +566,6 @@ void Adafruit_GFX::drawChar(int16_t x, int16_t y, uint16_t c, uint16_t color, ui
         uint8_t w = glyph->width, h = glyph->height;
         int8_t xo = glyph->xOffset, yo = glyph->yOffset;
         uint8_t xx, yy, bits = 0, bit = 0;
-        int16_t xo16 = 0, yo16 = 0;
 
         // Todo: Add character clipping here
 

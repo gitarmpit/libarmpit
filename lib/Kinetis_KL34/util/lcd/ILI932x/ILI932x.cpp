@@ -428,6 +428,7 @@ void ILI932x::fillRect(int16_t x1, int16_t y1, int16_t w, int16_t h,
 
 void ILI932x::setAddrWindow(int x1, int y1, int x2, int y2)
 {
+#if 0
     int x, y, t;
     switch (rotation) {
     default:
@@ -463,6 +464,7 @@ void ILI932x::setAddrWindow(int x1, int y1, int x2, int y2)
         y = y2;
         break;
     }
+#endif
 
     writeRegister16(ILI932X_HOR_START_AD, x1);
     writeRegister16(ILI932X_HOR_END_AD, x2);
@@ -473,4 +475,7 @@ void ILI932x::setAddrWindow(int x1, int y1, int x2, int y2)
     writeRegister16(ILI932X_GRAM_HOR_AD, x1);
     writeRegister16(ILI932X_GRAM_VER_AD, y1);
 
+    // Why is this not used? Does the caller pass rotated coords?
+    //writeRegister16(ILI932X_GRAM_HOR_AD, x);
+    //writeRegister16(ILI932X_GRAM_VER_AD, y);
  }

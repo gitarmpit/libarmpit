@@ -180,6 +180,7 @@ void MCG_Set_FLL_OSCCLK();
 // 3.
 void MCG_Enable_MCGIRCLK (BOOL isOn);
 
+void InitClock_FEI_Common();
 
 void InitClock_FEI_24Mhz_Bus_24Mhz();
 void InitClock_FEI_48Mhz_Bus_24Mhz();

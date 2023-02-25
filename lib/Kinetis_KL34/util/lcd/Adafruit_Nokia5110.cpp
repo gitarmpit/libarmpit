@@ -33,17 +33,6 @@ static uint8_t pcd8544_buffer[LCDWIDTH * LCDHEIGHT / 8] = {0};
 static uint8_t xUpdateMin, xUpdateMax, yUpdateMin, yUpdateMax;
 #endif
 
-
-
-static void updateBoundingBox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax) {
-#ifdef enablePartialUpdate
-  if (xmin < xUpdateMin) xUpdateMin = xmin;
-  if (xmax > xUpdateMax) xUpdateMax = xmax;
-  if (ymin < yUpdateMin) yUpdateMin = ymin;
-  if (ymax > yUpdateMax) yUpdateMax = ymax;
-#endif
-}
-
 Adafruit_Nokia5110::Adafruit_Nokia5110(SPI* spi, GPIO_PIN* dcPin, GPIO_PIN* rstPin, GPIO_PIN* ssPin)
 : Adafruit_GFX(LCDWIDTH, LCDHEIGHT)
 {

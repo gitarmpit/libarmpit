@@ -160,6 +160,10 @@ uint8_t I2C_MasterStart(I2C *i2c, uint8_t address, BOOL isRead);
 uint8_t I2C_MasterStop(I2C *i2c);
 
 uint8_t I2C_MasterWrite(I2C *i2c, const uint8_t *txBuff, size_t txSize);
+uint8_t I2C_MasterWriteToAddr(I2C *i2c, uint8_t addr, const uint8_t *txBuff, size_t txSize);
+uint8_t I2C_MasterWriteRegister(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *txBuff, size_t txSize);
+
+
 uint8_t I2C_MasterRead(I2C* i2c, uint8_t *rxBuff, size_t rxSize);
 uint8_t I2C_MasterReadRegister(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *rxBuff, size_t rxSize);
 uint8_t I2C_MasterReadRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg,
@@ -170,7 +174,6 @@ uint8_t I2C_MasterWriteRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg,
 uint8_t I2C_MasterTransferAsync(I2C* i2c, uint8_t addr, uint8_t* tx_buf, uint8_t tx_size,
 		uint8_t *rx_buf, size_t rx_size, I2C_Async_Context* ctx, BOOL isRead, uint32_t timeout);
 
-uint8_t I2C_MasterWriteRegister(I2C* i2c, uint8_t addr, uint8_t reg, uint8_t *txBuff, size_t txSize);
 
 void I2C_SlaveInit(I2C *i2c, uint32_t slaveAddress);
 BOOL I2C_SlaveWrite(I2C *i2c, const uint8_t *txBuff, size_t txSize);

@@ -8,11 +8,6 @@
 #define SETBIT(var,bit) (var |= (0x01 << (bit)))
 #define CLRBIT(var,bit) (var &= (~(0x01 << (bit))))
 
-/* The default behavior is active low: button is configured as a weak pull-up
- * So to activate it, the switch needs to be connected from the input port to ground
- * Then pushing the switch will set it low: the IsOn method will return true
- *
- */
 class RotaryHandler
 {
 private:

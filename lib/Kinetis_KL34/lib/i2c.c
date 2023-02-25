@@ -521,6 +521,20 @@ uint8_t I2C_MasterReadRegisterAsync(I2C* i2c, uint8_t addr, uint8_t reg,
 	return I2C_MasterTransferAsync(i2c, addr, &reg, 1, rx_buf, rx_size, ctx, TRUE, timeout);
 }
 
+
+uint8_t I2C_MasterWriteToAddr(I2C *i2c, uint8_t addr, const uint8_t *txBuff, size_t txSize)
+{
+	uint8_t rc = I2C_MasterStart(i2c, addr, FALSE);
+	if (rc != I2C_ERROR_SUCCESS)
+		return rc;
+
+	rc = I2C_MasterWrite(i2c, txBuff, txSize);
+	if (rc != I2C_ERROR_SUCCESS)
+		return rc;
+
+	return I2C_MasterStop(i2c);
+}
+
 uint8_t I2C_MasterWriteRegister(I2C* i2c, uint8_t addr, uint8_t reg,
 		uint8_t *txBuff, size_t txSize)
 {

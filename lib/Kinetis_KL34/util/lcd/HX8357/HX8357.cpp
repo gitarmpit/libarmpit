@@ -106,8 +106,8 @@ uint16_t HX8357::readID()
     // Set Data
     GPIO_SetPin(_rs);
 
-	uint8_t b1 = read8();
-	uint8_t b2 = read8();
+	//uint8_t b1 = read8();
+	//uint8_t b2 = read8();
 
 	GPIO_ResetPin(_cs);
 

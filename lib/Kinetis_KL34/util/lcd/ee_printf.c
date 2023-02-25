@@ -140,7 +140,7 @@ static char *ee_number(char *str, long num, int base, int size, int precision, i
   return str;
 }
 
-static char *eaddr(char *str, unsigned char *addr, int size, int precision, int type)
+static char *eaddr(char *str, unsigned char *addr, int size, int type)
 {
   char tmp[24];
   char *dig = lower_digits;
@@ -523,7 +523,7 @@ repeat:
 
       case 'a':
         if (qualifier == 'l')
-          str = eaddr(str, va_arg(args, unsigned char *), field_width, precision, flags);
+          str = eaddr(str, va_arg(args, unsigned char *), field_width, flags);
         else
           str = iaddr(str, va_arg(args, unsigned char *), field_width, precision, flags);
         continue;
