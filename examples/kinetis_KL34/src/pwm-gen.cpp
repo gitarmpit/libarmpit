@@ -108,7 +108,7 @@ static void pwm_gen2()
 {
 	setup();
 
-    uint16_t res, res0 = 0;
+    uint16_t res;
     int start_freq = 1000;
     int val0 = 0;
     int count_changed = 0;
@@ -147,7 +147,6 @@ static void pwm_gen2()
         	count_changed = 0;
         }
         delay_ms(10);
-        res0 = res;
         val0 = val;
     }
 
@@ -194,7 +193,7 @@ static void pwm_gen3()
     		once = false;
         	int16_t val = res - 5;
         	int freq = start_freq + (float)val*99000/4085;
-        	int period_us = 1000000/freq;
+        	//int period_us = 1000000/freq;
         	lcd->printf(0,5, "%-4d", res);
         	//lcd->printf(0,5, "%-4d %-6d Hz %-6d us", val, freq, period_us);
         	//lcd->printf(0,6, "cmax: %-4d", cmax);

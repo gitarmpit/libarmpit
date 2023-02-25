@@ -52,7 +52,6 @@ void test_rotary_handler()
     GPIO_PIN pinA = GPIO_Helper_GetPin("A12");
     GPIO_PIN pinB = GPIO_Helper_GetPin("A5");
 
-
     MyRotaryHandler bh (pit, &pinA, &pinB);
     bh.SetUpdateIntervalUs(500);
     bh.Init(true);

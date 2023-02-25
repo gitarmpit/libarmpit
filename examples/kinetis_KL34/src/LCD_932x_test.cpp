@@ -74,7 +74,7 @@ void LCD_932x_test()
     GPIO_EnableClock(portD, TRUE);
 	ILI932x lcd (&cs, &rs, &wr, &rd, &rst, portD);
 	//uint16_t id = lcd.readRegister16(0);
-	uint16_t id = lcd.readID();
+	//uint16_t id = lcd.readID();
 	lcd.init();
 	while(1)
 	{

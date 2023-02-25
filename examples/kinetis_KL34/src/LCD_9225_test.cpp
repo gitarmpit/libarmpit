@@ -74,7 +74,7 @@ void LCD_9225_test()
     GPIO_EnableClock(portD, TRUE);
 	ILI9225 lcd (&cs, &rs, &wr, &rd, &rst, portD);
 	//uint16_t id = lcd.readRegister16(0);
-	uint16_t id = lcd.readID();
+	//uint16_t id = lcd.readID();
 	lcd.init();
 	//delay_ms(1000);
 	lcd.setRotation(1);

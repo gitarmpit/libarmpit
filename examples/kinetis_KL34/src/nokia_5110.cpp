@@ -103,6 +103,7 @@ static int __printf (const char *fmt, ...)
 
 static int __printf_float(double f, uint8_t prec)
 {
+	UNUSED(prec);
 	static volatile char buf[256];
 	int i = (int32_t)f;
 	int frac = (f-i)*1000;

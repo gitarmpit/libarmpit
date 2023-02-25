@@ -434,10 +434,9 @@ static void pwm_gen1()
 {
 	setup_adc();
 
-    uint16_t res, res0 = 0;
+    uint16_t res;
     uint16_t ema_s = 0;
     float 	ema_a = 0.3;
-    int period0 = 0;
     int start_freq = 100;
     int end_freq = start_freq*100;
     int val0 = 0;
@@ -466,8 +465,6 @@ static void pwm_gen1()
         	//TPM_Channel_SetupPWM(tpm_ch, period_us, period_us/2);
         }
         delay_ms(10);
-        res0 = res;
-        period0 = period_us;
         val0 = val;
     }
 
@@ -488,7 +485,6 @@ typedef struct _ADC_Ctx
 
 static void PitHandler_ADC(void* ctx)
 {
-	static int cnt = 0;
 	ADC_CTX* adc_ctx = (ADC_CTX*)ctx;
 
 	int16_t raw = ADC_SingleConversion(&adc_ch);

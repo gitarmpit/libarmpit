@@ -7,8 +7,7 @@
 #include "GPIO_Helper.h"
 #include "spi.h"
 #include "gpio_cpp.h"
-#include <stdio.h>
-#include "lcd5110.h"
+//#include <stdio.h>
 #include "debug.h"
 
 
@@ -73,7 +72,7 @@ static void DAC_Test_DMA()
     dac->SetIrqHandler(new DAC_IRQ_Handler1());
 
     DAC_Channel* dacCh = dac->GetChannel(DAC_CHANNEL_1);
-    dacCh->SelectTriggerTimer8();
+    dacCh->SelectTriggerTimer6();
     //dacCh->EnableUnderrunInterrupt();
     dacCh->SelectDataRegister12R();
 
@@ -112,8 +111,8 @@ static void DAC_Test_DMA()
     dacCh->EnableChannel();
     dacCh->EnableDMA();
 
-    TIM8* tim = TIM8::GetInstance();
-    tim->EnablePeripheralClock(TRUE);
+    //TIM6* tim = TIM6::GetInstance();
+    //tim->EnablePeripheralClock(TRUE);
 
     uint32_t sin_period_us = 8;
 
@@ -121,11 +120,11 @@ static void DAC_Test_DMA()
 
     //tim6->SetUpdatePeriod_us(1); //84=100us, 21=25us, 8~11us
     //tim6->SetAutoReloadValue(6);    
-    tim->SetUpdatePeriod_ns (update_period_ns);
+    //tim->SetUpdatePeriod_ns (update_period_ns);
     
-    tim->EnableAutoPreload(TRUE);
-    tim->SetMMS_Update();
-    tim->EnableCounter(TRUE);
+    //tim->EnableAutoPreload(TRUE);
+    //tim->SetMMS_Update();
+    //tim->EnableCounter(TRUE);
 
     while(1) 
         ;
@@ -166,72 +165,10 @@ static void DAC_Test_manual()
 
 }
 
-static void Test_LCD()  
-{
-    delay(10);
-    GPIOC* portC = GPIOC::GetInstance();
-    GPIOD* portD = GPIOD::GetInstance();
-    portC->EnablePeripheralClock(true);
-    portD->EnablePeripheralClock(true);
-
-    SPI* spi = GPIO_Helper::SetupSPI3_MasterMode_PC_10_11_12(false, false, SPI_BAUD_RATE_2);
-
-    GPIO_PIN* rstPin = portD->GetPin(GPIO_PIN2);
-    rstPin->SetupGPIO_OutPP();
-    rstPin->SetSpeedHigh();
-
-    GPIO_PIN* ssPin = portD->GetPin(GPIO_PIN0);
-    ssPin->SetupGPIO_OutPP();
-    ssPin->SetSpeedHigh();
-
-    GPIO_PIN* dcPin = portD->GetPin(GPIO_PIN1);
-    dcPin->SetupGPIO_OutPP();
-    dcPin->SetSpeedHigh();
-
-
-
-    LCD5110 display(spi, dcPin, rstPin, ssPin, false);
-
-    display.Init();
-    display.Clear();
-
-    display.WriteLine("12345");
-//    display.GotoXY(5, 1);
-//    display.WriteLine("12345");
-//    display.GotoXY(0, 1);
-//    display.WriteLine("1");
-//    display.GotoXY(1, 2);
-//    display.WriteLine("23");
-
-    uint32_t i = 0;
-    char buf[32] = {0};
-    while(6)
-    {
-      //  display.GotoXY(0, 0);
-      //  sprintf (buf, "%d", i++);
-      //  display.WriteLine(buf);
-      //  delay(10);
-    }
-
-    //display.WriteLine("test1!");
-    //display.GotoXY(0, 1);
-    //display.WriteLine("test2!");
-    //display.GotoXY(0, 2);
-    //display.WriteLine("test3!");
-    //display.GotoXY(0, 3);
-    //display.WriteLine("1234567890 123456789");
-
-    while(1)
-        ;
-
-}
-
-
 int main()
 {
 
-    RCC_EnableHSI_168Mhz();
-    Test_LCD();
+    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
 
     DAC_Test_DMA();
 }

@@ -27,6 +27,7 @@ extern "C"
 	void test_pit();
 	void test_adc();
 	void testSSD1306_c();
+	void test_tpm();
 }
 
 void test_button_handler();
@@ -47,6 +48,9 @@ void LCD_HX8357_test();
 void test_thermocouple();
 void pwm_gen();
 void test_uart();
+void ad9833();
+void dac121();
+void test_mcp47x6();
 
 int main(void)
 {
@@ -74,8 +78,13 @@ int main(void)
     //test_button_handler();
 
     //test_thermocouple();
-    pwm_gen();
+    //pwm_gen();
     //test_uart();
+    //ad9833();
+    //test_tpm();
+    //dac121();
+
+    test_mcp47x6();
 
     while(1)
         ;

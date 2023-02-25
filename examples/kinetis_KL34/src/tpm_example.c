@@ -229,8 +229,28 @@ static void test_pwm3()
 
 }
 
+static void test_pwm4()
+{
+	InitClock_FEI_48Mhz_Bus_24Mhz();
+    SIM_Select_TPMSRC_MCGFLLCLK();
+	SIM_Select_FLL();
+	TPM_FREQ = CORE_FREQ;
+
+    TPM_Channel_t* ch = GPIO_Helper_SetupTPM_Channel_t(TPM0_CH3_E30);
+	int period_us = 1000;
+	int duty_us = 500;
+	TPM_Channel_SetupPWM(ch, period_us, duty_us);
+	TPM_EnableCounter(ch->tpm, TRUE);
+
+	while(1);
+
+}
+
+
 void test_tpm()
 {
+	test_pwm4();
+	//test_tpm_timer();
 	while(1);
 }
 

@@ -86,17 +86,16 @@ void test_lptmr3()
 	LPTMPR_EnableClock(TRUE);
 	LPTMPR_SelectMode_TimeCounter();
 	LPTMR_SelectClock_MCGIRCLK(32768);
-	uint16_t cnt = LPTMR_GetCounterValue();
-	cnt = LPTMR_GetCounterValue();
+	//uint16_t cnt = LPTMR_GetCounterValue();
+	//cnt = LPTMR_GetCounterValue();
 	LPTMPR_SetCMR(15);
 	LPTMR_SetPrescaler(LPTMR_DIV2);
-	uint16_t psr = (uint16_t)LPTMR_PSR;
 	LPTMPR_SetInterruptHandler(handler);
 	LPTMPR_EnableCounter(TRUE);
 	LPTMPR_EnableInterrupt(TRUE);
 	while(1)
 	{
-		cnt = LPTMR_GetCounterValue();
+		//cnt = LPTMR_GetCounterValue();
 	}
 }
 
