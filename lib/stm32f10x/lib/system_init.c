@@ -36,7 +36,7 @@ extern "C"
 void SystemInit(void)
 {
     FLASH_EnablePrefetchBuffer();
-    Debug_EnableCYCCNT(TRUE);
+    // Debug_EnableCYCCNT(TRUE);
 }
 
 

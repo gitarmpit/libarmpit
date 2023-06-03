@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     uint8_t            bit;
     uint16_t           dpi = 72;
 
-    dpi = 100;
+    // dpi = 100;
 
     // Parse command line.  Valid syntaxes are:
     //   fontconvert [filename] [size]

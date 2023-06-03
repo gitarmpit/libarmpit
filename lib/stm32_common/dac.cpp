@@ -160,14 +160,14 @@ void DAC_Channel::SelectDataRegister12R()
 {
     _dataRegister = _pDAC_DHR12R;
     _dataShift = 0;
-    _dataBitmask = 0x4ff;
+    _dataBitmask = 0x0fff;
 }
 
 void DAC_Channel::SelectDataRegister12L()
 {
     _dataRegister = _pDAC_DHR12L;
     _dataShift = 4;
-    _dataBitmask = 0xffc;
+    _dataBitmask = 0xfff0;
 }
 
 void DAC_Channel::SelectDataRegister8R()

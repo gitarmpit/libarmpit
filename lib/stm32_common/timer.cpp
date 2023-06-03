@@ -119,6 +119,11 @@ void TIM6_IRQHandler(void)
 {
     TIM6::GetInstance()->HandleInterrupt();
 }
+#endif
+
+#if (defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL)) || defined(STM32F4) ||\
+defined(VALUE_LINE)
+
 void TIM7_IRQHandler(void)
 {
     TIM7::GetInstance()->HandleInterrupt();
