@@ -1,4 +1,4 @@
-Eclipse toolchain config 
+Eclipse toolchain config  
 
 Preferences:
 
