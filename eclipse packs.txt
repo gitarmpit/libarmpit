@@ -1,1 +1,5 @@
 https://www.keil.com/pack/index.pidx
+
+Eclipse:
+file:///C:/Users/guest2/AppData/Roaming/CMSIS-Packs/index.pidx
+

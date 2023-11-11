@@ -26,6 +26,7 @@ Lipo min 3.0V
 or   
 3.3*1260/1280 = 3.25
 
+
 1260: BG ADC reading at 3.3 V 
 1280: BG ADC reading at a lower voltage
 
