@@ -35,4 +35,3 @@ find Vref based on BG ADC reading (1260):  3.3/4096*1260 = 1.015V
 then:
 Vcc = Vref / adc_ref * 4096
 Vcc = 1.015 / 1280 * 4096  = 3.25 V
-
