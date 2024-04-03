@@ -53,6 +53,9 @@ static void initGPIO()
     ssPin->SetSpeedHigh();
 
 }
+
+
+/*
 static void test()
 {
     //delay(10);
@@ -101,6 +104,7 @@ static void test()
         ;
 
 }
+*/
 
 
 /*
@@ -118,6 +122,7 @@ VCC      (VCC)      5v
 #include "adc_cpp.h"
 #include "fp.h"
 
+/*
 static void bat(TFT_ILI9163C* display)
 {
     GPIOA* gpioA = GPIOA::GetInstance();
@@ -143,8 +148,6 @@ static void bat(TFT_ILI9163C* display)
         delay(500);
     }
 }
-
-
 
 static void test_flood() {
 
@@ -237,6 +240,7 @@ static void test_font() {
 
 }
 
+*/
 
 int main()
 {
@@ -264,5 +268,5 @@ int main()
     Debug_EnableCYCCNT(true);
     //test_flood();
     //test_font();
-    test_bmp2();
+    //test_bmp2();
 }

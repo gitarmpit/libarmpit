@@ -38,7 +38,7 @@
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>1494010886217</id>
+			<id>1712075829714</id>
 			<name>lib</name>
 			<type>9</type>
 			<matcher>
@@ -47,7 +47,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1494010886222</id>
+			<id>1712075829724</id>
 			<name>lib</name>
 			<type>9</type>
 			<matcher>
@@ -56,21 +56,12 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1494010886227</id>
+			<id>1712075829735</id>
 			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-name-matches-false-false-stm32f10x</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1494010886232</id>
-			<name>lib</name>
-			<type>9</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-util</arguments>
 			</matcher>
 		</filter>
 		<filter>

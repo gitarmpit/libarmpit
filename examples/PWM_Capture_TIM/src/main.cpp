@@ -5,7 +5,7 @@
 #include "GPIO_Helper.h"
 #include <stdio.h>
 #include "debug.h"
-#include "PWM_Capture/PWM_Capture_TIM.h"
+//#include "PWM_Capture/PWM_Capture_TIM.h"
 
 
 static void generatePWM(uint32_t period_us, uint32_t duty_us)
@@ -41,6 +41,7 @@ static void test_manual_pwm()
     }
 }
 
+/*
 class My_Timeout_Handler : public PWM_Timeout_Handler
 {
 public:
@@ -180,7 +181,7 @@ static void test_input_capture()
 
 
 extern "C" void initialise_monitor_handles(void);
-
+*/
 
 int main()
 {
@@ -188,14 +189,16 @@ int main()
 //    initialise_monitor_handles();
 //#endif
 
-#ifdef STM32F4
+#if defined(STM32F4)
     RCC_EnableHSI_168Mhz();
-#else
-    RCC_EnableHSI_64Mhz_AHB_32Mhz_APB1_16MHz_APB2_16MHz();
+#elif defined(STM32F207xx)
+    RCC_EnableHSI_100Mhz();
 #endif
     RCC_SetAHBPrescalerDiv2();
     //RCC_SetAPB1PrescalerDiv16();
+    while(1)
+    	;
 
-    test_input_capture2();
-    test_manual_pwm();
+    //test_input_capture2();
+    //test_manual_pwm();
 }

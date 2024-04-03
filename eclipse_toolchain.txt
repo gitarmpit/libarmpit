@@ -31,6 +31,15 @@ C:/Program Files (x86)/GNU MCU Eclipse/Build Tools/2.12-20190422-1053/bin
 make, sh etc 
 
 -------------------
+Eclipse 2023-03:
+
+Preferences -> MCU -> Global Arm Toolchains Paths
+xPack:  C:/Users/guest2/AppData/Roaming/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/12.2.1-1.2.1/.content/bin
+
+                      Global Build Tools Path:
+Build Tools Folder:  C:/Users/guest2/AppData/Roaming/xPacks/@xpack-dev-tools/windows-build-tools/4.4.0-1.1/.content/bin 
+
+-------------------
 
 C/C++ -> New C/C++ Project Wizard 
 
@@ -38,7 +47,6 @@ Toolchains (right tab) : "Arm Cross GCC"
 
 =======================================================
 Project Properties: C/C++ Build -> Environment -> PATH should contain one of the paths above
-
 
 
 
