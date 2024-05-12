@@ -49,5 +49,6 @@ Toolchains (right tab) : "Arm Cross GCC"
 Project Properties: C/C++ Build -> Environment -> PATH should contain one of the paths above
 
 
+Packs:  (minimum set)
 
 file:///C:/Users/guest2/AppData/Roaming/CMSIS-Packs/index.pidx
