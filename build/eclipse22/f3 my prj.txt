@@ -1,0 +1,84 @@
+assembly .s:
+
+arm-none-eabi-gcc 
+
+-fdata-sections 
+-ffreestanding 
+-ffunction-sections 
+-flto 
+-fmessage-length=0 
+-fsigned-char 
+-g3 
+-mcpu=cortex-m3 
+-mfloat-abi=soft 
+-mthumb 
+-O0 
+-Wall 
+-Wextra 
+-x assembler-with-cpp 
+-DUSE_SPI -DUSE_ADC -DUSE_TIMER -DHSE_VALUE=8000000 -DSTM32F10X_MD 
+ 
+-MMD -MP -MF"system/startup_stm32f10x_md.d" -MT"system/startup_stm32f10x_md.o" -c -o "system/startup_stm32f10x_md.o" "../system/startup_stm32f10x_md.S"
+
+================================================================
+.c
+
+arm-none-eabi-gcc 
+
+same as .s
+plus
+-std=gnu11 
+
+
+-I"C:\git\libarmpit\lib\mcortex_core" -I"C:\git\libarmpit\examples\AD9850\src" -I"C:\git\libarmpit\lib" 
+-I"C:\git\libarmpit\lib\mcortex_core\armv7m" -I"C:\git\libarmpit\lib\stm32_common" 
+-I"C:\git\libarmpit\lib\stm32f10x\lib" -I"C:\git\libarmpit\lib\util\displays" 
+
+-MMD -MP -MF"lib/util/displays/glcdfont.d" -MT"lib/util/displays/glcdfont.o" -c -o "lib/util/displays/glcdfont.o" "C:/git/libarmpit/lib/util/displays/glcdfont.c"
+
+
+================================================================
+.cpp
+
+arm-none-eabi-g++ 
+
+same as .c and .s
+plus:
+-std=gnu++11 -fabi-version=0 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics 
+
+-I"C:\git\libarmpit\examples\AD9850\src" -I"C:\git\libarmpit\lib\util\displays" 
+-I"C:\git\libarmpit\lib\mcortex_core" -I"C:\git\libarmpit\lib" -I"C:\git\libarmpit\lib\mcortex_core\armv7m" 
+-I"C:\git\libarmpit\lib\stm32_common" -I"C:\git\libarmpit\lib\stm32f10x\lib" 
+
+================================================================
+linker
+
+arm-none-eabi-g++ 
+
+same as .c and .s
+plus:
+
+-T stm32.ld 
+-Xlinker --gc-sections 
+-L../ldscripts 
+-Wl,-Map,"AD9850_f103.map" 
+--specs=nano.specs 
+-o "AD9850_f103.elf" 
+-lm  (math lib, optional)
+
+./system/startup_stm32f10x_md.o ...
+
+
+================================================================
+generate hex:
+
+arm-none-eabi-objcopy -O ihex "AD9850_f103.elf"  "AD9850_f103.hex"
+
+================================================================
+size:
+
+arm-none-eabi-size --format=berkeley "AD9850_f103.elf"
+
+================================================================
+
+
