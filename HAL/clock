@@ -1,0 +1,108 @@
+HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
+
+
+LL_RCC_GetSystemClocksFreq(LL_RCC_ClocksTypeDef *RCC_Clocks);
+
+typedef struct
+{
+  uint32_t SYSCLK_Frequency;        /*!< SYSCLK clock frequency */
+  uint32_t HCLK_Frequency;          /*!< HCLK clock frequency */
+  uint32_t PCLK1_Frequency;         /*!< PCLK1 clock frequency */
+  uint32_t PCLK2_Frequency;         /*!< PCLK2 clock frequency */
+} LL_RCC_ClocksTypeDef;
+
+
+LL_RCC_ClocksTypeDef rcc_clocks;
+LL_RCC_GetSystemClocksFreq(&rcc_clocks);
+
+
+void LL_RCC_GetSystemClocksFreq(LL_RCC_ClocksTypeDef *RCC_Clocks)
+{
+  RCC_Clocks->SYSCLK_Frequency = RCC_GetSystemClockFreq();
+  RCC_Clocks->HCLK_Frequency   = RCC_GetHCLKClockFreq(RCC_Clocks->SYSCLK_Frequency);
+  RCC_Clocks->PCLK1_Frequency  = RCC_GetPCLK1ClockFreq(RCC_Clocks->HCLK_Frequency);
+  RCC_Clocks->PCLK2_Frequency  = RCC_GetPCLK2ClockFreq(RCC_Clocks->HCLK_Frequency);
+}
+
+
+============================================================================
+
+timer clock: 
+
+
+LL_RCC_ClocksTypeDef rcc_clocks;
+LL_RCC_GetSystemClocksFreq(&rcc_clocks);
+
+
+PCLK1_Frequency (TIM2-TIM7) or PCLK2_Frequency (TIM1)
+
+times 1 if APB{1,2}Prescaler > 1 
+times 2 if APB{1,2}Prescaler = 2
+
+uint32_t LL_RCC_GetAPB1Prescaler(void)
+
+result: LL_RCC_APB1_DIV_1{2,4,8,16}
+
+uint32_t presc;
+uint32_t freq;
+
+if ((uint32_t)TIM2 >= APB2PERIPH_BASE)
+{
+  presc = LL_RCC_GetAPB2Prescaler(void);
+  freq = RCC_Clocks->PCLK2_Frequency;
+}
+else {
+  presc = LL_RCC_GetAPB1Prescaler(void);
+  freq = RCC_Clocks->PCLK1_Frequency;
+}
+
+if (pres == LL_RCC_APB1_DIV_1) 
+{
+  freq *= 2;
+} 
+
+return freq;
+
+====================================================
+
+
+
+
+
+
+uint32_t LL_RCC_GetADCClockFreq(uint32_t ADCxSource)
+{
+  uint32_t adc_prescaler = 0U;
+  uint32_t adc_frequency = 0U;
+
+  /* Get ADC prescaler */
+  adc_prescaler = LL_RCC_GetADCClockSource(ADCxSource);
+
+  /* ADC frequency = PCLK2 frequency / ADC prescaler (2, 4, 6 or 8) */
+  adc_frequency = RCC_GetPCLK2ClockFreq(RCC_GetHCLKClockFreq(RCC_GetSystemClockFreq()))
+                  / (((adc_prescaler >> POSITION_VAL(ADCxSource)) + 1U) * 2U);
+
+  return adc_frequency;
+}
+
+
+
+
+SYSCLK: system clock after HSI,HSE,PLL    F1: 72MHz max
+
+SYSCLK-> divided by AHB prescaler (2-512)  ->  HCLK  (to AHB bus, core memory, and DMA)
+
+HCLK -> divided by APB1 prescaler (1-16)  ->   PCLK1 to APB1 peripherals  F1: 36MHz max
+     -> divided by APB2 prescaler (1-16)  ->   PCLK2 to APB2 peripherals  F1: 72MHz max
+
+HCLK / 8 -> SysTick timer 
+
+PCLK1 ->  (if APB1 pres == 1 x1, else x2) -> TIMxCLK  (TIM2-7) 
+
+PCLK2 ->  (if APB1 pres == 1 x1, else x2) -> TIMxCLK  (TIM2-7) 
+ 
+
+PCLK2 -> ADC prescaler 2/4/6/8 -> ADCCLK  F1: 14MHz max 
+
+
+ 

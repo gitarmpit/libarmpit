@@ -1,0 +1,15 @@
+https://github.com/STMicroelectronics/STM32CubeF1
+
+drivers are included as a submodule. otherwise C:\git\STM32CubeF1\Drivers\STM32F1xx_HAL_Driver is empty
+
+either:
+git submodule update --init --recursive
+
+
+or clone separately:
+
+https://github.com/STMicroelectronics/stm32f1xx_hal_driver
+
+then copy and rename to C:\git\STM32CubeF1\Drivers\STM32F1xx_HAL_Driver
+
+

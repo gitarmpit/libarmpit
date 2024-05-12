@@ -1,0 +1,33 @@
+TIM3
+__HAL_RCC_TIM3_CLK_ENABLE()
+
+extern TIM_HandleTypeDef    TimHandle;
+
+
+
+
+
+16-bit auto-reload counter driven by a programmable prescaler.
+
+
+Prescaler divides counter clock frequency 
+TIMx_PSC
+
+Auto-reload register (TIMx_ARR)
+
+Repetition counter register (TIMx_RCR)
+
+
+///////////////////////////////////////
+//  PWM needs this for TIM1
+LL:
+
+__STATIC_INLINE void LL_TIM_EnableAllOutputs(TIM_TypeDef *TIMx)
+{
+  SET_BIT(TIMx->BDTR, TIM_BDTR_MOE);
+}
+
+HAL:
+#define __HAL_TIM_MOE_ENABLE(__HANDLE__)             ((__HANDLE__)->Instance->BDTR|=(TIM_BDTR_MOE))
+
+
