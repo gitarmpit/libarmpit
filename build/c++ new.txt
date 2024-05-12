@@ -1,0 +1,58 @@
+Eclipse: 
+
+if using C++ new operator:
+
+add --specs=nosys.specs  ("Do not use syscalls") 
+
+in addition to the default nano.specs 
+
+(otherwise: undefined reference to `_exit'  _kill _getpid) 
+
+or use  nano + --specs=rdimon.specs (for example if also using semihosting)
+
+=========================
+other C++ stuff:  
+
+libarmpit\lib\__gnu_stubs.c
+
+//C++ stubs. Required to be able to build C++ code using gcc instead of g++ and without linking with libstdc++
+//C++ limitations: no rtti, no exceptions: -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics
+
+void __cxa_pure_virtual() { while (1); } 
+
+=============
+also need to implement _sbrk  if SEMIHOSTING is not defined (librdimon implements _sbrk, libnano does not)
+question: do we need to ifdef it or should always keep _sbrk, since there seems to be no conflict last time i checked with rdimon
+
+=============
+
+new.h:   (not used) : now use g++ to compile c++ code, and that doesnt increase the size as long as libstdc++ is not linked
+
+inline void* operator new  (size_t n) {return ::malloc(n);}
+
+==============================================
+
+-Xlinker --gc-sections   :  makes code smaller
+
+===============================
+linker:
+arm-none-eabi-g++ -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -O0 -fmessage-length=0 -fsigned-char -ffunction-sections \
+                  -fdata-sections -ffreestanding -flto -Wall -Wextra  -g3 -T stm32.ld -Xlinker --gc-sections \
+                  -L../ldscripts -Wl,-Map,"932x_f103.map" --specs=nano.specs --specs=nosys.specs -o "932x_f103.elf"  \
+                  *.o ....
+                  -lm
+
+C code:
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -O0 -fmessage-length=0 -fsigned-char -ffunction-sections \
+                 -fdata-sections -ffreestanding -flto -Wall -Wextra  -g3 -DUSE_ADC -DSTM32F10X_MD -DHSE_VALUE=8000000 \
+                 -I "..." \
+                 -std=gnu11 -MMD -MP -MF"lib/ee_printf.d" -MT"lib/ee_printf.o" -c -o "lib/ee_printf.o" \
+                 "C:/TMP/git/libarmpit/lib/ee_printf.c" 
+
+C++ code:
+arm-none-eabi-g++ -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -O0 -fmessage-length=0 -fsigned-char -ffunction-sections \
+                -fdata-sections -ffreestanding -flto -Wall -Wextra  -g3 -DUSE_ADC -DTIMER_INTERRUPTS_OFF -DSTM32F10X_MD -DHSE_VALUE=8000000 \
+                -I "..."  \
+                -std=gnu++11 -fabi-version=0 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics \
+                -MMD -MP -MF"lib/stm32_common/peripheral.d" -MT"lib/stm32_common/peripheral.o" -c -o "lib/stm32_common/peripheral.o" \
+                "C:/TMP/git/libarmpit/lib/stm32_common/peripheral.cpp"
