@@ -42,6 +42,8 @@ __attribute__ ((used))
 
 // stubs 
 
+#ifndef SEMIHOSTING
+
 int _close(int file) {
   return -1;
 }
@@ -67,6 +69,7 @@ int _write(int file, char *ptr, int len) {
   return 0;
 }
 
+#endif
 
 
 #endif
