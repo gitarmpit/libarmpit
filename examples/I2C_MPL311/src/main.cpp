@@ -34,7 +34,7 @@ static void test_pressure()
     {
         tpa = 0.;
 
-        for (uint i = 0; i < 1; ++i)
+        for (uint8_t i = 0; i < 1; ++i)
         {
             pa = mpl311.GetPressureAltitude();
             tpa += pa;

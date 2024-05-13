@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>MPL311_F103</name>
+	<name>MPL311_f103</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -26,20 +26,20 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src/lib</name>
+			<name>lib</name>
 			<type>2</type>
-			<locationURI>ARMPIT_ROOT/lib</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/lib</locationURI>
 		</link>
 		<link>
-			<name>src/src</name>
+			<name>src</name>
 			<type>2</type>
-			<locationURI>ARMPIT_ROOT/examples/I2C_MPL311/src</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/src</locationURI>
 		</link>
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>0</id>
-			<name>src/lib</name>
+			<id>1494010886217</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -47,8 +47,8 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>0</id>
-			<name>src/lib</name>
+			<id>1494010886222</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -56,8 +56,8 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>0</id>
-			<name>src/lib</name>
+			<id>1494010886227</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -66,7 +66,7 @@
 		</filter>
 		<filter>
 			<id>0</id>
-			<name>src/lib/mcortex_core</name>
+			<name>lib/mcortex_core</name>
 			<type>10</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -75,7 +75,7 @@
 		</filter>
 		<filter>
 			<id>0</id>
-			<name>src/lib/stm32f10x</name>
+			<name>lib/stm32f10x</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -83,10 +83,4 @@
 			</matcher>
 		</filter>
 	</filteredResources>
-	<variableList>
-		<variable>
-			<name>ARMPIT_ROOT</name>
-			<value>file:/c:/tmp/github/libarmpit-cortex/src</value>
-		</variable>
-	</variableList>
 </projectDescription>
