@@ -1,3 +1,4 @@
+#if 0
 /**************************************************************************/
 /*! 
     @file     MCP47X6.cpp
@@ -148,3 +149,4 @@ bool MCP47X6::writeConfigReg(uint8_t theConfig) {
   Wire.write(theConfig | MCP47X6_CMD_VOLCONFIG);
   return (Wire.endTransmission() == 0);
 }
+#endif

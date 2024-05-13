@@ -836,69 +836,69 @@ TIMER* TIMER::Get_Instance(TIMER_Number timer_no)
 {
     switch (timer_no)
     {
-        case TIM1:
+        case TIMER1:
             return TIM1::GetInstance();
-        case TIM2:
+        case TIMER2:
             return TIM2::GetInstance();
-        case TIM3:
+        case TIMER3:
             return TIM3::GetInstance();
 
 #if !defined(STM32F10X_LD) && !defined(STM32F10X_LD_VL)
-        case TIM4:
+        case TIMER4:
             return TIM4::GetInstance();
 #endif
 #if defined(STM32F4) || defined(STM32F2) || defined(STM32F10X_HD) || defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
-        case TIM5:
+        case TIMER5:
             return TIM5::GetInstance();
 #endif
 
 #if defined(VALUE_LINE) || defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL) \
 || defined(STM32F2) || defined(STM32F4) \
 && (!defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-        case TIM6:
+        case TIMER6:
             return TIM6::GetInstance();
-        case TIM7:
+        case TIMER7:
             return TIM7::GetInstance();
 #endif
 
 #if (defined(STM32F10X_XL) || defined(STM32F10X_HD) || defined(STM32F2) || defined(STM32F4)) \
 && (!defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-        case TIM8:
+        case TIMER8:
             return TIM8::GetInstance();
 #endif
 
 #if defined(STM32F2) || defined(STM32F4) || defined(STM32F10X_XL)
-            case TIM9:
+            case TIMER9:
             return TIM9::GetInstance();
-        case TIM10:
+        case TIMER10:
             return TIM10::GetInstance();
-        case TIM11:
+        case TIMER11:
             return TIM11::GetInstance();
 #endif
 
 #if (defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F2) || defined(STM32F4) \
 && !defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-        case TIM12:
+        case TIMER12:
             return TIM12::GetInstance();
-        case TIM13:
+        case TIMER13:
             return TIM13::GetInstance();
-        case TIM14:
+        case TIMER14:
             return TIM14::GetInstance();
 #endif
 
 #if defined(VALUE_LINE)
-        case TIM15:
+        case TIMER15:
             return TIM15::GetInstance();
-        case TIM16:
+        case TIMER16:
             return TIM16::GetInstance();
-        case TIM17:
+        case TIMER17:
             return TIM17::GetInstance();
 #endif
 
 #if defined(STM32L0)
-        case TIM21:
+        case TIMER21:
             return TIM21::GetInstance();
-        case TIM22:
+        case TIMER22:
             return TIM22::GetInstance();
 #endif
     };

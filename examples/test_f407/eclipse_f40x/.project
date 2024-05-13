@@ -31,7 +31,7 @@
 			<locationURI>PARENT-1-PROJECT_LOC/src</locationURI>
 		</link>
 		<link>
-			<name>src/lib</name>
+			<name>lib</name>
 			<type>2</type>
 			<locationURI>PARENT-3-PROJECT_LOC/lib</locationURI>
 		</link>
@@ -39,7 +39,7 @@
 	<filteredResources>
 		<filter>
 			<id>0</id>
-			<name>src/lib</name>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -48,7 +48,7 @@
 		</filter>
 		<filter>
 			<id>0</id>
-			<name>src/lib</name>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -57,7 +57,7 @@
 		</filter>
 		<filter>
 			<id>0</id>
-			<name>src/lib</name>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -66,7 +66,7 @@
 		</filter>
 		<filter>
 			<id>0</id>
-			<name>src/lib/mcortex_core</name>
+			<name>lib/mcortex_core</name>
 			<type>10</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -75,7 +75,7 @@
 		</filter>
 		<filter>
 			<id>0</id>
-			<name>src/lib/stm32f4xx</name>
+			<name>lib/stm32f4xx</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>

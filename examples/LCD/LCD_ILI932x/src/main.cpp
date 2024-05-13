@@ -1,13 +1,15 @@
+#include <RCC_Helper.h>
+#include "debug.h"
 #include <gpio.h>
 #include <gpio_cpp.h>
 #include <rcc.h>
-#include <RCC_Helper.h>
 #include <stdint-gcc.h>
 #include <stdlib.h>
 #include <string.h>
-#include "debug.h"
-#include "932x/ILI932x.h"
 #include "systick.h"
+
+#include "932x/ILI932x.h"
+
 #include "consola24.h"  //xmax=24 ymax=8
 //#include "cour20.h"
 #include "lucon22.h"   //24 x 10
@@ -35,7 +37,6 @@ static void systick_cfg() {
 
 static GPIO_PORT* _dataPort;
 static GPIO_PIN *cs, *rs, *rd, *wr, *rst;
-
 
 //f103, f407 directly to pins, no socket
 static void initGPIO()
@@ -69,7 +70,6 @@ static void initGPIO()
     rd->SetSpeedHigh();
 
     delay(500);
-
 }
 
 //411 board with pin header
@@ -132,6 +132,7 @@ static void test_flood() {
     //f103 86fps (same color), 60fps 2 bytes different
     //f407 240Mhz (4 nops): 182fps (2 bytes different), 182: 2 bytes same
 }
+
 
 static void test_drawPixel() {
 
@@ -331,6 +332,9 @@ static void testPushColors_quick()
     //f103: release:  33.3 fps
 }
 
+
+
+
 #if defined (USE_ASM)
 
 void testPushColors2()
@@ -381,6 +385,7 @@ void testPushColors2()
     //f103: release:  40 fps
 }
 #endif
+
 
 /*
 static void testPushColorsAsm()
@@ -448,7 +453,10 @@ static void test() {
 
 }
 
+/*
 static void test2() {
+
+	//for new(), add --specs=nosys.specs  ("Do not use syscalls")
 
     ILI932x* lcd =  new ILI932x(cs, rs, wr, rd, rst, _dataPort);
     lcd->init();
@@ -464,6 +472,7 @@ static void test2() {
       ;
 
 }
+*/
 
 static void test_font() {
     ILI932x lcd(cs, rs, wr, rd, rst, _dataPort);
@@ -496,6 +505,8 @@ static void test_font() {
 
 }
 
+
+
 #if 0
 extern "C" void initialise_monitor_handles(void);
 #include <stdio.h>
@@ -518,6 +529,7 @@ static void test_semihosting()
     }
 }
 #endif
+
 
 #ifdef STM32F1
 static void initF1()
@@ -590,11 +602,13 @@ int main() {
 	initF407();
 #endif
     Debug_EnableCYCCNT(true);
-    // initGPIO();
-    initGPIO_411();
+    initGPIO();
+    //initGPIO_411();
     //testPushColors();
-    testPushColors_quick();
+    //testPushColors_quick();
     //test_flood();
     //test_font();
     //test_drawPixel();
+    while(1)
+    	;
 }

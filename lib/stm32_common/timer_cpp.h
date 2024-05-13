@@ -256,52 +256,52 @@ public:
 
 enum TIMER_Number
 {
-    TIM1,
-    TIM2,
-    TIM3,
+    TIMER1,
+    TIMER2,
+    TIMER3,
 #if !defined(STM32F10X_LD) && !defined(STM32F10X_LD_VL)
-    TIM4,
+    TIMER4,
 #endif
 
 #if defined(STM32F4) || defined(STM32F2) || defined(STM32F10X_HD) || defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F10X_CL)
-    TIM5,
+    TIMER5,
 #endif
 
 #if defined(VALUE_LINE) || defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL) \
 || defined(STM32F2) || defined(STM32F4) \
 && (!defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-    TIM6,
-    TIM7,
+    TIMER6,
+    TIMER7,
 #endif
 
 #if (defined(STM32F10X_XL) || defined(STM32F10X_HD) || defined(STM32F2) || defined(STM32F4)) \
 && (!defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-    TIM8,
+    TIMER8,
 #endif
 
 #if defined(STM32F2) || defined(STM32F4) || defined(STM32F10X_XL)
-    TIM9,
-    TIM10,
-    TIM11,
+    TIMER9,
+    TIMER10,
+    TIMER11,
 #endif
 
 
 #if (defined(STM32F10X_HD_VL) || defined(STM32F10X_XL) || defined(STM32F2) || defined(STM32F4) \
 && !defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
-    TIM12,
-    TIM13,
-    TIM14,
+    TIMER12,
+    TIMER13,
+    TIMER14,
 #endif
 
 #if defined(VALUE_LINE)
-    TIM15,
-    TIM16,
-    TIM17,
+    TIMER15,
+    TIMER16,
+    TIMER17,
 #endif
 
 #if defined(STM32L0)
-    TIM21,
-    TIM22
+    TIMER21,
+    TIMER22
 #endif
 
 } ;

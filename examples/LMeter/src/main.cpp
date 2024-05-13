@@ -5,13 +5,13 @@
 #include "9341/Adafruit_ILI9341.h"
 #include "debug.h"
 #include "system_time.h"
-#include "Fonts2/7seg_4.h"
-#include "Fonts2/consola18.h"
+//#include "Fonts2/7seg_4.h"
+//#include "Fonts2/consola18.h"
 //#include "rote-gefahr-320x222.cpp"
 #include "himalaya60.h"
 #include <stdio.h>      /* printf */
 #include <stdarg.h>
-#include "Fonts2/FreeMono18pt7b.h"
+//#include "Fonts2/FreeMono18pt7b.h"
 
 #if 0
 static void speed_test(Adafruit_ILI9341* display)
@@ -181,7 +181,7 @@ void test()
 
     // display.setFont(&DSEG7ModernMini_BoldItalic_ttf);
     //display.setFont(&consola_ttf);
-    display.setFont(&FreeMono18pt7b);
+    //display.setFont(&FreeMono18pt7b);
     //display.setCursor(0, 0);
     display.printf(1,1, "test3: %d", 123);
     display.printf(1,2, "ABC: %d", 012345);

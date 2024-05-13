@@ -1,4 +1,4 @@
-#include "button_handler/button_handler.h"
+#include "button_handler.h"
 
 #define LEFT_BUTTON 1 
 #define RIGHT_BUTTON 2

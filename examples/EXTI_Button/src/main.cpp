@@ -1,7 +1,8 @@
-#include "exti.h"
+#include "exti_cpp.h"
 #include "afio.h"
 #include "gpio_cpp.h"
-#include "rcc_cpp.h"
+#include "RCC_Helper.h"
+#include "debug.h"
 
 class EXTI15_Handler: public EXTI_IRQ_Handler
 {
@@ -11,7 +12,7 @@ public:
     {
         exti->EnableInterruptFallingEdge(false);
         GPIOB::GetInstance()->TogglePin(GPIO_PIN12);
-        RCC::GetInstance()->Delay_ms(100);
+        delay(100);
         exti->EnableInterruptFallingEdge(true);
     }
 };
@@ -23,10 +24,10 @@ static void exti_button_test()
     GPIOB::GetInstance()->SetupGPIO_OutPP(GPIO_PIN12);
 
     //button on pin28
-    GPIOB::GetInstance()->SetupGPIO_InPUPD(GPIO_PIN15);
+    GPIOB::GetInstance()->SetupGPIO_InPullUp(GPIO_PIN15);
     GPIOB::GetInstance()->SetPin(GPIO_PIN15);
 
-    RCC::GetInstance()->EnableAFIO(true);
+    RCC_EnableAFIO(TRUE);
     
     //Remap LINE15 to PB15 : pin28
     AFIO_RemapEXTI(EXTI_LINE15, PORTB);
@@ -44,12 +45,8 @@ static void exti_button_test()
 
 int main()
 {
-    RCC* rcc = RCC::GetInstance();
-    rcc->SetAHBPrescalerDiv4();
-    rcc->SetAPB1PrescalerDiv1();
-    rcc->SetAPB2PrescalerDiv1();
-    rcc->SetADCPrescalerDiv2();
-    rcc->EnableHSI(3);
+    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+    Debug_EnableCYCCNT(TRUE);
 
     exti_button_test();
 }

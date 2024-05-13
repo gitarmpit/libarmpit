@@ -3,7 +3,7 @@
 #include "RCC_helper.h"
 #include "GPIO_Helper.h"
 #include "_pins.h"
-#include "button_handler/button_handler.h"
+#include "button_handler.h"
 #include "debug.h"
 
 //#include "led_pwm.h"

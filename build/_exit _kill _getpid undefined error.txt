@@ -1,3 +1,6 @@
+This should happened anymore.  I added all three stubs.
+
+
 (.text.abort+0xa): undefined reference to `_exit'
 (.text._kill_r+0xe): undefined reference to `_kill'
 (.text._getpid_r+0x0): undefined reference to `_getpid'

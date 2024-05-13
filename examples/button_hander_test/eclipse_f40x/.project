@@ -26,25 +26,20 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src</name>
-			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src</locationURI>
-		</link>
-		<link>
-			<name>src/lib</name>
+			<name>lib</name>
 			<type>2</type>
 			<locationURI>PARENT-3-PROJECT_LOC/lib</locationURI>
 		</link>
 		<link>
-			<name>src/util</name>
+			<name>src</name>
 			<type>2</type>
-			<locationURI>PARENT-3-PROJECT_LOC/lib/util</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/src</locationURI>
 		</link>
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>0</id>
-			<name>src/lib</name>
+			<id>1715565665698</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -52,8 +47,8 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>0</id>
-			<name>src/lib</name>
+			<id>1715565665731</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -61,8 +56,8 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>0</id>
-			<name>src/lib</name>
+			<id>1715565665754</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -70,17 +65,17 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1477344765698</id>
-			<name>src/util</name>
+			<id>1715565665781</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-button_handler</arguments>
+				<arguments>1.0-name-matches-false-false-util</arguments>
 			</matcher>
 		</filter>
 		<filter>
 			<id>0</id>
-			<name>src/lib/mcortex_core</name>
+			<name>lib/mcortex_core</name>
 			<type>10</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -89,11 +84,20 @@
 		</filter>
 		<filter>
 			<id>0</id>
-			<name>src/lib/stm32f4xx</name>
+			<name>lib/stm32f4xx</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-name-matches-false-false-lib</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1715565824607</id>
+			<name>lib/util</name>
+			<type>9</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-button_handler</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>

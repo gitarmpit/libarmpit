@@ -1,12 +1,14 @@
-#include "exti.h"
+#include "exti_cpp.h"
 #include "afio.h"
 #include "gpio_cpp.h"
+#include "RCC_Helper.h"
 #include "timer_cpp.h"
 
 static void generatePWM()
 {
     GPIOA::GetInstance()->EnablePeripheralClock(true);
     GPIOA::GetInstance()->SetupGPIO_OutAltPP(GPIO_PIN0);
+
     TIM2* timer2 = TIM2::GetInstance();
     timer2->EnablePeripheralClock(true);
     TIMER_Channel* ch1 = timer2->GetChannel(1);
@@ -37,7 +39,7 @@ static void exti_input_pwm_test()
     //Connect pin10 to the EXTI input on pin28
     generatePWM();
 
-    RCC::GetInstance()->EnableAFIO(true);
+    RCC_EnableAFIO(TRUE);
     
     //Remap LINE15 to PB15 : pin28
     AFIO_RemapEXTI(EXTI_LINE15, PORTB);
@@ -56,12 +58,7 @@ static void exti_input_pwm_test()
 
 int main()
 {
-    RCC* rcc = RCC::GetInstance();
-    rcc->SetAHBPrescalerDiv4();
-    rcc->SetAPB1PrescalerDiv1();
-    rcc->SetAPB2PrescalerDiv1();
-    rcc->SetADCPrescalerDiv2();
-    rcc->EnableHSI(3);
+    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
 
     exti_input_pwm_test();
 }
