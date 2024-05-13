@@ -1,0 +1,13 @@
+(.text.abort+0xa): undefined reference to `_exit'
+(.text._kill_r+0xe): undefined reference to `_kill'
+(.text._getpid_r+0x0): undefined reference to `_getpid'
+
+either new operator was used, or varags (ex. printf in LCD) 
+
+add --specs=nosys.specs  ("Do not use syscalls") 
+
+in addition to the default nano.specs 
+
+(otherwise: undefined reference to `_exit'  _kill _getpid) 
+
+or use  nano + --specs=rdimon.specs (for example if also using semihosting)
