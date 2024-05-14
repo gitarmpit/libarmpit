@@ -51,32 +51,9 @@ static void test()
 int main()
 {
 #if defined (STM32F1)   
-    RCC_EnableHSI(TRUE);
-    //RCC_EnableHSI_72Mhz_AHB_72Mhz_APB1_36MHz_APB2_72MHz();
+    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
 #else
-
-    //RCC_EnableHSI_100Mhz();
-    //RCC_SetAHBPrescalerDiv2();
-
-    FLASH_EnableDCache(TRUE);
-    FLASH_EnableICache(TRUE);
-    FLASH_EnablePrefetchBuffer(TRUE);
-
-    FLASH_SetWaitState(3);
-
-    RCC_EnableHSI(TRUE);
-    uint8_t pllm = 8;
-    uint16_t plln = 200;
-    uint16_t pllp = 4;
-    RCC_EnablePLL(pllm, plln, pllp);
-
-    RCC_SetAHBPrescalerDiv2();
-
-    //RCC_SetAPB1PrescalerDiv16();
-
-    volatile uint32_t c1 = RCC_GetAPB1_CLK();
-    volatile uint32_t c2 = RCC_GetAPB2_CLK();
-
+    RCC_EnableHSI_168Mhz();
 #endif  
 
     test();

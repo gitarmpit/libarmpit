@@ -6,8 +6,6 @@
 
 SPI* spi_master;
 
-
-
 class Update_Handler: public TIMER_Interrupt_Handler
 {
 public:

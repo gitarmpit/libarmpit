@@ -356,7 +356,9 @@ static void run3()
 
     while (1)
     {
+#ifdef STM32F1
         adc1->ClearSequence();
+#endif
         adc1->AddConversion (ADC_IN3, ADC_SMP_SLOW);
       	++total;
 
@@ -369,7 +371,9 @@ static void run3()
 
       	val /= 32;
 
+#ifdef STM32F1
         adc1->ClearSequence();
+#endif
         adc1->AddConversion (ADC_IN4, ADC_SMP_SLOW);
 
       	val2 = 0;

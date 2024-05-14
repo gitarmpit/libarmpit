@@ -71,7 +71,9 @@ void TwoADCs2() {
 	int period0 = 0, period;
 
 	while (1) {
-		adc1->ClearSequence();
+#ifdef STM32F1
+        adc1->ClearSequence();
+#endif
 		adc1->AddConversion(ADC_IN3, ADC_SMP_SLOW);
 
 		val = 0;
@@ -81,7 +83,9 @@ void TwoADCs2() {
 
 		val /= 32;
 
-		adc1->ClearSequence();
+#ifdef STM32F1
+        adc1->ClearSequence();
+#endif
 		adc1->AddConversion(ADC_IN4, ADC_SMP_SLOW);
 
 		val2 = 0;
