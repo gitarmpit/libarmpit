@@ -101,7 +101,6 @@ void TIM5_IRQHandler(void)
 }
 #endif
 
-
 #if defined(STM32F2) || \
 (defined(STM32F4) && !defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE)) ||\
 defined(VALUE_LINE)
@@ -114,16 +113,13 @@ void TIM6_DAC_IRQHandler(void)
 }
 #endif
 
-#if (defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL)) || defined(STM32F4)
+#if defined(VALUE_LINE) || defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL) \
+|| defined(STM32F2) || defined(STM32F4) \
+&& (!defined(STM32F401xC)  && !defined(STM32F401xE) && !defined(STM32F401xx) && !defined(STM32F411xE))
 void TIM6_IRQHandler(void)
 {
     TIM6::GetInstance()->HandleInterrupt();
 }
-#endif
-
-#if (defined(STM32F10X_HD)  || defined(STM32F10X_XL) || defined(STM32F10X_CL)) || defined(STM32F4) ||\
-defined(VALUE_LINE)
-
 void TIM7_IRQHandler(void)
 {
     TIM7::GetInstance()->HandleInterrupt();
