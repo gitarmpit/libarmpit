@@ -1,0 +1,5 @@
+#ifdef'ed definitions could not be resolved and red lines 
+
+Rebuild the index:
+
+Project -> C++ Index -> Rebuild 
