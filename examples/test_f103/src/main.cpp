@@ -18,10 +18,23 @@ static void setup_ADC(ADC_IRQ_Handler* adcHandler)
     adc1->StartContinuousConversion();
 }
 
+static void test_blinky()
+{
+    GPIO_PIN* led = GPIO_Helper::GetPin("B8");
+    led->SetupGPIO_OutPP();
+
+    while(1)
+    {
+        led->Toggle();
+        delay(1000);
+    }
+}
+
 int main()
 {
     RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
     Debug_EnableCYCCNT(TRUE);
+    test_blinky();
     while(1)
       ;
 }

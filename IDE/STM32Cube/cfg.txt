@@ -1,0 +1,1 @@
+STM32Cube -> Default GDB Server -> SEGGER

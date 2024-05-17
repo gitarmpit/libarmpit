@@ -1,0 +1,3 @@
+Preferences -> STM32Cube -> Toolchain Manager 
+
+The default is STM32 built-in gcc 

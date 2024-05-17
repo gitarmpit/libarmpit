@@ -1,0 +1,2 @@
+
+It's in Project Manager -> Advanced Settings -> Driver Selector. Change from HAL to LL on the ones you want.
