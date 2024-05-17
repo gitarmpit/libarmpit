@@ -3,7 +3,7 @@
 
 #define MOTOR_TIMER            TIM1_PA_8_9_10_11
 
-#define PWM_CAPTURE_TIMER  TIM6
+#define PWM_CAPTURE_TIMER  TIMER6
 
 #define PWM_INPUT_ROLL       "D2"
 #define PWM_INPUT_PITCH      "D3"
@@ -11,7 +11,7 @@
 
 //RGB LED
 #define LED_R_PIN            "E5"
-#define LED_R_TIM            TIM9
+#define LED_R_TIM            TIMER9
 #define LED_R_CH             1
 //#define LED_R_AF             AF3
 
@@ -39,12 +39,12 @@
 #define RADIO_SS_PIN      "a0"
 
 #define BUZZER_PIN       "B15"
-#define BUZZER_TIMER     TIM12
+#define BUZZER_TIMER     TIMER12
 #define BUZZER_TIMER_CHANNEL 2
 
 #define BUZZER_TIMER_AF   AF9
 
-#define BUTTON_TIMER     TIM7
+#define BUTTON_TIMER     TIMER7
 #define BUTTON_UP        "D6"
 #define BUTTON_DOWN		 "D7"
 

@@ -1,0 +1,8 @@
+HAL_PPP_Init()  calls  HAP_PPP_MspInit()
+
+HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef* hadc)
+{
+
+   HAL_ADC_MspInit(hadc); // defined in user code
+
+}

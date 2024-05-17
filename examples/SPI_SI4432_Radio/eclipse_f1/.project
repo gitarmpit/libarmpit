@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>SI4432_f1</name>
+	<name>Radio_SI4432_f1</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -26,20 +26,20 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src/lib</name>
+			<name>lib</name>
 			<type>2</type>
-			<locationURI>ARMPIT_ROOT/lib</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/lib</locationURI>
 		</link>
 		<link>
-			<name>src/src</name>
+			<name>src</name>
 			<type>2</type>
-			<locationURI>ARMPIT_ROOT/examples/SPI_SI4432_Radio/src</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/src</locationURI>
 		</link>
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>1465606303275</id>
-			<name>src/lib</name>
+			<id>1494010886217</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -47,8 +47,8 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1465606303291</id>
-			<name>src/lib</name>
+			<id>1494010886222</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -56,8 +56,8 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1465606303306</id>
-			<name>src/lib</name>
+			<id>1494010886227</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -65,8 +65,8 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1465606303306</id>
-			<name>src/lib</name>
+			<id>1494010886232</id>
+			<name>lib</name>
 			<type>9</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
@@ -74,19 +74,31 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1465606104196</id>
-			<name>src/lib/mcortex_core</name>
-			<type>13</type>
+			<id>0</id>
+			<name>lib/mcortex_core</name>
+			<type>10</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-name-matches-false-false-armv7m</arguments>
+				<arguments>1.0-name-matches-false-false-armv6m</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>0</id>
+			<name>lib/stm32f10x</name>
+			<type>9</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-lib</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1715648308023</id>
+			<name>lib/util</name>
+			<type>9</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-RF22</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>
-	<variableList>
-		<variable>
-			<name>ARMPIT_ROOT</name>
-			<value>file:/c:/tmp/github/libarmpit-cortex/src</value>
-		</variable>
-	</variableList>
 </projectDescription>

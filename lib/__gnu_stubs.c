@@ -19,7 +19,6 @@ void __cxa_pure_virtual() { while (1); }
 /*This function is used for handle heap option*/
 extern int  _end;
 
-//#ifndef SEMIHOSTING
 
 __attribute__ ((used))
  caddr_t _sbrk ( int incr )
@@ -37,10 +36,11 @@ __attribute__ ((used))
     return (caddr_t) prev_heap;
 }
 
-//#endif
 
 
 // stubs 
+
+#ifndef SEMIHOSTING
 
 int _close(int file) {
   return -1;
@@ -66,6 +66,24 @@ int _read(int file, char *ptr, int len) {
 int _write(int file, char *ptr, int len) {
   return 0;
 }
+
+int _getpid(void)
+{
+	return 1;
+}
+
+int _kill(int pid, int sig)
+{
+	return -1;
+}
+
+void _exit (int status)
+{
+	_kill(status, -1);
+	while (1) {}		/* Make sure we hang here */
+}
+
+#endif
 
 
 

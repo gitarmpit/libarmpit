@@ -41,8 +41,9 @@
                           //23-24 ok-ish, same size as the default font but not kind ugly
                           //27,31,35,38 ok
 
-#include "fnt/dos12.h"
-#include "fnt/term12.h"
+//#include "fnt/dos12.h"
+//#include "fnt/term12.h"
+#include "ttf/consola12.h"
 
 static void test_display()
 {
@@ -75,13 +76,12 @@ static void test_display()
     lcd.display();
     //lcd.setRotation(2); //upside down
     lcd.setTextColor(1, 0);
-    lcd.setFont(&dos12);
+    lcd.setFont(&consola12);
     lcd.printf("ABC0123456789\n");
-    lcd.setFont(&term12);
-    lcd.printf("ABC0123456789\n");
+#if 0
 
     lcd.display();
-
+#endif
 
     //lcd.printf ("1'234'567\n");
     //lcd.setFont(&ARLRDBD47_40);
@@ -351,6 +351,12 @@ public:
 //}
 //
 
+#ifdef SEMIHOSTING
+
+extern "C" void initialise_monitor_handles(void);
+
+#endif
+
 int main()
 {
 #if defined(STM32F1)
@@ -363,6 +369,10 @@ int main()
     RCC_EnableHSI_84Mhz();
 #endif
 
+#ifdef SEMIHOSTING
+    initialise_monitor_handles();
+    printf ("test semihosting\n");
+ #endif
     test_display();
 }
 

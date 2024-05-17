@@ -86,7 +86,7 @@ extern "C" void initialise_monitor_handles(void);
 
 int main()
 {
-    RCC_EnableHSI_64Mhz();
+    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
     //RCC_EnableHSI_24Mhz();
     //RCC_EnableHSI(true);
     RCC_SetAHBPrescalerDiv2();

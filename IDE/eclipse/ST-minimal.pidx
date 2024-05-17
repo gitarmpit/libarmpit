@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<index schemaVersion="1.1.0" xs:noNamespaceSchemaLocation="PackIndex.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
+<vendor>Keil</vendor>
+<url>https://www.keil.com/pack/</url>
+<timestamp>2024-05-11T04:02:16.9299527+00:00</timestamp>
+<pindex>
+  <pdsc url="https://www.keil.com/pack/" vendor="Keil" name="STM32F1xx_DFP" version="2.4.1" />
+  <pdsc url="https://www.keil.com/pack/" vendor="Keil" name="STM32F3xx_DFP" version="2.2.2" />
+  <pdsc url="https://www.keil.com/pack/" vendor="Keil" name="STM32F2xx_DFP" version="2.11.0" />
+  <pdsc url="https://www.keil.com/pack/" vendor="Keil" name="STM32F4xx_DFP" version="2.17.1" />
+  <pdsc url="https://www.keil.com/pack/" vendor="Keil" name="STM32F7xx_DFP" version="2.16.0" />
+  <pdsc url="https://www.keil.com/pack/" vendor="Keil" name="STM32H7xx_DFP" version="3.1.1" />
+  <pdsc url="https://www.keil.com/pack/" vendor="Keil" name="STM32G0xx_DFP" version="1.5.0" />
+  <pdsc url="https://www.keil.com/pack/" vendor="Keil" name="STM32L0xx_DFP" version="2.3.0" />
+</pindex>
+</index>

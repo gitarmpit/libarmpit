@@ -1,4 +1,3 @@
-
 #include "bkp.h"
 #include "pwr.h"
 #include "rtc_cpp.h"
@@ -27,15 +26,15 @@ class PowerModeTester: public RTC_Interrupt_Handler
 
 private:
 
-    GPIO_PORT* gpioPort;
-    PWR* pwr;
-    BKP* bkp;
-    RTC* rtc;
-    EXTI17* exti17;
+    GPIO_PORT *gpioPort;
+    PWR *pwr;
+    BKP *bkp;
+    RTC *rtc;
+    EXTI17 *exti17;
 
     void StartClock()
     {
-            RCC_EnableHSI_24Mhz();
+        RCC_EnableHSI_24Mhz();
     }
 
     void InitSystick(uint32_t ms)
@@ -171,10 +170,10 @@ public:
 
 void bkp_pwr_test()
 {
-    PWR* pwr = PWR::GetInstance();
+    PWR *pwr = PWR::GetInstance();
     pwr->EnablePeripheralClock(true);
 
-    BKP* bkp = BKP::GetInstance();
+    BKP *bkp = BKP::GetInstance();
     bkp->EnablePeripheralClock(true);
 
     pwr->EnableBKPWriteAccess(true);
@@ -204,7 +203,6 @@ void bkp_pwr_test()
     d = bkp->ReadBackupData(3);
 
 }
-
 
 int main()
 {

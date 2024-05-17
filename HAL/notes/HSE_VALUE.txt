@@ -1,0 +1,11 @@
+Can be defined in project settings 
+Default 8Mhz 
+
+Defined in stm32f1xx_hal_conf.h  which is included from  stm32f1xx_hal.h
+C:\git\STM32CubeF1\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h
+
+or in system_stm32f1xx.c
+
+
+C:\git\STM32CubeF1\Drivers\CMSIS\Device\ST\STM32F1xx\Source\Templates\system_stm32f1xx.c
+

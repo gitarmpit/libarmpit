@@ -1,0 +1,20 @@
+SET_BIT(REG, BIT)     
+CLEAR_BIT(REG, BIT)   
+READ_BIT(REG, BIT)    
+CLEAR_REG(REG)        
+WRITE_REG(REG, VAL)   
+READ_REG(REG)         
+MODIFY_REG(REG, CLEARMASK, SETMASK)  WRITE_REG((REG), (((READ_REG(REG)) & (~(CLEARMASK))) | (SETMASK)))
+
+POSITION_VAL(VAL)     (__CLZ(__RBIT(VAL))) 
+
+ATOMIC_SET_BIT(REG, BIT)
+ATOMIC_CLEAR_BIT(REG, BIT) 
+ATOMIC_MODIFY_REG(REG, CLEARMSK, SETMASK)
+ATOMIC_SETH_BIT(REG, BIT)
+
+/* Atomic 16-bit register access macro to clear one or several bits */
+ATOMIC_CLEARH_BIT(REG, BIT)
+
+/* Atomic 16-bit register access macro to clear and set one or several bits */
+ATOMIC_MODIFYH_REG(REG, CLEARMSK, SETMASK)

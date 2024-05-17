@@ -1,0 +1,5 @@
+Example:
+
+HAL_ADC_MspInit
+
+defined stm32f1xx_hal_msp.c  

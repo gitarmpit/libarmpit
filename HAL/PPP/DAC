@@ -1,0 +1,5 @@
+DAC
+_HAL_RCC_DAC_CLK_ENABLE()
+DAC_CHANNEL_1
+
+extern DAC_HandleTypeDef    DacHandle;

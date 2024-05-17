@@ -1,0 +1,26 @@
+Inc:
+
+main.h : #include "stm32f1xx_hal.h" (which will include stm32f1xx_hal_conf.h )
+
+stm32f1xx_hal_conf.h 
+
+stm32f1xx_it.h       : interrupt handlers
+
+- any other project specific includes, ex:
+usbd_conf.h 
+usbd_desc.h
+
+---------------------------------------
+Src:
+
+main.c
+   HAL_Init();
+   SystemClock_Config();
+
+stm32f1xx_it.c
+  user defined interrupt handlers
+ 
+system_stm32f1xx.c 
+  SystemInit()  : called from startup .s
+  no user defined changes
+

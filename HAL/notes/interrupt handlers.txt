@@ -1,0 +1,8 @@
+Handlers for interrupts defined as weak in startup .s file such as NMI_Handler or peripheral handlers like DMA1_Channel7_IRQHandler
+are not defined in the HAL 
+
+They are in a separate file defined in the user project:
+
+stm32f1xx_it.h 
+stm32f1xx_it.c
+

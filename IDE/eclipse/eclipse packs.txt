@@ -1,0 +1,21 @@
+
+Eclipse:
+file:///C:/Users/guest2/AppData/Roaming/CMSIS-Packs/index.pidx
+
+
+PC:
+
+file:///C:/Users/guest2/AppData/Roaming/CMSIS-Packs/ST-minimal.pidx 
+file:///C:/Users/guest2/AppData/Roaming/CMSIS-Packs/ST.pidx 
+
+laptop:
+
+file:///C:/Users/mopoc/AppData/Roaming/CMSIS-Packs/ST-minimal.pidx 
+file:///C:/Users/mopoc/AppData/Roaming/CMSIS-Packs/ST.pidx 
+
+
+https://www.keil.com/pack/index.pidx
+redirect to:
+curl https://sadevicepacksdqaus.blob.core.windows.net/idxfile/index.pidx -o index.pidx
+
+

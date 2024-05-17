@@ -1,0 +1,5 @@
+define in project settings
+it is not defined by default
+
+used to include initialization code that takes an init structure 
+as opposed calling single functions in .h 

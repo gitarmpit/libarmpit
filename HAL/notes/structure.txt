@@ -1,0 +1,35 @@
+C:\git\STM32CubeF1\Drivers
+
+BSP    : dev boards, shields
+CMSIS  
+STM32F1xx_HAL_Driver 
+
+======================================================
+
+C:\git\STM32CubeF1\Drivers\CMSIS:
+CMSIS\Core\Include: arm cortex specific headers
+
+---------
+CMSIS\Device\ST\STM32F1xx\Include: 
+
+stm32f1xx.h  : includes specific device, ex: stm32f100xb.h  based on -D ex: STM32F100xB in project settings
+
+stm32f100xxxx.h  : for each device (101, 103 etc) 
+                   interrupts, all registers: 
+                   xxx_IRQn   PPP_TypeDef (peripherals)  
+
+system_stm32f1xx.h : extern SystemCoreClock; SystemInit; SystemCoreClockUpdate
+system_stm32f1xx.c : implementation, copied to user code next to main.c 
+
+-----------
+C:\git\STM32CubeF1\Drivers\CMSIS\Device\ST\STM32F1xx\Source\Templates:
+system_stm32f1xx.c : SystemCoreClock; SystemInit; SystemCoreClockUpdate
+
+
+
+======================================================
+
+Linker scripts and startup files: 
+
+C:\git\STM32CubeF1\Drivers\CMSIS\Device\ST\STM32F1xx\Source\Templates\gcc
+
