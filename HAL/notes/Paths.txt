@@ -1,3 +1,15 @@
 "C:\Users\guest2\Documents\STM32CubeMX"
 "C:\Users\guest2\Documents\SEGGER Embedded Studio for ARM Projects"
 
+
+=============================================
+
+STM32CubeIDE and STM32CubeMX Packs same repo:
+C:\Users\guest2\STM32Cube\Repository
+
+Can be configured in STM32CubeIDE in Preferences -> STM32Cube -> Firmware Updater
+
+=============================================
+
+STM32CubeIDE projects:
+C:\Users\guest2\STM32CubeIDE\workspace_1.12.1

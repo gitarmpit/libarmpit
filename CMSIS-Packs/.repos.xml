@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repositories>
+  <repository>
+    <type>Unused</type>
+    <name>Keil</name>
+    <url>https://www.keil.com/pack/index.pidx</url>
+  </repository>
+  <repository>
+    <type>CMSIS Pack</type>
+    <name>Local</name>
+    <url>file:///C:/Users/guest2/AppData/Roaming/CMSIS-Packs/index.pidx</url>
+  </repository>
+</repositories>

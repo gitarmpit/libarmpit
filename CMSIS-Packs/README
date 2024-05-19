@@ -1,0 +1,19 @@
+Copied from 
+
+C:\Users\guest2\AppData\Roaming\CMSIS-Packs
+
+Set up in Eclipse:
+
+Preferences -> MCU Packages -> 
+
+-> CMSIS Pack Folder:  C:\Users\guest2\AppData\Roaming\CMSIS-Packs
+
+            -> Repositories 
+
+Change default to Unused
+
+add:
+CMSIS Pack  ->  Name: Local
+                URL:  file:///C:/Users/guest2/AppData/Roaming/CMSIS-Packs/index.pidx
+
+
