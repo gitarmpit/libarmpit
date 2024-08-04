@@ -1,0 +1,12 @@
+LL_GPIO_PIN_x  x=0 to 15
+
+ports:
+GPIOA ... GPIOH
+
+
+
+  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+

@@ -37,16 +37,12 @@ __STATIC_INLINE void     UserButton_Init(void);
 
 int main(void)
 {
-  /* Configure the system clock to 72 MHz */
   SystemClock_Config();
 
-  /* Initialize button in EXTI mode */
   UserButton_Init();
   
-  /* Configure the timer in output compare mode */
   Configure_TIMPWMOutput();
 
-  /* Infinite loop */
   while (1)
   {
   }
@@ -57,27 +53,15 @@ __STATIC_INLINE void  Configure_TIMPWMOutput(void)
   LL_TIM_InitTypeDef    tim_initstruct;
   LL_TIM_OC_InitTypeDef tim_oc_initstruct;
   
-  /*************************/
-  /* GPIO AF configuration */
-  /*************************/
-  /* Enable the peripheral clock of GPIOs */
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
   
-  /* GPIO TIM2_CH1 configuration */
   LL_GPIO_SetPinMode(GPIOA, LL_GPIO_PIN_0, LL_GPIO_MODE_ALTERNATE);
   LL_GPIO_SetPinPull(GPIOA, LL_GPIO_PIN_0, LL_GPIO_PULL_DOWN);
   LL_GPIO_SetPinSpeed(GPIOA, LL_GPIO_PIN_0, LL_GPIO_SPEED_FREQ_HIGH);
-  
-  /***********************************************/
-  /* Configure the NVIC to handle TIM2 interrupt */
-  /***********************************************/
+
   NVIC_SetPriority(TIM2_IRQn, 0);
   NVIC_EnableIRQ(TIM2_IRQn);
-  
-  /******************************/
-  /* Peripheral clocks enabling */
-  /******************************/
-  /* Enable the timer peripheral clock */
+
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2); 
   
   /***************************/
@@ -95,8 +79,6 @@ __STATIC_INLINE void  Configure_TIMPWMOutput(void)
   tim_initstruct.ClockDivision     = LL_TIM_CLOCKDIVISION_DIV1;
   tim_initstruct.RepetitionCounter = (uint8_t)0x00;
   
-  /* Initialize TIM instance according to parameters defined in               */
-  /* initialization structure.                                                */
   LL_TIM_Init(TIM2, &tim_initstruct);
   
   /* Enable TIM2_ARR register preload. Writing to or reading from the         */
@@ -119,8 +101,6 @@ __STATIC_INLINE void  Configure_TIMPWMOutput(void)
   tim_oc_initstruct.OCIdleState  = LL_TIM_OCIDLESTATE_LOW;
   tim_oc_initstruct.OCNIdleState = LL_TIM_OCIDLESTATE_LOW;
   
-  /* Initialize TIM instance according to parameters defined in               */
-  /* initialization structure.                                                */
   LL_TIM_OC_Init(TIM2, LL_TIM_CHANNEL_CH1, &tim_oc_initstruct);
   
   /* Enable TIM2_CCR1 register preload. Read/Write operations access the      */
@@ -128,22 +108,12 @@ __STATIC_INLINE void  Configure_TIMPWMOutput(void)
   /* at each update event.                                                    */
   LL_TIM_OC_EnablePreload(TIM2, LL_TIM_CHANNEL_CH1);
   
-  /**************************/
-  /* TIM2 interrupts set-up */
-  /**************************/
-  /* Enable the capture/compare interrupt for channel 1*/
   LL_TIM_EnableIT_CC1(TIM2);
   
-  /**********************************/
-  /* Start output signal generation */
-  /**********************************/
-  /* Enable output channel 1 */
   LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH1);
   
-  /* Enable counter */
   LL_TIM_EnableCounter(TIM2);
   
-  /* Force update generation */
   LL_TIM_GenerateEvent_UPDATE(TIM2);
 }
 

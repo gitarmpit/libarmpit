@@ -20,16 +20,12 @@ static uint32_t aDutyCycle[TIM_DUTY_CYCLES_NB] = {
   100,  /* 100% */
 };
 
-/* Duty cycle index */
 static uint8_t iDutyCycle = 0;
 
-/* Measured duty cycle */
 __IO uint32_t uwMeasuredDutyCycle = 0;
 
-/* TIM2 Clock */
 static uint32_t TimOutClock = 1;
 
-/* Private function prototypes -----------------------------------------------*/
 __STATIC_INLINE void     SystemClock_Config(void);
 __STATIC_INLINE void     Configure_TIMPWMOutput(void);
 __STATIC_INLINE void     Configure_DutyCycle(uint32_t OCMode);
@@ -206,23 +202,18 @@ void SystemClock_Config(void)
   {
   };
 
-  /* Set APB1 & APB2 prescaler*/
   LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_2);
   LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
 
-  /* Set systick to 1ms in using frequency set to 72MHz */
   LL_Init1msTick(72000000);
 
-  /* Update CMSIS variable (which can be updated also through SystemCoreClockUpdate function) */
   LL_SetSystemCoreClock(72000000);
 }
 
 void UserButton_Callback(void)
 {
-  /* Set new duty cycle */
   iDutyCycle = (iDutyCycle + 1) % TIM_DUTY_CYCLES_NB;
 
-  /* Change PWM signal duty cycle */
   Configure_DutyCycle(aDutyCycle[iDutyCycle]);
 }
 
