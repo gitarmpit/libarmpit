@@ -1,0 +1,16 @@
+F103:
+
+LL_PWR_WriteReg
+LL_PWR_ReadReg
+
+LL_PWR_EnableBkUpAccess
+LL_PWR_DisableBkUpAccess
+
+
+// Set Power Down mode when CPU enters deepsleep
+LL_PWR_SetPowerMode
+
+LL_PWR_EnablePVD
+LL_PWR_EnableWakeUpPin
+
+==============================
