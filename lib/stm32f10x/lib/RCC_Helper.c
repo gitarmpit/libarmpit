@@ -34,6 +34,14 @@ void RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz(void)
 	RCC_SetAPB1PrescalerDiv2();
 }
 
+void RCC_EnableHSE_72()
+{
+    FLASH_SetWaitState(2);
+    RCC_EnableHSE(TRUE);
+    RCC_EnablePLL(9);
+    RCC_SetAPB1PrescalerDiv2();
+}
+
 void RCC_EnableHSI_64Mhz_AHB_32Mhz_APB1_16MHz_APB2_16MHz(void)
 {
 	FLASH_SetWaitState(2);

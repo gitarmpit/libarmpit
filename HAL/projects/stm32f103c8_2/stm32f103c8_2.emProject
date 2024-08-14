@@ -1,0 +1,127 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="stm32f103c8_2" target="8" version="2">
+  <configuration
+    Name="Debug"
+    c_preprocessor_definitions="DEBUG"
+    gcc_debugging_level="Level 3"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="None"
+    hidden="Yes" />
+  <configuration
+    Name="Debug External"
+    inherited_configurations="External GNU;Debug" />
+  <configuration
+    Name="External GNU"
+    Platform="ARM"
+    build_toolchain_directory="C:/Users/mopoc/Application Data/xPacks/arm-none-eabi-gcc/xpack-arm-none-eabi-gcc-11.3.1-1.1/bin"
+    hidden="Yes" />
+  <configuration
+    Name="Release"
+    c_preprocessor_definitions="NDEBUG"
+    gcc_debugging_level="Level 2"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="Level 2 balanced"
+    hidden="Yes" />
+  <configuration
+    Name="Release External"
+    inherited_configurations="External GNU;Release" />
+  <project Name="stm32f103c8_2">
+    <configuration
+      Name="Common"
+      arm_architecture="v7M"
+      arm_core_type="Cortex-M3"
+      arm_endian="Little"
+      arm_fpu_type=""
+      arm_target_device_name="STM32F103C8"
+      arm_target_interface_type="SWD"
+      debug_start_from_entry_point_symbol="No"
+      debug_target_connection="J-Link"
+      linker_section_placements_segments="FLASH1 RX 0x08000000 0x00010000;RAM1 RWX 0x20000000 0x00005000;"
+      project_directory=""
+      project_type="Externally Built Executable" />
+    <configuration
+      Name="Debug"
+      arm_architecture="v7M"
+      arm_core_type="Cortex-M3"
+      arm_endian="Little"
+      arm_fpu_type=""
+      arm_target_device_name="STM32F103C8"
+      c_preprocessor_definitions="DEBUG;USE_FULL_LL_DRIVER;STM32F103xB;HSE_VALUE=8000000;HSE_STARTUP_TIMEOUT=100;LSE_STARTUP_TIMEOUT=5000;LSE_VALUE=32768;HSI_VALUE=8000000;LSI_VALUE=40000;VDD_VALUE=3300;PREFETCH_ENABLE=1"
+      c_user_include_directories="$(ProjectDir)/Drivers/STM32F1xx_HAL_Driver/Inc;$(ProjectDir)/Drivers/CMSIS/Device/ST/STM32F1xx/Include;$(ProjectDir)/Drivers/CMSIS/Include;$(ProjectDir)/TestFolder"
+      gcc_debugging_level="Level 3"
+      gcc_optimization_level="Optimize For Size"
+      linker_additional_files=""
+      linker_section_placements_segments="FLASH1 RX 0x08000000 0x00010000;RAM1 RWX 0x20000000 0x00005000;" />
+    <configuration
+      Name="Debug External"
+      armgnu_cl_cpu="cortex-m3"
+      asm_additional_options_backup=";-mcpu=cortex-m3"
+      build_intermediate_directory="Debug"
+      build_output_directory="Debug"
+      build_output_file_name="Debug/stm32f103c8_2.elf"
+      c_additional_options_backup=";-g3;-Os;-mcpu=cortex-m3"
+      debug_RTTCB="_SEGGER_RTT"
+      debug_enable_RTT="Yes"
+      gcc_cl_enable_debug_info="Level 3"
+      gcc_cl_optimization_level="None"
+      gcc_prefix="arm-none-eabi-"
+      link_additional_options_backup=";-Wl,--gc-sections;-lm;--specs=nosys.specs;--specs=nano.specs;-mcpu=cortex-m3"
+      link_linker_script_file="$(ProjectDir)//STM32F103C8TX_FLASH.ld"
+      link_use_linker_script_file="Yes"
+      linker_additional_options="-Wl,--gc-sections;-lm;--specs=nosys.specs;--specs=nano.specs" />
+    <configuration
+      BUILD_OPTIONS="ARM GNU"
+      Name="External GNU"
+      armgnu_cl_cpu="cortex-m3"
+      armgnu_cl_endian="little"
+      armgnu_cl_fpu=""
+      build_generic_options_file_name="$(StudioDir)/targets/ARMGNU_build_options.xml" />
+    <configuration
+      Name="Release"
+      arm_architecture="v7M"
+      arm_core_type="Cortex-M3"
+      arm_endian="Little"
+      arm_fpu_type=""
+      arm_target_device_name="STM32F103C8"
+      c_preprocessor_definitions="USE_FULL_LL_DRIVER;STM32F103xB;HSE_VALUE=8000000;HSE_STARTUP_TIMEOUT=100;LSE_STARTUP_TIMEOUT=5000;LSE_VALUE=32768;HSI_VALUE=8000000;LSI_VALUE=40000;VDD_VALUE=3300;PREFETCH_ENABLE=1"
+      c_user_include_directories="$(ProjectDir)/Inc;$(ProjectDir)/Drivers/STM32F1xx_HAL_Driver/Inc;$(ProjectDir)/Drivers/CMSIS/Device/ST/STM32F1xx/Include;$(ProjectDir)/Drivers/CMSIS/Include"
+      gcc_debugging_level="None"
+      gcc_optimization_level="Optimize For Size"
+      linker_additional_files=""
+      linker_section_placements_segments="FLASH1 RX 0x08000000 0x00010000;RAM1 RWX 0x20000000 0x00005000;" />
+    <configuration
+      Name="Release External"
+      asm_additional_options=";-mcpu=cortex-m3"
+      build_intermediate_directory="Release"
+      build_output_directory="Release"
+      build_output_file_name="Release/stm32f103c8_2.elf"
+      c_additional_options=";-g0;-Os;-mcpu=cortex-m3"
+      link_linker_script_file="$(ProjectDir)//STM32F103C8TX_FLASH.ld"
+      link_use_linker_script_file="Yes"
+      linker_additional_options=";-Wl,--gc-sections;-lm;--specs=nosys.specs;--specs=nano.specs;-mcpu=cortex-m3" />
+    <folder
+      Name="Drivers"
+      exclude="Drivers/;*_PP.s;*_PP.c"
+      filter="*.c;*.h;*.cpp;*.hpp;*.s;*.S"
+      path="Drivers"
+      recurse="Yes" />
+    <folder
+      Name="Src"
+      exclude="Src/;*_PP.s;*_PP.c"
+      filter="*.c;*.h;*.cpp;*.hpp;*.s;*.S"
+      path="Src"
+      recurse="Yes" />
+    <folder
+      Name="Startup"
+      exclude="Startup/;*_PP.s;*_PP.c"
+      filter="*.c;*.h;*.cpp;*.hpp;*.s;*.S"
+      path="Startup"
+      recurse="Yes" />
+    <folder
+      Name="TestFolder"
+      exclude=""
+      filter=""
+      path="TestFolder"
+      recurse="No" />
+  </project>
+</solution>

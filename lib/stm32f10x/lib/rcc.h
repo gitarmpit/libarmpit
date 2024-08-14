@@ -5,7 +5,7 @@
 #include "common.h"
 
 #ifndef HSE_CLOCK_FREQ 
-#define HSE_CLOCK_FREQ 4000000
+#define HSE_CLOCK_FREQ 8000000
 #endif
 
 #define HSI_CLOCK_FREQ 8000000

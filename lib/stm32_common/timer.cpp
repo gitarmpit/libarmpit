@@ -1251,7 +1251,7 @@ void TIMER::SetUpdatePeriod_us (uint32_t us)
 
     CalculateTimerValues (us, &count, &presc);
 
-    SetAutoReloadValue(count);
+    SetAutoReloadValue(count-1);
     SetPrescalerValue(presc-1);
 }
 
@@ -1262,7 +1262,7 @@ void TIMER::SetUpdatePeriod_ns (uint32_t ns)
 
     CalculateTimerValues_ns (ns, &count, &presc);
 
-    SetAutoReloadValue(count);
+    SetAutoReloadValue(count-1);
     SetPrescalerValue(presc-1);
 }
 

@@ -23,3 +23,10 @@ extern "C" void initialise_monitor_handles(void);
     initialise_monitor_handles();
     printf ("test semihosting\n");
 #endif
+
+
+=============================
+semihosting in ST32Cube 
+
+Linker General :  don't use system calls   (disables --specs=nosyscalls.specs) 
+Linker Misc:  --specs=rdimon.specs

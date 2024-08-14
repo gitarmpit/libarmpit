@@ -19,7 +19,7 @@ public:
         if (isUpdate)
         {
             t1++;
-            GPIOB::GetInstance()->TogglePin(GPIO_PIN11);
+            GPIOB::GetInstance()->TogglePin(GPIO_PIN8);
         }
     }
 };
@@ -29,18 +29,18 @@ public:
 static void test_counter() 
 {
     GPIOB::GetInstance()->EnablePeripheralClock(true);
-    GPIOB::GetInstance()->SetupGPIO_OutPP(GPIO_PIN11);  //pin22
-    GPIOB::GetInstance()->SetPin(GPIO_PIN11);
+    GPIOB::GetInstance()->SetupGPIO_OutPP(GPIO_PIN8);
+    GPIOB::GetInstance()->SetPin(GPIO_PIN8);
 
     Update_Handler handler;
-    TIM2* t = TIM2::GetInstance();
+    TIMER* t = TIM1::GetInstance();
     t->EnablePeripheralClock(true);
     t->EnableNVICInterrupt(true);     //enable global system interrupts (core)
     //NVIC_SetPriority (IRQn_TIM2, 15<<4);  //set lowest priority
     t->AddInterruptHandler(&handler);
     t->EnableUpdateInterrupt(true);   //enable timer update interrupt
     t->SetCounterValue(0);            //optional
-    t->SetUpdatePeriod_us(1000000);   //1 second 
+    t->SetUpdatePeriod_us(100);   //
     t->EnableCounter(true);           //start counting
 
     GPIOB::GetInstance()->ResetPin(GPIO_PIN11);
@@ -53,7 +53,8 @@ static void test_counter()
 int main()
 {
 #ifdef STM32F1
-    RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+    // RCC_EnableHSI_64Mhz_AHB_64Mhz_APB1_32MHz_APB2_64MHz();
+    RCC_EnableHSE_72();
 #else
     RCC_EnableHSI_168Mhz();
 #endif

@@ -75,7 +75,7 @@
 									<listOptionValue builtIn="false" value="USE_ADC"/>
 									<listOptionValue builtIn="false" value="USE_TIMER"/>
 									<listOptionValue builtIn="false" value="STM32F10X_MD"/>
-									<listOptionValue builtIn="false" value="HSE_VALUE=8000000"/>
+									<listOptionValue builtIn="false" value="HSE_CLOCK_FREQ=8000000"/>
 								</option>
 								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.944277127" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
 							</tool>
@@ -97,7 +97,7 @@
 									<listOptionValue builtIn="false" value="USE_SPI"/>
 									<listOptionValue builtIn="false" value="USE_ADC"/>
 									<listOptionValue builtIn="false" value="USE_TIMER"/>
-									<listOptionValue builtIn="false" value="HSE_VALUE=8000000"/>
+									<listOptionValue builtIn="false" value="HSE_CLOCK_FREQ=8000000"/>
 									<listOptionValue builtIn="false" value="STM32F10X_MD"/>
 								</option>
 								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.721758826" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input"/>
