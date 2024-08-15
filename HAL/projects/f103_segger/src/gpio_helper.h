@@ -23,6 +23,14 @@ GPIO_PIN GPIO_GetPin(const char *pin_name);
     LL_GPIO_SetPinOutputType((pin)->GPIOx, (pin)->Pin, LL_GPIO_OUTPUT_PUSHPULL); \
   } while (0)
 
+#define GPIO_Setup_OutAltPP(pin)                                                    \
+  do {                                                                           \
+    LL_GPIO_SetPinMode((pin)->GPIOx, (pin)->Pin, LL_GPIO_MODE_ALTERNATE);           \
+    LL_GPIO_SetPinSpeed((pin)->GPIOx, (pin)->Pin, LL_GPIO_SPEED_FREQ_HIGH);      \
+    LL_GPIO_SetPinOutputType((pin)->GPIOx, (pin)->Pin, LL_GPIO_OUTPUT_PUSHPULL); \
+  } while (0)
+
+
 #define GPIO_Setup_In_Pulldown(pin)                                   \
   do {                                                                \
     LL_GPIO_SetPinMode((pin)->GPIOx, (pin)->Pin, LL_GPIO_MODE_INPUT); \

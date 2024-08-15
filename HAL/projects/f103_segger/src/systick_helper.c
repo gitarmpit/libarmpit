@@ -4,6 +4,11 @@
 
 __IO uint32_t uwTick = 0;
 
+void SysTick_Handler(void)
+{
+    SysTick_IncTick();
+}
+
 void SysTick_Init()
 {
     LL_RCC_ClocksTypeDef RCC_Clocks;

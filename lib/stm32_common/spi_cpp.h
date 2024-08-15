@@ -7,7 +7,7 @@
 #include "nvic.h"
 #include "rcc.h"
 
-#include "Peripheral.h"
+#include "peripheral.h"
 #include "gpio_cpp.h"
 
 

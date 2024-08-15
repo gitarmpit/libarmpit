@@ -2,6 +2,18 @@
 #include "gpio_cpp.h"
 #include "rcc_helper.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+  void SystemCoreClockUpdate()
+  {
+  }
+#ifdef __cplusplus
+}
+#endif
+
+
 
 volatile static uint32_t t1 = 0;
 volatile static uint32_t t2 = 0;

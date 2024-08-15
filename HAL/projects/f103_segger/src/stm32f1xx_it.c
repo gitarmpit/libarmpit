@@ -1,6 +1,3 @@
-#include "stm32f1xx_it.h"
-#include "stm32f1xx_ll_tim.h"
-#include "systick_helper.h"
 
 void NMI_Handler(void)
 {
@@ -38,10 +35,6 @@ void DebugMon_Handler(void) {}
 
 void PendSV_Handler(void) {}
 
-void SysTick_Handler(void)
-{
-    SysTick_IncTick();
-}
 
 void RCC_IRQHandler(void) {}
 

@@ -5,6 +5,8 @@
 #include "rcc.h"
 #include "debug.h"
 
+extern "C" void SystemCoreClockUpdate(){}
+
 static void test()
 {
     TIMER_With_Channels* timer = TIM3::GetInstance();

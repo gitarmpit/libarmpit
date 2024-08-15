@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <malloc.h>
+//#include <malloc.h>
 
 //C++ stubs. Required to be able to build C++ code using gcc instead of g++ and without linking with libstdc++
 //C++ limitations: no rtti, no exceptions: -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics

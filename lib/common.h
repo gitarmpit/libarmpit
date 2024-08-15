@@ -50,8 +50,8 @@ typedef int BOOL;
 #define FALSE 0
 
 #if defined(__GNUC__) && defined (__cplusplus)
-#include <bits/c++config.h>
-#include <malloc.h>
+//#include <bits/c++config.h>
+//#include <malloc.h>
 //inline void* operator new (std::size_t size) {return ::malloc(size);}
 #endif
 
@@ -65,6 +65,7 @@ typedef int BOOL;
    ({ __typeof__ (a) _a = (a); \
        __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
+
 
 #endif
 
