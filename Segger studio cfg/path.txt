@@ -1,0 +1,2 @@
+AppData\Local\SEGGER\SEGGER Embedded Studio\v3
+ 

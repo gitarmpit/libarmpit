@@ -5,6 +5,13 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
+typedef uint8_t BOOL; 
+
+#define TRUE 1 
+#define FALSE 0
+
 
 void Error_Handler(void);
 
