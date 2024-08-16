@@ -4,12 +4,17 @@
 
 #include "but.h"
 #include "stm32f103xb.h"
+#include <stdint.h>
 
 /* The default behavior is active low: button is configured as a weak pull-up
  * So to active it, the switch needs to be connected from the input port to ground
  * Then pushing the switch will set it low: the IsOn method will return true
  *
  */
+
+ #ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef void (*button_handler)(void*);
 
@@ -30,5 +35,8 @@ void BH_SetTimerHookHandler(button_handler timer_hook_handler);
 
 // void SetTimerHookInterval (uint32_t ms) { _timerHookInterval = ms; }
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

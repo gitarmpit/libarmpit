@@ -1,3 +1,4 @@
+#include "bh.h"
 #include "but.h"
 #include "stm32f1xx_ll_bus.h"
 #include "stm32f1xx_ll_gpio.h"
@@ -127,6 +128,27 @@ static void testButton2() {
   }
 }
 
+void on_click(void* ctx) {
+  button_ctx* b = (button_ctx*)ctx;
+  printf ("on click, b: %d\n", b->buttonId);
+}
+
+void on_dclick(void* ctx) {
+  button_ctx* b = (button_ctx*)ctx;
+  printf ("on dclick, b: %d\n", b->buttonId);
+}
+
+static void testButtonHandler() {
+  BH_Init(TIM2);
+  GPIO_PIN bpin = GPIO_GetPin("A7");
+  button_ctx b1 = Button_Init(&bpin, 1);
+  BH_AddButton(&b1);
+  BH_SetOnClickHandler(on_click);
+  BH_SetOnDoubleClickHandler(on_dclick);
+  while(1)
+    ;
+}
+
 
 static void testBlinky() {
   GPIO_PIN pin1 = GPIO_GetPin("B0");
@@ -159,11 +181,13 @@ int main(void) {
   SystemClock_Config_HSI();
 
   //testBlinky();
-  testPWM1();
+  //testPWM1();
   // testTimer();
 
   //testUpdateDs();
   //testButton2();
+
+  testButtonHandler();
 
   while (1)
     ;
