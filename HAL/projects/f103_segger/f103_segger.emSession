@@ -90,30 +90,30 @@
  </Watch4>
  <Files>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="52" useTextEdit="1" path="src/main.cpp" left="0" top="52" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="45" y="92" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/timer_helper.h" path="src/timer_helper.c" left="0" top="90" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="45" y="92" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/timer_helper.h" path="src/timer_helper.c" left="0" top="92" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="src/systick_helper.c" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="14" useTextEdit="1" path="src/timer_helper.h" left="0" top="2" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="168" useTextEdit="1" path="Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_gpio.c" left="0" top="139" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1561" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/main.cpp" path="Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_gpio.h" left="0" top="1540" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="14" useTextEdit="1" path="src/timer_helper.h" left="0" top="14" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="168" useTextEdit="1" path="Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_gpio.c" left="0" top="168" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1561" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/main.cpp" path="Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_gpio.h" left="0" top="1561" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="6" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/timer_helper.c" path="src/gpio_helper.c" left="0" top="6" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="180" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/main.cpp" path="Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_bus.h" left="0" top="158" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="9" useTextEdit="1" path="src/stm32f1xx_it.c" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="183" useTextEdit="1" path="startup/STM32F1xx_Startup.s" left="0" top="167" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="73" useTextEdit="1" path="src/system_stm32f1xx.c" left="0" top="57" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="186" useTextEdit="1" path="startup/SEGGER_THUMB_Startup.s" left="0" top="158" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="180" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/main.cpp" path="Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_bus.h" left="0" top="180" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="9" useTextEdit="1" path="src/stm32f1xx_it.c" left="0" top="9" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="183" useTextEdit="1" path="startup/STM32F1xx_Startup.s" left="0" top="183" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="73" useTextEdit="1" path="src/system_stm32f1xx.c" left="0" top="73" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="186" useTextEdit="1" path="startup/SEGGER_THUMB_Startup.s" left="0" top="186" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="startup/stm32f10x_md_Vectors.s" left="0" top="234" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="27" y="13" useTextEdit="1" path="src/button_handler.cpp" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="7" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/bh.c" path="src/button_handler.h" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="65" useTextEdit="1" path="src/button.h" left="0" top="25" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="27" y="13" useTextEdit="1" path="src/button_handler.cpp" left="0" top="13" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="7" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/bh.c" path="src/button_handler.h" left="0" top="7" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="63" useTextEdit="1" path="src/button.h" left="0" top="63" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="src/but.h" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="55" useTextEdit="1" path="src/button.cpp" left="0" top="15" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="27" useTextEdit="1" path="src/but.c" left="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="53" useTextEdit="1" path="src/button.cpp" left="0" top="53" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="27" useTextEdit="1" path="src/but.c" left="0" top="27" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/but.c" path="C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 7.22/include/stdlib.h" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="8" useTextEdit="1" path="src/main.h" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="7" y="250" useTextEdit="1" path="Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_adc.h" left="0" top="230" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="32" y="14" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/bh.c" path="src/bh.h" left="0" selected="1" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="27" useTextEdit="1" path="src/bh.c" left="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="8" useTextEdit="1" path="src/main.h" left="0" top="8" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="7" y="250" useTextEdit="1" path="Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_adc.h" left="0" top="250" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="32" y="14" useTextEdit="1" openedFrom="C:/git/libarmpit/HAL/projects/f103_segger/src/bh.c" path="src/bh.h" left="0" selected="1" top="14" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="27" useTextEdit="1" path="src/bh.c" left="0" top="27" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="src/systick_helper.h" left="0" top="0" codecName="Default"/>
  </Files>
- <EMStudioWindow activeProject="f103_segger" fileDialogDefaultFilter="*" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/Users/mopoc/Documents/SEGGER Embedded Studio for ARM Projects/f103_segger/STM32F1xx/Scripts" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <EMStudioWindow activeProject="f103_segger" fileDialogDefaultFilter="*" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/Users/mopoc/Documents/SEGGER Embedded Studio for ARM Projects/f103_segger/STM32F1xx/Scripts" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>
