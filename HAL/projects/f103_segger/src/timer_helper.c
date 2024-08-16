@@ -1,19 +1,21 @@
-#include "gpio_helper.h"
+#include "timer_helper.h"
 #include "stm32f1xx_ll_bus.h"
 #include "stm32f1xx_ll_rcc.h"
 #include "stm32f1xx_ll_tim.h"
-#include <stdlib.h>
-#include <string.h>
 
-void (*tim1_ptr)(void) = 0;
-void (*tim2_ptr)(void) = 0;
-void (*tim3_ptr)(void) = 0;
+tim_handler tim1_handler = 0;
+tim_handler tim2_handler = 0;
+tim_handler tim3_handler = 0;
+
+static void* tim1_ctx = 0;
+static void* tim2_ctx = 0;
+static void* tim3_ctx = 0;
 
 void TIM1_UP_IRQHandler(void) {
   if (LL_TIM_IsActiveFlag_UPDATE(TIM1) == 1) {
     LL_TIM_ClearFlag_UPDATE(TIM1);
-    if (tim1_ptr) {
-      tim1_ptr();
+    if (tim1_handler) {
+      tim1_handler(tim1_ctx);
     }
   }
 }
@@ -21,8 +23,8 @@ void TIM1_UP_IRQHandler(void) {
 void TIM2_IRQHandler(void) {
   if (LL_TIM_IsActiveFlag_UPDATE(TIM2) == 1) {
     LL_TIM_ClearFlag_UPDATE(TIM2);
-    if (tim2_ptr) {
-      tim2_ptr();
+    if (tim2_handler) {
+      tim2_handler(tim2_ctx);
     }
   }
 }
@@ -30,10 +32,9 @@ void TIM2_IRQHandler(void) {
 void TIM3_IRQHandler(void) {
   if (LL_TIM_IsActiveFlag_UPDATE(TIM3) == 1) {
     LL_TIM_ClearFlag_UPDATE(TIM3);
-    if (tim3_ptr) {
-      tim3_ptr();
+    if (tim3_handler) {
+      tim3_handler(tim3_ctx);
     }
-    // Timer_Callback();
   }
 }
 
@@ -90,8 +91,7 @@ void TIM_SetUpdatePeriod_us(TIM_TypeDef* timer, uint32_t us) {
   LL_TIM_SetAutoReload(timer, arr);
 }
 
-static void TIM_SetUpCounter(TIM_TypeDef* tim, uint32_t periph, IRQn_Type IRQn, uint32_t us) {
-  // LL_APB1_GRP1_EnableClock(periph);
+static void _TIM_SetUpCounter(TIM_TypeDef* tim, uint32_t periph, IRQn_Type IRQn, uint32_t us) {
   LL_TIM_SetCounterMode(tim, LL_TIM_COUNTERMODE_UP);
   LL_TIM_EnableARRPreload(tim);
 
@@ -105,22 +105,48 @@ static void TIM_SetUpCounter(TIM_TypeDef* tim, uint32_t periph, IRQn_Type IRQn, 
   LL_TIM_EnableCounter(tim);
 }
 
-void TIM_SetupCounterTIM1(uint32_t period_us, void (*tim_ptr)(void)) {
-  tim1_ptr = tim_ptr;
+void TIM_SetupCounterTIM1(uint32_t period_us, tim_handler th, void* ctx) {
+  tim1_handler = th;
+  tim1_ctx     = ctx;
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
-  TIM_SetUpCounter(TIM1, LL_APB2_GRP1_PERIPH_TIM1, TIM1_UP_IRQn, period_us);
+  _TIM_SetUpCounter(TIM1, LL_APB2_GRP1_PERIPH_TIM1, TIM1_UP_IRQn, period_us);
 }
 
-void TIM_SetupCounterTIM2(uint32_t period_us, void (*tim_ptr)(void)) {
-  tim2_ptr = tim_ptr;
+void TIM_SetupCounterTIM2(uint32_t period_us, tim_handler th, void* ctx) {
+  tim2_handler = th;
+  tim2_ctx     = ctx;
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
-  TIM_SetUpCounter(TIM2, LL_APB1_GRP1_PERIPH_TIM2, TIM2_IRQn, period_us);
+  _TIM_SetUpCounter(TIM2, LL_APB1_GRP1_PERIPH_TIM2, TIM2_IRQn, period_us);
 }
 
-void TIM_SetupCounterTIM3(uint32_t period_us, void (*tim_ptr)(void)) {
-  tim3_ptr = tim_ptr;
+void TIM_SetupCounterTIM3(uint32_t period_us, tim_handler th, void* ctx) {
+  tim3_handler = th;
+  tim3_ctx     = ctx;
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
-  TIM_SetUpCounter(TIM3, LL_APB1_GRP1_PERIPH_TIM3, TIM3_IRQn, period_us);
+  _TIM_SetUpCounter(TIM3, LL_APB1_GRP1_PERIPH_TIM3, TIM3_IRQn, period_us);
+}
+
+void TIM_SetupCounter(TIM_TypeDef* timer, uint32_t period_us, tim_handler th, void* ctx) {
+  if (timer == TIM1) {
+    TIM_SetupCounterTIM1(period_us, th, ctx);
+  } else if (timer == TIM2) {
+    TIM_SetupCounterTIM2(period_us, th, ctx);
+  } else if (timer == TIM3) {
+    TIM_SetupCounterTIM3(period_us, th, ctx);
+  }
+}
+
+void TIM_SetHandler(TIM_TypeDef* timer, tim_handler th, void* ctx) {
+  if (timer == TIM1) {
+    tim1_handler = th;
+    tim1_ctx     = ctx;
+  } else if (timer == TIM2) {
+    tim2_handler = th;
+    tim2_ctx     = ctx;
+  } else if (timer == TIM3) {
+    tim3_handler = th;
+    tim3_ctx     = ctx;
+  }
 }
 
 void TIM_SetupPWM(TIM_TypeDef* tim, int channel, uint32_t period_us, uint32_t ds_us) {
@@ -150,16 +176,18 @@ void TIM_SetupPWM(TIM_TypeDef* tim, int channel, uint32_t period_us, uint32_t ds
   LL_TIM_OC_InitTypeDef init;
   LL_TIM_OC_StructInit(&init);
   init.CompareValue = duty_count;
-
   init.OCMode = LL_TIM_OCMODE_PWM1;
   // init.OCPolarity   = LL_TIM_OCPOLARITY_HIGH;
 
   // break
+  
+  /*
   init.OCState      = LL_TIM_OCSTATE_DISABLE;
   init.OCNState     = LL_TIM_OCSTATE_DISABLE;
   init.OCNPolarity  = LL_TIM_OCPOLARITY_HIGH;
   init.OCIdleState  = LL_TIM_OCIDLESTATE_LOW;
   init.OCNIdleState = LL_TIM_OCIDLESTATE_LOW;
+   */ 
 
   LL_TIM_OC_Init(tim, tim_channel_mask, &init);
 
@@ -178,21 +206,45 @@ void TIM_SetupPWM(TIM_TypeDef* tim, int channel, uint32_t period_us, uint32_t ds
   LL_TIM_GenerateEvent_UPDATE(tim);
 }
 
-void TIM_SetupPWM_TIM2(int channel, uint32_t period_us, uint32_t ds_us) {
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
-  TIM_SetupPWM(TIM2, channel, period_us, ds_us);
-}
-
-void TIM_SetupPWM_TIM3(int channel, uint32_t period_us, uint32_t ds_us) {
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
-  TIM_SetupPWM(TIM3, channel, period_us, ds_us);
-}
-
-void TIM_SetupPWM_TIM1(int channel, uint32_t period_us, uint32_t ds_us) {
+void TIM_SetupPWM_TIM1(uint8_t channel, uint32_t period_us, uint32_t ds_us) {
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
   TIM_SetupPWM(TIM1, channel, period_us, ds_us);
 }
 
+void TIM_SetupPWM_TIM2(uint8_t channel, uint32_t period_us, uint32_t ds_us) {
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
+  TIM_SetupPWM(TIM2, channel, period_us, ds_us);
+}
+
+TIM_Channel TIM_SetupPWM_TIM3(uint8_t channel, uint32_t period_us, uint32_t ds_us) {
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
+  TIM_SetupPWM(TIM3, channel, period_us, ds_us);
+  TIM_Channel ch = {TIM3, channel};
+  return ch;
+}
+
+void TIM_UpdateDs(TIM_Channel* ch, uint32_t ds_us) {
+  uint32_t presc = LL_TIM_GetPrescaler(ch->timer);
+  int isAPB1     = ((uint32_t)ch->timer < APB2PERIPH_BASE);
+  uint32_t t_clk = GetTIMx_CLK(isAPB1);
+
+  uint16_t ccr_val = (uint64_t)ds_us * (uint64_t)t_clk / 1000000ull / (uint64_t)(presc + 1);
+  if (ch->channel == 1) {
+    uint32_t tmp = LL_TIM_OC_GetCompareCH1(ch->timer);
+    LL_TIM_OC_SetCompareCH1(ch->timer, ccr_val);
+  } else if (ch->channel == 2) {
+    uint32_t tmp = LL_TIM_OC_GetCompareCH2(ch->timer);
+    LL_TIM_OC_SetCompareCH2(ch->timer, ccr_val);
+  } else if (ch->channel == 3) {
+    uint32_t tmp = LL_TIM_OC_GetCompareCH3(ch->timer);
+    LL_TIM_OC_SetCompareCH3(ch->timer, ccr_val);
+  } else if (ch->channel == 4) {
+    uint32_t tmp = LL_TIM_OC_GetCompareCH4(ch->timer);
+    LL_TIM_OC_SetCompareCH4(ch->timer, ccr_val);
+  }
+}
+
+/*
 void TIM_SetupPWM_TIM1_A8(uint32_t period_us, uint32_t ds_us) {
   GPIO_PIN pin1 = GPIO_GetPin("A8");    // TIM1 channel 1
   GPIO_Setup_OutAltPP(&pin1);
@@ -243,7 +295,7 @@ void TIM_SetupPWM_TIM2_A3(uint32_t period_us, uint32_t ds_us) {
 }
 
 void TIM_SetupPWM_TIM2_A15(uint32_t period_us, uint32_t ds_us) {
-  // A15 is JTDI 
+  // A15 is JTDI
   LL_GPIO_AF_Remap_SWJ_NOJTAG();
   LL_GPIO_AF_EnableRemap_TIM2();
   GPIO_PIN pin1 = GPIO_GetPin("A15");    // TIM2 channel 1
@@ -252,7 +304,7 @@ void TIM_SetupPWM_TIM2_A15(uint32_t period_us, uint32_t ds_us) {
 }
 
 void TIM_SetupPWM_TIM2_B3(uint32_t period_us, uint32_t ds_us) {
-  // B3 is JTDO 
+  // B3 is JTDO
   LL_GPIO_AF_Remap_SWJ_NOJTAG();
   LL_GPIO_AF_EnableRemap_TIM2();
   GPIO_PIN pin1 = GPIO_GetPin("B3");    // TIM2 channel 2
@@ -337,7 +389,7 @@ void TIM_SetupPWM_TIM3_C9(uint32_t period_us, uint32_t ds_us)
 
 void TIM_SetupPWM_TIM3_B4(uint32_t period_us, uint32_t ds_us)
 {
-  LL_GPIO_AF_Remap_SWJ_NONJTRST(); 
+  LL_GPIO_AF_Remap_SWJ_NONJTRST();
   LL_GPIO_AF_RemapPartial_TIM3();
   GPIO_PIN pin1 = GPIO_GetPin("B4");    // TIM3 channel 1
   GPIO_Setup_OutAltPP(&pin1);
@@ -400,3 +452,4 @@ void TIM_SetupPWM_OnPin(const char* pin_name, uint32_t period_us, uint32_t ds_us
     TIM_SetupPWM_TIM3_B5(period_us, ds_us);
   }
 }
+*/

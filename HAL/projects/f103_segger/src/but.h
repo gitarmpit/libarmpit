@@ -1,11 +1,12 @@
 #ifndef _BUT_H
 #define _BUT_H
 
-#ifndef _BUTTON_H
-#define _BUTTON_H
-
 #include "main.h"
 #include "gpio_helper.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* The default behavior is active low: button is configured as a weak pull-up
  * So to active it, the switch needs to be connected from the input port to ground
@@ -43,6 +44,8 @@ void Button_PullDown(button_ctx* ctx);
 
 BOOL Button_IsDown(button_ctx* ctx);
 BOOL Button_IsUp(button_ctx* ctx);
+BOOL Button_IsPinSet(button_ctx* ctx);
+
 
 /*
 GPIO_PIN* GetPin() const {
@@ -65,6 +68,9 @@ uint32_t GetDurDown() {
 */
 
 
+#ifdef __cplusplus
+}
 #endif
 
 #endif
+

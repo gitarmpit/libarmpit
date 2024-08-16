@@ -1,17 +1,18 @@
 #ifndef _SYSTICK_HELPER_H
 #define _SYSTICK_HELPER_H 
 
+#include "stm32f103xb.h"
+#include <stdint.h>
+
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#include "stm32f1xx_ll_utils.h"
-//#include <stdint.h>
 
 extern __IO uint32_t uwTick;
 
-void      SysTick_Init();
-void      SysTick_IncTick();
+void      SysTick_Init(void);
+void      SysTick_IncTick(void);
 uint32_t  SysTick_GetTick(void);
 void      SysTick_Delay(uint32_t delay_ms);
 

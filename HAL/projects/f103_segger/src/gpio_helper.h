@@ -2,7 +2,6 @@
 #define GPIO_HELPER_H
 
 #include "stm32f1xx_ll_gpio.h"
-#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,6 +44,9 @@ GPIO_PIN GPIO_GetPin(const char *pin_name);
 
 #define GPIO_SetPin(pin) \
   LL_GPIO_SetOutputPin((pin)->GPIOx, (pin)->Pin)
+
+#define GPIO_ResetPin(pin) \
+  LL_GPIO_ResetOutputPin((pin)->GPIOx, (pin)->Pin)
 
 #define GPIO_TogglePin(pin) \
   LL_GPIO_TogglePin((pin)->GPIOx, (pin)->Pin)

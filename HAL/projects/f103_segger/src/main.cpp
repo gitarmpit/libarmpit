@@ -1,9 +1,8 @@
+#include "but.h"
 #include "stm32f1xx_ll_bus.h"
 #include "stm32f1xx_ll_gpio.h"
 #include "stm32f1xx_ll_rcc.h"
 #include "stm32f1xx_ll_system.h"
-#include "stm32f1xx_ll_tim.h"
-#include "stm32f1xx_ll_utils.h"
 
 #include "button.h"
 #include "gpio_helper.h"
@@ -15,28 +14,63 @@
 // #define __HAL_RCC_DMA1_CLK_DISABLE()      (RCC->AHBENR &= ~(RCC_AHBENR_DMA1EN))
 
 void SystemClock_Config(void);
+void SystemClock_Config_HSI(void);
 
 static GPIO_PIN* led;
 
 static int cnt = 0;
-void Timer_Callback(void) {
+static BOOL UP = FALSE;
+static void Timer_Callback(void*) {
   GPIO_TogglePin(led);
 }
 
+static void Timer_Callback2(void* ctx) {
+  TIM_Channel* ch = (TIM_Channel*)ctx;
+  if (UP && cnt <= 70) {
+    TIM_UpdateDs(ch, cnt++);
+    if (cnt == 70) {
+      UP = FALSE;
+    }
+  }
+  else if (!UP && cnt >= 10) {
+    TIM_UpdateDs(ch, cnt--);
+    if (cnt == 10) {
+      UP = TRUE;
+    }
+  }
+}
+
+
 static void testPWM3() {
-  //GPIO_PIN pin1 = GPIO_GetPin("B0");    // TIM3 channel 3
-  //GPIO_Setup_OutAltPP(&pin1);
-  //TIM_SetupPWM_TIM3(3, 80, 20);
-  TIM_SetupPWM_OnPin("B5", 400, 200);
+  GPIO_PIN pin1 = GPIO_GetPin("B0");    // TIM3 channel 3
+  GPIO_Setup_OutAltPP(&pin1);
+  TIM_Channel ch = TIM_SetupPWM_TIM3(3, 80, 20);
+
+  TIM_UpdateDs(&ch, 40);
+
+  //TIM_SetupPWM_OnPin("B5", 400, 200);
+  while (1)
+    ;
+}
+
+static void testUpdateDs() {
+  GPIO_PIN pin1 = GPIO_GetPin("B0");    // TIM3 channel 3
+  GPIO_Setup_OutAltPP(&pin1);
+  TIM_Channel ch = TIM_SetupPWM_TIM3(3, 80, 10);
+  SysTick_Delay(2000);
+  UP = TRUE;
+  cnt = 10;
+  TIM_SetupCounterTIM1(100000, Timer_Callback2, &ch);
+
   while (1)
     ;
 }
 
 static void testPWM2() {
-  // GPIO_PIN pin1 = GPIO_GetPin("A0");    // TIM2 channel 1
-  // GPIO_Setup_OutAltPP(&pin1);
-  // TIM_SetupPWM_TIM2(1, 180, 40);
-  TIM_SetupPWM_OnPin("B11", 800, 600);
+  GPIO_PIN pin1 = GPIO_GetPin("A0");    // TIM2 channel 1
+  GPIO_Setup_OutAltPP(&pin1);
+  TIM_SetupPWM_TIM2(1, 180, 40);
+  //TIM_SetupPWM_OnPin("B11", 800, 600);
   while (1)
     ;
 }
@@ -44,8 +78,17 @@ static void testPWM2() {
 static void testPWM1() {
   // GPIO_PIN pin1 = GPIO_GetPin("A11");    // TIM1 channel 4
   // GPIO_Setup_OutAltPP(&pin1);
+
+  GPIO_PIN pin1 = GPIO_GetPin("A10");
+  GPIO_Setup_OutPP(&pin1);
+  GPIO_SetPin(&pin1);
+  GPIO_ResetPin(&pin1);
+    
+  GPIO_Setup_OutAltPP(&pin1);
+  TIM_SetupPWM_TIM1(3, 80, 20);
+
   // TIM_SetupPWM_TIM1(4, 80, 60);
-  TIM_SetupPWM_OnPin("A10", 8, 2);
+  //TIM_SetupPWM_OnPin("A10", 8, 2);
   while (1)
     ;
 }
@@ -56,7 +99,7 @@ static void testTimer() {
   led = &pin1;
 
   GPIO_SetPin(&pin1);
-  TIM_SetupCounterTIM1(100, Timer_Callback);
+  TIM_SetupCounterTIM1(100, Timer_Callback, NULL);
   while (1)
     ;
 }
@@ -71,6 +114,19 @@ static void testButton() {
     printf("%d\n", b.IsPinSet());
   }
 }
+
+static void testButton2() {
+  GPIO_PIN sw = GPIO_GetPin("A7");
+  // GPIO_Setup_In_Pullup(&sw);
+  button_ctx button = Button_Init(&sw, 1);
+
+  while (1) {
+    SysTick_Delay(100);
+    // printf ("%d\n", GPIO_IsSet(&sw));
+    printf("%d\n", Button_IsPinSet(&button));
+  }
+}
+
 
 static void testBlinky() {
   GPIO_PIN pin1 = GPIO_GetPin("B0");
@@ -100,11 +156,14 @@ int main(void) {
   LL_GPIO_AF_Remap_SWJ_NONJTRST();
   LL_GPIO_AF_Remap_SWJ_NOJTAG();
 
-  SystemClock_Config();
+  SystemClock_Config_HSI();
 
   //testBlinky();
-  //testPWM3();
-  testTimer();
+  testPWM1();
+  // testTimer();
+
+  //testUpdateDs();
+  //testButton2();
 
   while (1)
     ;
@@ -143,8 +202,8 @@ void SystemClock_Config(void) {
   SysTick_Init();
 }
 
-#if 0
-void SystemClock_Config(void)
+
+void SystemClock_Config_HSI(void)
 {
   LL_FLASH_SetLatency(LL_FLASH_LATENCY_2);
   while(LL_FLASH_GetLatency()!= LL_FLASH_LATENCY_2)
@@ -177,10 +236,10 @@ void SystemClock_Config(void)
 
   // LL_SetSystemCoreClock(64000000);
 
+  SystemCoreClockUpdate();
   SysTick_Init();
   LL_RCC_SetADCClockSource(LL_RCC_ADC_CLKSRC_PCLK2_DIV_8);
 }
-#endif
 
 void Error_Handler(void) {
   __disable_irq();

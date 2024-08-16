@@ -1,4 +1,5 @@
 #include "bh.h"
+#define MAX_BUTTONS 32
 
 // if defined, single click will not be triggered immeditiately
 // we'll wait for another click in which case it will treated as a double click
@@ -6,25 +7,62 @@
 // slows things down!
 // #define SINGLE_DOUBLE_CLICK_MUTUALLY_EXCLUSIVE
 
-const static uint32_t DEFAULT_TIMER_UPDATE_INTERVAL_US = 2000;
-const static uint32_t DEFAULT_SETTLE_TIME_US  = DEFAULT_TIMER_UPDATE_INTERVAL_US * 2;
+#define DEFAULT_TIMER_UPDATE_INTERVAL_US 2000
+#define DEFAULT_SETTLE_TIME_US  DEFAULT_TIMER_UPDATE_INTERVAL_US * 2;
 
 // Windows default is 500ms
-const static uint32_t DOUBLE_CLICK_INTERVAL_MS = 300;
-
-const static uint32_t SINGLE_CLICK_INTERVAL_MS = 1500;
+#define DOUBLE_CLICK_INTERVAL_MS = 300;
+#define SINGLE_CLICK_INTERVAL_MS = 1500;
 
 static uint32_t timer_update_interval_us;
 static uint32_t settle_time_us;
 static uint32_t n_retries;
-static const static uint8_t MAX_BUTTONS = 32;
 
-static TIMER* _timer;
+static TIM_TypeDef* _timer;
 
-Button _buttons[MAX_BUTTONS];
+button_ctx _buttons[MAX_BUTTONS];
+
 uint8_t _totalButtons;
 uint32_t _timerHookInterval;
 uint32_t _lastTimerHookTime;
+
+button_handler _on_state_chage;
+button_handler _on_up;
+button_handler _on_down;
+button_handler _on_click;
+button_handler _on_double_click;
+button_handler _timer_hook_handler;
+
+
+void BH_SetOnStateChangeHandler(button_handler on_state_chage) {
+  _on_state_chage = on_state_chage;
+}
+
+void BH_SetOnButtonUpHandler(button_handler on_up) {
+  _on_up = on_up;
+}
+
+void BH_SetOnButtonDownHandler(button_handler on_down) {
+  _on_down = on_down;
+}
+
+void BH_SetOnClickHandler(button_handler on_click) {
+  _on_click = on_click;
+}
+
+void BH_SetOnDoubleClickHandler(button_handler on_double_click) {
+  _on_double_click = on_double_click;
+}
+
+void BH_SetTimerHookHandler(button_handler timer_hook_handler) {
+  _timer_hook_handler = timer_hook_handler;
+}
+
+
+
+#if 0
+
+
 
 ButtonHandler::ButtonHandler(TIMER* timer, bool initialize_timer) {
   _timer = timer;
@@ -182,3 +220,5 @@ bool ButtonHandler::HasButtonStateChanged(Button* b) {
 
   return stateChanged;
 }
+
+#endif
