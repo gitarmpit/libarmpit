@@ -9,7 +9,7 @@ void SysTick_Handler(void)
     SysTick_IncTick();
 }
 
-void SysTick_Init()
+void SysTick_Init(void)
 {
     LL_RCC_ClocksTypeDef RCC_Clocks;
     LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
@@ -17,7 +17,7 @@ void SysTick_Init()
     NVIC_SetPriority(SysTick_IRQn, 0);
 }
 
-void SysTick_IncTick() 
+void SysTick_IncTick(void) 
 {
   ++uwTick;
 }

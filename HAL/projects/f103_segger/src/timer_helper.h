@@ -1,24 +1,42 @@
 #ifndef TIMER_HELPER_H
 #define TIMER_HELPER_H
 
+#include "stm32f103xb.h"
+#include <stdint.h>
+
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-extern void (*tim1_ptr)(void);
-extern void (*tim2_ptr)(void);
-extern void (*tim3_ptr)(void);
+typedef void (*tim_handler)(void*);
+
+extern tim_handler  tim1_handler;
+extern tim_handler  tim2_handler;
+extern tim_handler  tim3_handler;
+
+typedef struct {
+  TIM_TypeDef *timer;
+  uint8_t channel;
+} TIM_Channel;
 
 
 void TIM_SetUpdatePeriod_us (TIM_TypeDef *timer, uint32_t us);
 
-void TIM_SetupCounterTIM1(uint32_t period_us, void (*tim_ptr)(void));
-void TIM_SetupCounterTIM2(uint32_t period_us, void (*tim_ptr)(void));
-void TIM_SetupCounterTIM3(uint32_t period_us, void (*tim_ptr)(void));
+void TIM_SetupCounter(TIM_TypeDef *timer, uint32_t period_us, tim_handler th, void* ctx);
+void TIM_SetHandler(TIM_TypeDef *timer, tim_handler th, void* ctx);
 
-void TIM_SetupPWM_TIM1(int channel, uint32_t period_us, uint32_t ds_us);
-void TIM_SetupPWM_TIM2(int channel, uint32_t period_us, uint32_t ds_us);
-void TIM_SetupPWM_TIM3(int channel, uint32_t period_us, uint32_t ds_us);
+void TIM_SetupCounterTIM1(uint32_t period_us, tim_handler th, void* ctx);
+void TIM_SetupCounterTIM2(uint32_t period_us, tim_handler th, void* ctx);
+void TIM_SetupCounterTIM3(uint32_t period_us, tim_handler th, void* ctx);
+
+////////////////////////////////////////////////////////////////////////////////
+// PWM
+
+void TIM_SetupPWM_TIM1(uint8_t channel, uint32_t period_us, uint32_t ds_us);
+void TIM_SetupPWM_TIM2(uint8_t channel, uint32_t period_us, uint32_t ds_us);
+TIM_Channel TIM_SetupPWM_TIM3(uint8_t channel, uint32_t period_us, uint32_t ds_us);
+
+void TIM_UpdateDs (TIM_Channel* ch, uint32_t ds_us);
 
 void TIM_SetupPWM_TIM1_A8(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM1_A9(uint32_t period_us, uint32_t ds_us);

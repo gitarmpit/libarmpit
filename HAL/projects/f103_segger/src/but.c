@@ -1,17 +1,16 @@
 #include "but.h"
 #include <string.h>
 
-
-button_ctx Button_Init(GPIO_PIN* pin, uint8_t buttonId)
-{
+button_ctx Button_Init(GPIO_PIN* pin, uint8_t buttonId) {
   button_ctx ctx;
-  memset (&ctx, 0, sizeof ctx);
-  ctx.buttonId = buttonId;
-  ctx.pin      = pin;
-  ctx.lastClick = 0;
+  memset(&ctx, 0, sizeof ctx);
+  ctx.buttonId     = buttonId;
+  ctx.pin          = pin;
+  ctx.lastClick    = 0;
   ctx.n_same_state = 0;
   ctx.lastDown     = 0;
   ctx.durDown      = 0;
+  
 
   GPIO_Setup_In_Pullup(pin);
   Button_PullUp(&ctx);
@@ -43,3 +42,5 @@ BOOL Button_IsDown(button_ctx* ctx) {
 BOOL Button_IsUp(button_ctx* ctx) {
   return !Button_IsDown(ctx);
 }
+
+

@@ -1,10 +1,9 @@
+
 #ifndef _BH_H
 #define _BH_H
 
 #include "but.h"
-#include "gpio_helper.h"
-#include "systick_helper.h"
-#include "timer_helper.h"
+#include "stm32f103xb.h"
 
 /* The default behavior is active low: button is configured as a weak pull-up
  * So to active it, the switch needs to be connected from the input port to ground
@@ -12,21 +11,24 @@
  *
  */
 
-void BH_Init (TIM_TypeDef* tim); 
-void BH_AddButton(Button* button);
+typedef void (*button_handler)(void*);
 
-Button* BH_GetButton(uint8_t ID);
+void BH_Init (TIM_TypeDef* tim); 
+void BH_AddButton(button_ctx* button);
+
+button_ctx* BH_GetButton(uint8_t ID);
 
 void BH_SetUpdateIntervalUs(uint32_t us);
 void BH_SetSettleTimeUs(uint32_t us);
 
-void BH_SetOnStateChange(Button* button);
-void BH_SetOnButtonUp(Button* button);
-void BH_SetOnButtonDown(Button* button);
-void BH_SetOnClick(Button* button);
-void BH_SetOnDoubleClick(Button* button);
-void BH_SetTimerHook(Button* button);
+void BH_SetOnStateChangeHandler(button_handler on_state_chage);
+void BH_SetOnButtonUpHandler(button_handler on_up);
+void BH_SetOnButtonDownHandler(button_handler on_down);
+void BH_SetOnClickHandler(button_handler on_click);
+void BH_SetOnDoubleClickHandler(button_handler on_double_click);
+void BH_SetTimerHookHandler(button_handler timer_hook_handler);
 
 // void SetTimerHookInterval (uint32_t ms) { _timerHookInterval = ms; }
+
 
 #endif

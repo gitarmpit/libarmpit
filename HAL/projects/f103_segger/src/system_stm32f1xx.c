@@ -61,11 +61,12 @@ const uint8_t APBPrescTable[8U] =  {0, 0, 0, 0, 1, 2, 3, 4};
 
 void SystemInit (void)
 {
-#if defined(STM32F100xE) || defined(STM32F101xE) || defined(STM32F101xG) || defined(STM32F103xE) || defined(STM32F103xG)
-  #ifdef DATA_IN_ExtSRAM
-    SystemInit_ExtMemCtl(); 
-  #endif /* DATA_IN_ExtSRAM */
-#endif 
+
+#if defined (__FPU_USED) && (__FPU_USED == 1U)
+  SCB->CPACR |= ((3U << 10U*2U) |           /* enable CP10 Full Access */
+                 (3U << 11U*2U)  );         /* enable CP11 Full Access */
+#endif
+
 
   /* Configure the Vector Table location -------------------------------------*/
 #if defined(USER_VECT_TAB_ADDRESS)

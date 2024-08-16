@@ -15,8 +15,8 @@ typedef uint8_t BOOL;
 
 void Error_Handler(void);
 
-void Timer_Callback();
-void SysTick_Callback();
+//void Timer_Callback();
+//void SysTick_Callback();
 
 
 #define SW1_Pin        LL_GPIO_PIN_9

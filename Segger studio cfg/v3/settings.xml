@@ -1,0 +1,129 @@
+<!DOCTYPE CrossWorks_Settings_File>
+<settings>
+  <setting name="Environment/Active Studio Theme">Light</setting>
+  <setting name="Environment/Application Main Font">Segoe UI,8,-1,5,50,0,0,0,0,0</setting>
+  <setting name="Environment/Application Monospace Font">Consolas,10,-1,5,50,0,0,0,0,0</setting>
+  <setting name="Environment/Autos/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/BUILD_OPTIONS_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/Breakpoints/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/Breakpoints/Perspectives/Debug/State">Show</setting>
+  <setting name="Environment/Browser/Favorites">AAAACgAAADoAaAB0AHQAcAA6AC8ALwB3AHcAdwAuAHMAZQBnAGcAZQByAC4AYwBvAG0ALwByAHMAcwAuAHgAbQBsAAAAKABMAGEAdABlAHMAdAAgAE4AZQB3AHMAIABSAFMAUwAgAEYAZQBlAGQAAAABACWLaAImIXD/AAAAAP//////AAAABQAAAAwAUwBFAEcARwBFAFIAAAABAAAAAP////////////////////8AAAAA//////8AAAAAAAAAAP//////////</setting>
+  <setting name="Environment/Browser/Favorites Auto Added">AAAACgAAADoAaAB0AHQAcAA6AC8ALwB3AHcAdwAuAHMAZQBnAGcAZQByAC4AYwBvAG0ALwByAHMAcwAuAHgAbQBsAAAAKABMAGEAdABlAHMAdAAgAE4AZQB3AHMAIABSAFMAUwAgAEYAZQBlAGQAAAABACWLaAImIXD/AAAAAP//////AAAABQAAAAwAUwBFAEcARwBFAFIAAAABAAAAAP////////////////////8AAAAA//////8AAAAAAAAAAP//////////</setting>
+  <setting name="Environment/Browser/History">AAAACgAAAJIAQwA6AC8AUAByAG8AZwByAGEAbQAgAEYAaQBsAGUAcwAvAFMARQBHAEcARQBSAC8AUwBFAEcARwBFAFIAIABFAG0AYgBlAGQAZABlAGQAIABTAHQAdQBkAGkAbwAgAGYAbwByACAAQQBSAE0AIAA3AC4AMgAyAC8AaAB0AG0AbAAvAGgAbwBtAGUALgBoAHQAbQAAABAAaABvAG0AZQAuAGgAdABtAAAAAwAli3oDdGU2/wAAAAD//////wAAAAAAAAAaAFUAbgBjAGEAdABlAGcAbwByAGkAegBlAGQAAAAAAAAAAP////////////////////8AAAAA//////8AAAAAAAAAAP//////////</setting>
+  <setting name="Environment/Build/Build Before Debug">Yes</setting>
+  <setting name="Environment/Build/Building Threads">0</setting>
+  <setting name="Environment/Build/Show Build Information">Yes</setting>
+  <setting name="Environment/Build/Show Command Lines">Yes</setting>
+  <setting name="Environment/Build/Show Unparsed Error Output">Yes</setting>
+  <setting name="Environment/CMSIS_CORE_property_editor_dialog/Geometry">725,485,470,213</setting>
+  <setting name="Environment/CMSIS_DSP_property_editor_dialog/Geometry">725,485,470,213</setting>
+  <setting name="Environment/Call Stack/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/Call Stack/Show Stack Pointer">Yes</setting>
+  <setting name="Environment/Dashboard/Perspectives/Debug/State">Hide</setting>
+  <setting name="Environment/Dashboard/Perspectives/Standard/State">Hide</setting>
+  <setting name="Environment/Dashboard/Perspectives/Welcome/State">Show</setting>
+  <setting name="Environment/Debug Terminal/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/Disassembly/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/Disassembly/Perspectives/Debug/State">Show</setting>
+  <setting name="Environment/Environment Options Dialog/Geometry">660,383,600,370</setting>
+  <setting name="Environment/File History">AAAACgAAAKoAQwA6AC8AVQBzAGUAcgBzAC8AZwB1AGUAcwB0ADIALwBEAG8AYwB1AG0AZQBuAHQAcwAvAFMARQBHAEcARQBSACAARQBtAGIAZQBkAGQAZQBkACAAUwB0AHUAZABpAG8AIABmAG8AcgAgAEEAUgBNACAAUAByAG8AagBlAGMAdABzAC8ASABlAGwAbABvAC8AUwBvAHUAcgBjAGUALwBtAGEAaQBuAC4AYwAAAIwALwAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAAAAEAJYtoAiZIYf8AAAAA//////8AAAAAAAAAGgBVAG4AYwBhAHQAZQBnAG8AcgBpAHoAZQBkAAAAAAAAAAD/////////////////////AAAAAP//////AAAAAAAAAAD/////AAAAAQ==</setting>
+  <setting name="Environment/File System Location Property Editor/Geometry">711,462,498,259</setting>
+  <setting name="Environment/Globals/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/Internet/Check Updates">No</setting>
+  <setting name="Environment/Internet/Download History">http://studio.segger.com/packages/package.lst,C:/Users/guest2/AppData/Local/SEGGER/SEGGER Embedded Studio/v3/packages/downloads/package.lst,;http://studio.segger.com/packages/package.lst,C:/Users/guest2/AppData/Local/SEGGER/SEGGER Embedded Studio/v3/packages/downloads/package.lst,</setting>
+  <setting name="Environment/J-Link Control Panel/Perspectives/Standard/State">Active</setting>
+  <setting name="Environment/LIBRARY_IO_TYPE_property_editor_dialog/Geometry">725,382,470,419</setting>
+  <setting name="Environment/Locals/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/Main Window/Geometry">0,0,0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Bottom Splitter/">0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Bottom Splitter/Debug">0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Bottom Splitter/Standard">0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Bottom Splitter/Welcome">1916,0</setting>
+  <setting name="Environment/Main Window/Splitters/Central Splitter/">0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Central Splitter/Debug">1092,0</setting>
+  <setting name="Environment/Main Window/Splitters/Central Splitter/Standard">1092,0</setting>
+  <setting name="Environment/Main Window/Splitters/Central Splitter/Welcome">903,184</setting>
+  <setting name="Environment/Main Window/Splitters/Edit Splitter/">0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Edit Splitter/Debug">986,0</setting>
+  <setting name="Environment/Main Window/Splitters/Edit Splitter/Standard">734,0</setting>
+  <setting name="Environment/Main Window/Splitters/Edit Splitter/Welcome">1916,0</setting>
+  <setting name="Environment/Main Window/Splitters/Left Splitter/">0,0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Left Splitter/Debug">1092,0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Left Splitter/Standard">903,184,0</setting>
+  <setting name="Environment/Main Window/Splitters/Left Splitter/Welcome">0,0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Main Splitter/">0,0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Main Splitter/Debug">368,986,552</setting>
+  <setting name="Environment/Main Window/Splitters/Main Splitter/Standard">454,734,718</setting>
+  <setting name="Environment/Main Window/Splitters/Main Splitter/Welcome">0,1916,0</setting>
+  <setting name="Environment/Main Window/Splitters/MainSplitter">25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Right Splitter/">0,0,0</setting>
+  <setting name="Environment/Main Window/Splitters/Right Splitter/Debug">470,617,0</setting>
+  <setting name="Environment/Main Window/Splitters/Right Splitter/Standard">776,311,0</setting>
+  <setting name="Environment/Main Window/Splitters/Right Splitter/Welcome">0,0,0</setting>
+  <setting name="Environment/Main Window/Toolbar State">
+
+
+Navigator,Standard,Build,Text Edit,Debug,Debug Location,Macro Recording,Source Control,
+[Navigator,0,0,-1,-1,0][Standard,0,0,-1,-1,0][Build,0,0,-1,-1,0][Text Edit,0,0,-1,-1,0][Debug,0,0,-1,-1,0][Debug Location,0,0,-1,-1,0][Macro Recording,0,0,-1,-1,0][Source Control,0,0,-1,-1,0]
+
+
+
+
+
+
+</setting>
+  <setting name="Environment/Memory 1/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/New File Dialog/Geometry">660,368,600,400</setting>
+  <setting name="Environment/New Folder Dialog/Geometry">568,350,380,335</setting>
+  <setting name="Environment/New Project Dialog/Geometry">317,181,850,600</setting>
+  <setting name="Environment/Output Window View">Output</setting>
+  <setting name="Environment/Output/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/Output/Perspectives/Debug/State">Active</setting>
+  <setting name="Environment/Output/Perspectives/Standard/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/Output/Perspectives/Welcome/State">Active</setting>
+  <setting name="Environment/Package Manager Dialog/Geometry">407,182,720,444</setting>
+  <setting name="Environment/Project History">AAAACgAAAK4AQwA6AC8AVQBzAGUAcgBzAC8AZwB1AGUAcwB0ADIALwBEAG8AYwB1AG0AZQBuAHQAcwAvAFMARQBHAEcARQBSACAARQBtAGIAZQBkAGQAZQBkACAAUwB0AHUAZABpAG8AIABmAG8AcgAgAEEAUgBNACAAUAByAG8AagBlAGMAdABzAC8ASABlAGwAbABvAC8ASABlAGwAbABvAC4AZQBtAFAAcgBvAGoAZQBjAHQAAAAKAEgAZQBsAGwAbwAAAAIAJYtoAiYmzf8AAAAA//////8AAAAAAAAAEABjAGEAdABlAGcAbwByAHkAAAAAAAAAAP////////////////////8AAAAA//////8AAAAAAAAAAP//////////AAAAtgBDADoALwBVAHMAZQByAHMALwBnAHUAZQBzAHQAMgAvAEQAbwBjAHUAbQBlAG4AdABzAC8AUwBFAEcARwBFAFIAIABFAG0AYgBlAGQAZABlAGQAIABTAHQAdQBkAGkAbwAgAGYAbwByACAAQQBSAE0AIABQAHIAbwBqAGUAYwB0AHMALwB0AGUAcwB0AF8AZgAxAC8AdABlAHMAdABfAGYAMQAuAGUAbQBQAHIAbwBqAGUAYwB0AAAADgB0AGUAcwB0AF8AZgAxAAAAAwAli3oDdGcl/wAAAAD//////wAAAAAAAAAaAFUAbgBjAGEAdABlAGcAbwByAGkAegBlAGQAAAAAAAAAAP////////////////////8AAAAA//////8AAAAAAAAAAP//////////</setting>
+  <setting name="Environment/Project Properties Dialog/Geometry">600,346,1195,444</setting>
+  <setting name="Environment/ProjectPropertiesDialog/Headers/properties-dialog-list-view">365</setting>
+  <setting name="Environment/ProjectPropertiesDialog/Splitters/MainSplitter">489,661</setting>
+  <setting name="Environment/ProjectPropertiesDialog/Splitters/PropertiesSplitter">184,103</setting>
+  <setting name="Environment/Quick Watch Dialog/Geometry">295,144,400,300</setting>
+  <setting name="Environment/RSS History">AAAACg==</setting>
+  <setting name="Environment/Recent Projects/Perspectives/Standard/State">Active</setting>
+  <setting name="Environment/References/Perspectives/Standard/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/References/Perspectives/Standard/State">Show</setting>
+  <setting name="Environment/Registers 1/Perspectives/Debug/Dock Site Host">DockRightMiddle</setting>
+  <setting name="Environment/Simple Properties Dialog/Geometry">720,418,480,300</setting>
+  <setting name="Environment/Source Navigator/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/String List Property Editor/Geometry">725,377,470,429</setting>
+  <setting name="Environment/String Property Editor/Geometry">725,463,470,257</setting>
+  <setting name="Environment/Studio Theme">Light</setting>
+  <setting name="Environment/Target_property_editor_dialog/Geometry">701,403,522,454</setting>
+  <setting name="Environment/Task History">AAAACg==</setting>
+  <setting name="Environment/Watch 1/Perspectives/Debug/Dock Site Host">DockRightTop</setting>
+  <setting name="Environment/_property_editor_dialog/Geometry">725,358,470,467</setting>
+  <setting name="Environment/arm_architecture_property_editor_dialog/Geometry">725,279,470,625</setting>
+  <setting name="Environment/arm_compiler_variant_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/arm_core_type_property_editor_dialog/Geometry">725,395,470,393</setting>
+  <setting name="Environment/arm_fp_abi_property_editor_dialog/Geometry">725,453,470,277</setting>
+  <setting name="Environment/arm_library_optimization_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/arm_linker_variant_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/arm_target_device_name_property_editor_dialog/Geometry">1079,560,242,358</setting>
+  <setting name="Environment/cpp_enable_exceptions_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/cpp_enable_rtti_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/gcc_debugging_level_property_editor_dialog/Geometry">725,459,470,264</setting>
+  <setting name="Environment/gcc_wchar_size_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/is_cpp_project_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/libcxx_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/link_include_standard_libraries_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/link_map_file_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/link_time_optimization_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/linker_log_file_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Environment/use_compiler_driver_property_editor_dialog/Geometry">725,491,470,200</setting>
+  <setting name="Find In Files/Find History">SystemInit</setting>
+  <setting name="Find In Files/Match Case">Yes</setting>
+  <setting name="Find In Files/Match Whole Word">Yes</setting>
+  <setting name="Find Window/File Type">*.*</setting>
+  <setting name="Text Editor/Color Scheme V4">CrossWorks Standard;0,Automatic,Automatic;0,#c00000,Automatic;0,#008000,Automatic;1,#000080,Automatic;0,#808080,Automatic;1,#ff9900,Automatic;0,#008080,Automatic;0,Automatic,Automatic;0,#000080,Automatic;1,Automatic,Automatic;0,#ffffff,#ff0000;0,#ffff00,#ff6600;0,#ff6600,Automatic;0,#808080,Automatic;0,#000080,Automatic;0,Automatic,Automatic;2,#008000,Automatic;0,Automatic,Automatic;0,#ffeb9c,Automatic;0,#ffffb7,Automatic;0,#bcffba,Automatic;0,#eaffee,Automatic;0,#ffddb4,Automatic;0,#f9cca7,Automatic;0,#d62430,Automatic;0,#ffffe7,Automatic;0,Automatic,Automatic;0,#a0a0a0,Automatic;0,#f0f0f0,Automatic;0,#c00000,Automatic;0,#c00000,Automatic;0,#ff0000,Automatic;1,#000080,Automatic;0,Automatic,Automatic;0,Automatic,Automatic;0,Automatic,Automatic;0,#fffe0e,Automatic;0,#ff0000,Automatic;0,#800000,Automatic;0,#a3dc9c,Automatic;0,#a0a0a0,Automatic;0,#606060,Automatic;0,Automatic,Automatic;0,#cd0000,Automatic;0,#00cd00,Automatic;0,#cdcd00,Automatic;0,#0000cd,Automatic;0,#800080,Automatic;0,#008080,Automatic;0,Automatic,Automatic;0,Automatic,Automatic;0,#ff0000,Automatic;0,#00ff00,Automatic;0,#ffff00,Automatic;0,#0000ff,Automatic;0,#ff00ff,Automatic;0,#00ffff,Automatic;0,Automatic,Automatic;0,#4c9aff,Automatic;0,Automatic,Automatic;0,#ff0000,Automatic</setting>
+  <setting name="Text Editor/Font">Consolas,10,-1,5,50,0,0,0,0,0</setting>
+</settings>
