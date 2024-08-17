@@ -1,11 +1,13 @@
 #include "button_handler.h"
-#include "systick_helper.h"
+#include "systick.h"
 
 // if defined, single click will not be triggered immeditiately
 // we'll wait for another click in which case it will treated as a double click
 // if no click within the double click interval, single click event will fire
 // slows things down!
+
 // #define SINGLE_DOUBLE_CLICK_MUTUALLY_EXCLUSIVE
+
 
 ButtonHandler::ButtonHandler(TIMER* timer) {
   _timer = timer;

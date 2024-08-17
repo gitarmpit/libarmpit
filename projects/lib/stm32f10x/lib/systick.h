@@ -1,5 +1,5 @@
-#ifndef _SYSTICK_HELPER_H
-#define _SYSTICK_HELPER_H 
+#ifndef _SYSTICK_H
+#define _SYSTICK_H 
 
 #include "stm32f103xb.h"
 #include <stdint.h>
