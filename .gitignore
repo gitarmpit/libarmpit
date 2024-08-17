@@ -2,5 +2,6 @@ Release/
 Debug/
 .settings/
 *.emSession
+*.jlink
 
 /.project
