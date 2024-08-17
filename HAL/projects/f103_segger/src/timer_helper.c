@@ -6,10 +6,12 @@
 tim_handler tim1_handler = 0;
 tim_handler tim2_handler = 0;
 tim_handler tim3_handler = 0;
+tim_handler tim4_handler = 0;
 
 static void* tim1_ctx = 0;
 static void* tim2_ctx = 0;
 static void* tim3_ctx = 0;
+static void* tim4_ctx = 0;
 
 void TIM1_UP_IRQHandler(void) {
   if (LL_TIM_IsActiveFlag_UPDATE(TIM1) == 1) {
@@ -37,6 +39,16 @@ void TIM3_IRQHandler(void) {
     }
   }
 }
+
+void TIM4_IRQHandler(void) {
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM4) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM4);
+    if (tim4_handler) {
+      tim4_handler(tim4_ctx);
+    }
+  }
+}
+
 
 static uint32_t GetTIMx_CLK(int isAPB1) {
   LL_RCC_ClocksTypeDef RCC_Clocks;
@@ -124,6 +136,13 @@ void TIM_SetupCounterTIM3(uint32_t period_us, tim_handler th, void* ctx) {
   tim3_ctx     = ctx;
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
   _TIM_SetUpCounter(TIM3, LL_APB1_GRP1_PERIPH_TIM3, TIM3_IRQn, period_us);
+}
+
+void TIM_SetupCounterTIM4(uint32_t period_us, tim_handler th, void* ctx) {
+  tim4_handler = th;
+  tim4_ctx     = ctx;
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM4);
+  _TIM_SetUpCounter(TIM4, LL_APB1_GRP1_PERIPH_TIM4, TIM4_IRQn, period_us);
 }
 
 void TIM_SetupCounter(TIM_TypeDef* timer, uint32_t period_us, tim_handler th, void* ctx) {

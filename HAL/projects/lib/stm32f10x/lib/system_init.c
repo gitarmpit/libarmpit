@@ -2,10 +2,10 @@
 #include "stm32f1xx_ll_gpio.h"
 #include "stm32f1xx_ll_rcc.h"
 #include "stm32f1xx_ll_system.h"
-#include "systick.h"
+#include "systick_helper.h"
 #include "stm32f1xx_ll_bus.h"
 #include "stm32f1xx_ll_gpio.h"
-#include "main.h"
+#include "system_init.h"
 
 
 void System_Config(void) {

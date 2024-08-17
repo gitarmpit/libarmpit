@@ -13,6 +13,7 @@ typedef void (*tim_handler)(void*);
 extern tim_handler  tim1_handler;
 extern tim_handler  tim2_handler;
 extern tim_handler  tim3_handler;
+extern tim_handler  tim4_handler;
 
 typedef struct {
   TIM_TypeDef *timer;
@@ -28,6 +29,7 @@ void TIM_SetHandler(TIM_TypeDef *timer, tim_handler th, void* ctx);
 void TIM_SetupCounterTIM1(uint32_t period_us, tim_handler th, void* ctx);
 void TIM_SetupCounterTIM2(uint32_t period_us, tim_handler th, void* ctx);
 void TIM_SetupCounterTIM3(uint32_t period_us, tim_handler th, void* ctx);
+void TIM_SetupCounterTIM4(uint32_t period_us, tim_handler th, void* ctx);
 
 ////////////////////////////////////////////////////////////////////////////////
 // PWM
