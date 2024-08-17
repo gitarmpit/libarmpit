@@ -244,7 +244,8 @@ void TIM_UpdateDs(TIM_Channel* ch, uint32_t ds_us) {
   }
 }
 
-/*
+#ifdef TIM_HELPERS
+
 void TIM_SetupPWM_TIM1_A8(uint32_t period_us, uint32_t ds_us) {
   GPIO_PIN pin1 = GPIO_GetPin("A8");    // TIM1 channel 1
   GPIO_Setup_OutAltPP(&pin1);
@@ -452,4 +453,4 @@ void TIM_SetupPWM_OnPin(const char* pin_name, uint32_t period_us, uint32_t ds_us
     TIM_SetupPWM_TIM3_B5(period_us, ds_us);
   }
 }
-*/
+#endif

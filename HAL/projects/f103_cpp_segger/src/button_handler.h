@@ -1,12 +1,8 @@
 #ifndef _BUTTON_HANDLER_H
 #define _BUTTON_HANDLER_H
 
-#if 0
-
 #include "timer_cpp.h"
-#include "gpio_cpp.h"
 #include "button.h"
-#include "system_time.h"
 
 /* The default behavior is active low: button is configured as a weak pull-up
  * So to active it, the switch needs to be connected from the input port to ground
@@ -31,19 +27,17 @@ private:
 
     TIMER* _timer;
 
-
     Button  _buttons[MAX_BUTTONS];
     uint8_t  _totalButtons;
     uint32_t _timerHookInterval;
     uint32_t _lastTimerHookTime;
 
-
-    void Init(bool initialize_timer);
+    void Init();
 
     bool HasButtonStateChanged(Button* b);
-    virtual void HandleInterrupt(bool isUpdate, bool isTrigger);
+    virtual void HandleInterrupt();
 protected:
-    ButtonHandler(TIMER* timer, bool initialize_timer = true);
+    ButtonHandler(TIMER* timer);
     virtual ~ButtonHandler() {}
 
 public:
@@ -66,7 +60,5 @@ public:
 
 
 };
-
-#endif
 
 #endif

@@ -25,7 +25,6 @@ static void Timer_Callback(void*) {
   GPIO_TogglePin(led);
 }
 
-/*
 static void Timer_Callback2(void* ctx) {
   TIM_Channel* ch = (TIM_Channel*)ctx;
   if (UP && cnt <= 70) {
@@ -95,6 +94,17 @@ static void testPWM1() {
     ;
 }
 
+static void testTimer() {
+  GPIO_PIN pin1 = GPIO_GetPin("B0");
+  GPIO_Setup_OutPP(&pin1);
+  led = &pin1;
+
+  GPIO_SetPin(&pin1);
+  TIM_SetupCounterTIM1(100, Timer_Callback, NULL);
+  while (1)
+    ;
+}
+
 static void testButton() {
   GPIO_PIN sw = GPIO_GetPin("A7");
   // GPIO_Setup_In_Pullup(&sw);
@@ -141,7 +151,7 @@ static void testButtonHandler() {
 
 
 static void testBlinky() {
-  GPIO_PIN pin1 = GPIO_GetPin("B8");
+  GPIO_PIN pin1 = GPIO_GetPin("B0");
   GPIO_Setup_OutPP(&pin1);
   while (1) {
     printf("%d\n", SysTick_GetTick());
@@ -149,19 +159,6 @@ static void testBlinky() {
     SysTick_Delay(1000);
   }
 }
-*/
-
-static void testTimer() {
-  GPIO_PIN pin1 = GPIO_GetPin("B8");
-  GPIO_Setup_OutPP(&pin1);
-  led = &pin1;
-
-  GPIO_SetPin(&pin1);
-  TIM_SetupCounterTIM1(1, Timer_Callback, NULL);
-  while (1)
-    ;
-}
-
 
 int main(void) {
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_AFIO);
@@ -181,16 +178,16 @@ int main(void) {
   LL_GPIO_AF_Remap_SWJ_NONJTRST();
   LL_GPIO_AF_Remap_SWJ_NOJTAG();
 
-  SystemClock_Config();
+  SystemClock_Config_HSI();
 
   //testBlinky();
   //testPWM1();
-  testTimer();
+  // testTimer();
 
   //testUpdateDs();
   //testButton2();
 
-  //testButtonHandler();
+  testButtonHandler();
 
   while (1)
     ;
