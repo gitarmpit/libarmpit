@@ -56,19 +56,30 @@ static void testButtonHandler() {
     ;
 }
 
+static void testPWM() {
+  GPIO_PIN pin1 = GPIO_GetPin("A0");    // TIM2 channel 1
+  GPIO_Setup_OutAltPP(&pin1);
+  TIMER* t = TIMER2::GetInstance();
+  t->SetupPWM(1, 40, 20);
+}
+
+static void testTimer() {
+
+  GPIO_PIN pin1 = GPIO_GetPin("A0");  // LED: B8
+  GPIO_Setup_OutPP(&pin1);
+  led = &pin1;
+
+  TestInterruptHandler handler;
+  TIMER* t = TIMER4::GetInstance();
+  t->SetInterruptHandler(&handler);
+  //__tim2_handler = Timer_Callback;
+  t->SetupCounter(40);
+}
 
 int main(void) {
   
   System_Config();
   SystemClock_Config_HSE();
-
-  /*
-  TestInterruptHandler handler;
-  TIMER* t = TIMER2::GetInstance();
-  t->SetInterruptHandler(&handler);
-  __tim2_handler = Timer_Callback;
-  t->SetupCounter(1);
-  */
 
   /*
   while (1) {
@@ -78,7 +89,10 @@ int main(void) {
   }
   */
 
-  testButtonHandler();
+  // testButtonHandler();
+
+  //testPWM();
+  testTimer();
 
   while (1)
     ;

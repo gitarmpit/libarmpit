@@ -9,10 +9,12 @@ extern "C" {
 tim_handler __tim1_handler = 0;
 tim_handler __tim2_handler = 0;
 tim_handler __tim3_handler = 0;
+tim_handler __tim4_handler = 0;
 
 static void* tim1_ctx = 0;
 static void* tim2_ctx = 0;
 static void* tim3_ctx = 0;
+static void* tim4_ctx = 0;
 
 #ifdef TIM_DIRECT_INTERRUPT 
 
@@ -43,6 +45,16 @@ void TIM3_IRQHandler(void) {
   }
 }
 
+void TIM4_IRQHandler(void) {
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM3) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM3);
+    if (__tim4_handler) {
+      __tim4_handler(tim4_ctx);
+    }
+  }
+}
+
+
 #else
 
 
@@ -64,6 +76,13 @@ void TIM3_IRQHandler(void) {
   if (LL_TIM_IsActiveFlag_UPDATE(TIM3) == 1) {
     LL_TIM_ClearFlag_UPDATE(TIM3);
     TIMER3::GetInstance()->HandleInterrupt();
+  }
+}
+
+void TIM4_IRQHandler(void) {
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM4) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM4);
+    TIMER4::GetInstance()->HandleInterrupt();
   }
 }
 
@@ -148,6 +167,14 @@ void TIMER::SetupCounter(uint32_t period_us) {
 }
 
 TIM_Channel TIMER::SetupPWM(uint8_t channel, uint32_t period_us, uint32_t ds_us) {
+
+  if (_isAPB1) {
+    LL_APB1_GRP1_EnableClock(_periph);
+  }
+  else {
+    LL_APB2_GRP1_EnableClock(_periph);
+  }
+
   uint16_t presc, arr;
   uint32_t timClk = GetTIMx_CLK();
 

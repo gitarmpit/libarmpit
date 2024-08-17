@@ -10,6 +10,7 @@ typedef void (*tim_handler)(void*);
 extern tim_handler __tim1_handler;
 extern tim_handler __tim2_handler;
 extern tim_handler __tim3_handler;
+extern tim_handler __tim4_handler;
 }
 
 class TIMER;
@@ -88,6 +89,17 @@ public:
 public:
   static TIMER3* GetInstance() {
     static TIMER3 instance;
+    return &instance;
+  }
+};
+
+class TIMER4 : public TIMER {
+public:
+  TIMER4() : TIMER(TIM4, true, TIM4_IRQn, LL_APB1_GRP1_PERIPH_TIM4) {}
+
+public:
+  static TIMER4* GetInstance() {
+    static TIMER4 instance;
     return &instance;
   }
 };
