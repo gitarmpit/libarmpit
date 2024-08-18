@@ -2,32 +2,57 @@
 #include "stm32f7xx_ll_bus.h"
 #include "stm32f7xx_ll_rcc.h"
 #include "stm32f7xx_ll_tim.h"
+#include "gpio_helper.h"
+#include "system_init.h"
 
-tim_handler tim1_handler = 0;
-tim_handler tim2_handler = 0;
-tim_handler tim3_handler = 0;
-tim_handler tim4_handler = 0;
+tim_handler tim1_handler;
+tim_handler tim2_handler;
+tim_handler tim3_handler;
+tim_handler tim4_handler;
+tim_handler tim5_handler;
+tim_handler tim6_handler;
+tim_handler tim7_handler;
+tim_handler tim8_handler;
+tim_handler tim9_handler;
+tim_handler tim10_handler;
+tim_handler tim11_handler;
+tim_handler tim12_handler;
+tim_handler tim13_handler;
+tim_handler tim14_handler;
 
 static void* tim1_ctx = 0;
 static void* tim2_ctx = 0;
 static void* tim3_ctx = 0;
 static void* tim4_ctx = 0;
+static void* tim5_ctx = 0;
+static void* tim6_ctx = 0;
+static void* tim7_ctx = 0;
+static void* tim8_ctx = 0;
+static void* tim9_ctx = 0;
+static void* tim10_ctx = 0;
+static void* tim11_ctx = 0;
+static void* tim12_ctx = 0;
+static void* tim13_ctx = 0;
+static void* tim14_ctx = 0;
 
-void TIM1_BRK_TIM9_IRQHandler(void)
-{
-}
-
+// 1, 10
 void TIM1_UP_TIM10_IRQHandler(void)
 {
-  if (LL_TIM_IsActiveFlag_UPDATE(TIM1) == 1) {
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM1) && LL_TIM_IsEnabledIT_UPDATE(TIM1)) {
     LL_TIM_ClearFlag_UPDATE(TIM1);
     if (tim1_handler) {
       tim1_handler(tim1_ctx);
     }
+  } else if (LL_TIM_IsActiveFlag_UPDATE(TIM10) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM10);
+    if (tim10_handler) {
+      tim10_handler(tim10_ctx);
+    }
   }
+
 }
 
-
+// 2
 void TIM2_IRQHandler(void) {
   if (LL_TIM_IsActiveFlag_UPDATE(TIM2) == 1) {
     LL_TIM_ClearFlag_UPDATE(TIM2);
@@ -37,6 +62,7 @@ void TIM2_IRQHandler(void) {
   }
 }
 
+// 3
 void TIM3_IRQHandler(void) {
   if (LL_TIM_IsActiveFlag_UPDATE(TIM3) == 1) {
     LL_TIM_ClearFlag_UPDATE(TIM3);
@@ -46,11 +72,108 @@ void TIM3_IRQHandler(void) {
   }
 }
 
+// 4
 void TIM4_IRQHandler(void) {
   if (LL_TIM_IsActiveFlag_UPDATE(TIM4) == 1) {
     LL_TIM_ClearFlag_UPDATE(TIM4);
     if (tim4_handler) {
       tim4_handler(tim4_ctx);
+    }
+  }
+}
+
+// 5
+void TIM5_IRQHandler(void) {
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM5) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM5);
+    if (tim5_handler) {
+      tim5_handler(tim5_ctx);
+    }
+  }
+}
+
+// 6
+void TIM6_DAC_IRQHandler(void)
+{
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM6) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM6);
+    if (tim6_handler) {
+      tim6_handler(tim6_ctx);
+    }
+  }
+}
+
+// 7
+void TIM7_IRQHandler(void)
+{
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM7) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM7);
+    if (tim7_handler) {
+      tim7_handler(tim7_ctx);
+    }
+  }
+}
+
+// 8, 13
+void TIM8_UP_TIM13_IRQHandler(void)
+{
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM8) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM8);
+    if (tim8_handler) {
+      tim8_handler(tim8_ctx);
+    }
+  }
+  else if (LL_TIM_IsActiveFlag_UPDATE(TIM13) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM13);
+    if (tim13_handler) {
+      tim13_handler(tim13_ctx);
+    }
+  }
+
+}
+
+// 9
+void TIM1_BRK_TIM9_IRQHandler(void)
+{
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM9) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM9);
+    if (tim9_handler) {
+      tim9_handler(tim9_ctx);
+    }
+  }
+}
+
+// 11
+void TIM1_TRG_COM_TIM11_IRQHandler(void) 
+{
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM11) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM11);
+    if (tim11_handler) {
+      tim11_handler(tim11_ctx);
+    }
+  }
+}
+
+
+// 12
+void TIM8_BRK_TIM12_IRQHandler(void) 
+{
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM12) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM12);
+    if (tim12_handler) {
+      tim12_handler(tim12_ctx);
+    }
+  }
+}
+
+
+// 14
+void TIM8_TRG_COM_TIM14_IRQHandler(void) 
+{
+  if (LL_TIM_IsActiveFlag_UPDATE(TIM14) == 1) {
+    LL_TIM_ClearFlag_UPDATE(TIM14);
+    if (tim14_handler) {
+      tim14_handler(tim14_ctx);
     }
   }
 }
@@ -75,7 +198,7 @@ static uint32_t GetTIMx_CLK(int isAPB1) {
   return timx_clk;
 }
 
-/*
+
 static void CalculateTimerValues(uint32_t timClk, uint32_t us, uint16_t* presc, uint16_t* arr) {
 
   uint64_t timerCount = (uint64_t)timClk * (uint64_t)us / 1000000llu;
@@ -96,7 +219,6 @@ static void CalculateTimerValues(uint32_t timClk, uint32_t us, uint16_t* presc, 
   *arr = (uint16_t)(timerCount - 1);
   --(*presc);
 }
-*/
 
 static void CalculateTimerValues_ns(uint32_t timClk, uint32_t ns, uint16_t* presc, uint16_t* arr) {
 
@@ -131,7 +253,7 @@ void TIM_SetUpdatePeriod_us(TIM_TypeDef* timer, uint32_t us) {
   // So technically it is a half a period
   // So if it fires every second, it is a two-second period 
   // Divide by two to make it behave just like the PWM period
-  CalculateTimerValues_ns(timClk, us*1000, &presc, &arr);
+  CalculateTimerValues(timClk, us, &presc, &arr);
   // CalculateTimerValues(timClk / 2, us, &presc, &arr);
   // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
 
@@ -139,20 +261,57 @@ void TIM_SetUpdatePeriod_us(TIM_TypeDef* timer, uint32_t us) {
   LL_TIM_SetAutoReload(timer, arr);
 }
 
-static void _TIM_SetUpCounter(TIM_TypeDef* tim, uint32_t periph, IRQn_Type IRQn, uint32_t us) {
+void TIM_SetUpdatePeriod_ns(TIM_TypeDef* timer, uint32_t ns) {
+  uint32_t addr = (uint32_t)timer;
+  int isAPB1    = (addr < APB2PERIPH_BASE);
+  uint16_t presc, arr;
+
+  uint32_t timClk = GetTIMx_CLK(isAPB1);
+
+  // Here the period means how many times per second the interrupt is generated
+  // So technically it is a half a period
+  // So if it fires every second, it is a two-second period 
+  // Divide by two to make it behave just like the PWM period
+  CalculateTimerValues_ns(timClk, ns, &presc, &arr);
+  // CalculateTimerValues(timClk / 2, us, &presc, &arr);
+  // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
+
+  LL_TIM_SetPrescaler(timer, presc);
+  LL_TIM_SetAutoReload(timer, arr);
+}
+
+static void _TIM_EnableClock(BOOL isAPB1, uint32_t periph) {
+  if (isAPB1) {
+    LL_APB1_GRP1_EnableClock(periph);
+  } else {
+    LL_APB2_GRP1_EnableClock(periph);
+  }
+}
+
+static void _TIM_SetupCounter(TIM_TypeDef* tim, BOOL isAPB1, uint32_t periph, IRQn_Type IRQn, uint32_t us) {
+
+  _TIM_EnableClock(isAPB1, periph);
+
   LL_TIM_SetCounterMode(tim, LL_TIM_COUNTERMODE_UP);
-  LL_TIM_EnableARRPreload(tim);
 
   TIM_SetUpdatePeriod_us(tim, us);
 
+  //LL_TIM_GenerateEvent_UPDATE(tim);
+
+  
   LL_TIM_EnableIT_UPDATE(tim);
+  LL_TIM_ClearFlag_UPDATE(tim);
+  LL_TIM_EnableCounter(tim);
+
+  __NVIC_ClearPendingIRQ(IRQn);
 
   NVIC_SetPriority(IRQn, 0);
   NVIC_EnableIRQ(IRQn);
 
-  LL_TIM_EnableCounter(tim);
+  // LL_TIM_EnableARRPreload(tim);
 }
 
+/*
 void TIM_SetupCounterTIM1(uint32_t period_us, tim_handler th, void* ctx) {
   tim1_handler = th;
   tim1_ctx     = ctx;
@@ -181,14 +340,45 @@ void TIM_SetupCounterTIM4(uint32_t period_us, tim_handler th, void* ctx) {
   _TIM_SetUpCounter(TIM4, LL_APB1_GRP1_PERIPH_TIM4, TIM4_IRQn, period_us);
 }
 
+void TIM_SetupCounterTIM5(uint32_t period_us, tim_handler th, void* ctx) {
+  tim4_handler = th;
+  tim4_ctx     = ctx;
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM4);
+  _TIM_SetUpCounter(TIM4, LL_APB1_GRP1_PERIPH_TIM4, TIM4_IRQn, period_us);
+}
+*/
+
 void TIM_SetupCounter(TIM_TypeDef* timer, uint32_t period_us, tim_handler th, void* ctx) {
   if (timer == TIM1) {
-    TIM_SetupCounterTIM1(period_us, th, ctx);
+    _TIM_SetupCounter(TIM1, FALSE, LL_APB2_GRP1_PERIPH_TIM1, TIM1_UP_TIM10_IRQn, period_us);
   } else if (timer == TIM2) {
-    TIM_SetupCounterTIM2(period_us, th, ctx);
+    _TIM_SetupCounter(TIM2, TRUE, LL_APB1_GRP1_PERIPH_TIM2, TIM2_IRQn, period_us);
   } else if (timer == TIM3) {
-    TIM_SetupCounterTIM3(period_us, th, ctx);
+    _TIM_SetupCounter(TIM3, TRUE, LL_APB1_GRP1_PERIPH_TIM3, TIM3_IRQn, period_us);
+  } else if (timer == TIM4) {
+    _TIM_SetupCounter(TIM4, TRUE, LL_APB1_GRP1_PERIPH_TIM4, TIM4_IRQn, period_us);
+  } else if (timer == TIM5) {
+    _TIM_SetupCounter(TIM5, TRUE, LL_APB1_GRP1_PERIPH_TIM5, TIM5_IRQn, period_us);
+  } else if (timer == TIM6) {
+    _TIM_SetupCounter(TIM6, TRUE, LL_APB1_GRP1_PERIPH_TIM6, TIM6_DAC_IRQn, period_us);
+  } else if (timer == TIM7) {
+    _TIM_SetupCounter(TIM7, TRUE, LL_APB1_GRP1_PERIPH_TIM7, TIM7_IRQn, period_us);
+  } else if (timer == TIM8) {
+    _TIM_SetupCounter(TIM8, FALSE, LL_APB2_GRP1_PERIPH_TIM8, TIM8_UP_TIM13_IRQn, period_us);
+  } else if (timer == TIM9) {
+    _TIM_SetupCounter(TIM9, FALSE, LL_APB2_GRP1_PERIPH_TIM9, TIM1_BRK_TIM9_IRQn, period_us);
+  } else if (timer == TIM10) {
+    _TIM_SetupCounter(TIM10, FALSE, LL_APB2_GRP1_PERIPH_TIM10, TIM1_UP_TIM10_IRQn, period_us);
+  } else if (timer == TIM11) {
+    _TIM_SetupCounter(TIM11, FALSE, LL_APB2_GRP1_PERIPH_TIM11, TIM1_TRG_COM_TIM11_IRQn, period_us);
+  } else if (timer == TIM12) {
+    _TIM_SetupCounter(TIM12, TRUE, LL_APB1_GRP1_PERIPH_TIM12, TIM8_BRK_TIM12_IRQn, period_us);
+  } else if (timer == TIM13) {
+    _TIM_SetupCounter(TIM13, TRUE, LL_APB1_GRP1_PERIPH_TIM13, TIM8_UP_TIM13_IRQn, period_us);
+  } else if (timer == TIM14) {
+    _TIM_SetupCounter(TIM14, TRUE, LL_APB1_GRP1_PERIPH_TIM14, TIM8_TRG_COM_TIM14_IRQn, period_us);
   }
+  TIM_SetHandler(timer, th, ctx);
 }
 
 void TIM_SetHandler(TIM_TypeDef* timer, tim_handler th, void* ctx) {
@@ -201,13 +391,46 @@ void TIM_SetHandler(TIM_TypeDef* timer, tim_handler th, void* ctx) {
   } else if (timer == TIM3) {
     tim3_handler = th;
     tim3_ctx     = ctx;
+  } else if (timer == TIM4) {
+    tim4_handler = th;
+    tim4_ctx     = ctx;
+  } else if (timer == TIM5) {
+    tim5_handler = th;
+    tim5_ctx     = ctx;
+  } else if (timer == TIM6) {
+    tim6_handler = th;
+    tim6_ctx     = ctx;
+  } else if (timer == TIM7) {
+    tim7_handler = th;
+    tim7_ctx     = ctx;
+  } else if (timer == TIM8) {
+    tim8_handler = th;
+    tim8_ctx     = ctx;
+  } else if (timer == TIM9) {
+    tim9_handler = th;
+    tim9_ctx     = ctx;
+  } else if (timer == TIM10) {
+    tim10_handler = th;
+    tim11_ctx     = ctx;
+  } else if (timer == TIM11) {
+    tim11_handler = th;
+    tim11_ctx     = ctx;
+  } else if (timer == TIM12) {
+    tim12_handler = th;
+    tim12_ctx     = ctx;
+  } else if (timer == TIM13) {
+    tim13_handler = th;
+    tim13_ctx     = ctx;
+  } else if (timer == TIM14) {
+    tim14_handler = th;
+    tim14_ctx     = ctx;
   }
 }
 
-void TIM_SetupPWM(TIM_TypeDef* tim, int channel, uint32_t period_us, uint32_t ds_us) {
-  uint32_t addr = (uint32_t)tim;
-  int isAPB1    = (addr < APB2PERIPH_BASE);
+static void _TIM_SetupPWM(TIM_TypeDef* tim, int channel, BOOL isAPB1, uint32_t periph, uint32_t period_us, uint32_t ds_us) {
   uint16_t presc, arr;
+
+  _TIM_EnableClock(isAPB1, periph);
 
   uint32_t timClk = GetTIMx_CLK(isAPB1);
   CalculateTimerValues_ns(timClk, period_us*1000, &presc, &arr);
@@ -261,6 +484,7 @@ void TIM_SetupPWM(TIM_TypeDef* tim, int channel, uint32_t period_us, uint32_t ds
   LL_TIM_GenerateEvent_UPDATE(tim);
 }
 
+/*
 void TIM_SetupPWM_TIM1(uint8_t channel, uint32_t period_us, uint32_t ds_us) {
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
   TIM_SetupPWM(TIM1, channel, period_us, ds_us);
@@ -277,6 +501,44 @@ TIM_Channel TIM_SetupPWM_TIM3(uint8_t channel, uint32_t period_us, uint32_t ds_u
   TIM_Channel ch = {TIM3, channel};
   return ch;
 }
+*/
+
+TIM_Channel TIM_SetupPWM(TIM_TypeDef* tim, uint8_t channel, uint32_t period_us, uint32_t ds_us)
+{
+  if (tim == TIM1) {
+    _TIM_SetupPWM(TIM1, channel, FALSE, LL_APB2_GRP1_PERIPH_TIM1, period_us, ds_us);
+  } else if (tim == TIM2) {
+    _TIM_SetupPWM(TIM2, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM2, period_us, ds_us);
+  } else if (tim == TIM3) {
+    _TIM_SetupPWM(TIM3, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM3, period_us, ds_us);
+  } else if (tim == TIM4) {
+    _TIM_SetupPWM(TIM4, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM4, period_us, ds_us);
+  } else if (tim == TIM5) {
+    _TIM_SetupPWM(TIM5, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM5, period_us, ds_us);
+  } else if (tim == TIM6) {
+    _TIM_SetupPWM(TIM6, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM6, period_us, ds_us);
+  } else if (tim == TIM7) {
+    _TIM_SetupPWM(TIM7, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM7, period_us, ds_us);
+  } else if (tim == TIM8) {
+    _TIM_SetupPWM(TIM8, channel, FALSE, LL_APB2_GRP1_PERIPH_TIM8, period_us, ds_us);
+  } else if (tim == TIM9) {
+    _TIM_SetupPWM(TIM9, channel, FALSE, LL_APB2_GRP1_PERIPH_TIM9, period_us, ds_us);
+  } else if (tim == TIM10) {
+    _TIM_SetupPWM(TIM10, channel, FALSE, LL_APB2_GRP1_PERIPH_TIM10, period_us, ds_us);
+  } else if (tim == TIM11) {
+    _TIM_SetupPWM(TIM11, channel, FALSE, LL_APB2_GRP1_PERIPH_TIM11, period_us, ds_us);
+  } else if (tim == TIM12) {
+    _TIM_SetupPWM(TIM12, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM12, period_us, ds_us);
+  } else if (tim == TIM13) {
+    _TIM_SetupPWM(TIM13, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM13, period_us, ds_us);
+  } else if (tim == TIM14) {
+    _TIM_SetupPWM(TIM14, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM14, period_us, ds_us);
+  }
+
+  TIM_Channel ch = {tim, channel};
+  return ch;
+}
+
 
 void TIM_UpdateDs(TIM_Channel* ch, uint32_t ds_us) {
   uint32_t presc = LL_TIM_GetPrescaler(ch->timer);
@@ -305,7 +567,6 @@ void TIM_SetupPWM_TIM1_A8(uint32_t period_us, uint32_t ds_us) {
   GPIO_PIN pin1 = GPIO_GetPin("A8");    // TIM1 channel 1
   GPIO_Setup_OutAltPP(&pin1);
   TIM_SetupPWM_TIM1(1, period_us, ds_us);
-}
 
 void TIM_SetupPWM_TIM1_A9(uint32_t period_us, uint32_t ds_us) {
   GPIO_PIN pin1 = GPIO_GetPin("A9");    // TIM1 channel 2

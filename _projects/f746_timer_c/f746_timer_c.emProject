@@ -16,7 +16,7 @@
     <configuration
       LIBRARY_IO_TYPE="RTT"
       Name="Common"
-      Target="STM32F746ZGTx"
+      Target="STM32F746VGTx"
       arm_architecture="v7EM"
       arm_compiler_variant="SEGGER"
       arm_core_type="Cortex-M7"
@@ -38,7 +38,7 @@
       debug_target_connection="J-Link"
       gcc_entry_point="Reset_Handler"
       link_linker_script_file="$(ProjectDir)/STM32F7xx_Flash.icf"
-      linker_memory_map_file="$(ProjectDir)/STM32F746ZGTx_MemoryMap.xml"
+      linker_memory_map_file="$(ProjectDir)/STM32F746VGTx_MemoryMap.xml"
       linker_section_placements_segments="FLASH1 RX 0x08000000 0x00100000;FLASH2 RX 0x1fff0000 0x00000020;FLASH3 RX 0x90000000 0x10000000;RAM1 RWX 0x20020000 0x0002c000;"
       macros="DeviceHeaderFile=$(PackagesDir)/STM32F7xx/Device/Include/stm32f7xx.h;DeviceSystemFile=$(PackagesDir)/STM32F7xx/Device/Source/system_stm32f7xx.c;DeviceVectorsFile=$(PackagesDir)/STM32F7xx/Source/stm32f746xx_Vectors.s;DeviceFamily=STM32F7xx;DeviceSubFamily=STM32F746;Target=STM32F746ZGTx"
       project_directory=""

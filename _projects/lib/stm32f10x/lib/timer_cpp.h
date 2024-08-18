@@ -34,6 +34,8 @@ public:
   void SetUpdatePeriod_us(uint32_t us);
   void SetupCounter(uint32_t period_us);
   TIM_Channel SetupPWM(uint8_t channel, uint32_t period_us, uint32_t ds_us);
+  void EnableCounter();
+  void DisableCounter();
   void UpdateDs(uint8_t channel, uint32_t ds_us);
   void SetInterruptHandler(TIMER_Interrupt_Handler* handler) { _irqHandler = handler; }
   void HandleInterrupt() {

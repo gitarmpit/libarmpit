@@ -62,6 +62,10 @@ static void testPWM() {
   GPIO_Setup_OutAltPP(&pin1);
   TIMER* t = TIMER2::GetInstance();
   t->SetupPWM(1, 40, 20);
+  t->DisableCounter();
+  t->EnableCounter();
+  while(1)
+    ;
 }
 
 static void testTimer() {
@@ -79,8 +83,9 @@ static void testTimer() {
     ;
 }
 
+
 int main(void) {
-  
+
   System_Config();
   SystemClock_Config_HSE();
 
@@ -94,8 +99,8 @@ int main(void) {
 
   // testButtonHandler();
 
-  //testPWM();
-  testTimer();
+  testPWM();
+  //testTimer();
 
   while (1)
     ;

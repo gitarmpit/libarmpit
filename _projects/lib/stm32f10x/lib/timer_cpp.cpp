@@ -229,6 +229,15 @@ TIM_Channel TIMER::SetupPWM(uint8_t channel, uint32_t period_us, uint32_t ds_us)
   return ch;
 }
 
+void TIMER::EnableCounter() {
+  LL_TIM_EnableCounter(_tim);
+}
+
+void TIMER::DisableCounter() {
+  LL_TIM_DisableCounter(_tim);
+}
+
+
 void TIMER::UpdateDs(uint8_t channel, uint32_t ds_us) {
   uint32_t presc = LL_TIM_GetPrescaler(_tim);
   uint32_t t_clk = GetTIMx_CLK();

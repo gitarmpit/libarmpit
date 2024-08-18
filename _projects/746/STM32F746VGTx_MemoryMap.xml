@@ -1,5 +1,5 @@
 <!DOCTYPE Board_Memory_Definition_File>
-<root name="STM32F746ZGTx">
+<root name="STM32F746VGTx">
   <MemorySegment name="ITCM_RAM1" start="0x00000000" size="0x00004000" access="Read/Write" />
   <MemorySegment name="ITCM_FLASH1" start="0x00200000" size="0x00100000" access="ReadOnly" />
   <MemorySegment name="FLASH1" start="0x08000000" size="0x00100000" access="ReadOnly" />
