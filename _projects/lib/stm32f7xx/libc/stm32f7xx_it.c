@@ -45,10 +45,8 @@ void PendSV_Handler(void)
 {
 }
 
-void SysTick_Handler(void)
-{
-}
 
+#if 0
 void ADC_IRQHandler(void)
 {
 }
@@ -114,6 +112,7 @@ void TIM8_BRK_TIM12_IRQHandler(void)
 }
 
 void TIM8_UP_TIM13_IRQHandler(void)
+{
 }
 
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
@@ -163,3 +162,5 @@ void UART8_IRQHandler(void)
 void SPI4_IRQHandler(void)
 {
 }
+
+#endif

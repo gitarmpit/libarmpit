@@ -50,7 +50,7 @@
       link_linker_script_file="$(ProjectDir)/STM32F1xx_Flash.icf"
       linker_memory_map_file="$(ProjectDir)/STM32F103CB_MemoryMap.xml"
       linker_section_placements_segments="FLASH1 RX 0x08000000 0x00010000;RAM1 RWX 0x20000000 0x00005000;"
-      macros="DeviceHeaderFile=$(PackagesDir)/STM32F1xx/Device/Include/stm32f10x.h;DeviceSystemFile=$(PackagesDir)/STM32F1xx/Device/Source/system_stm32f10x.c;DeviceVectorsFile=$(PackagesDir)/STM32F1xx/Source/stm32f10x_md_Vectors.s;DeviceFamily=STM32F1xx;DeviceSubFamily=STM32F103;Target=STM32F103CB"
+      macros=""
       project_directory=""
       project_type="Executable"
       target_reset_script="TargetInterface.resetAndStop()"

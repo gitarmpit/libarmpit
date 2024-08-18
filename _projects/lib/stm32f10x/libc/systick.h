@@ -1,15 +1,13 @@
 #ifndef _SYSTICK_H
 #define _SYSTICK_H 
 
-#include "stm32f103xb.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-
-extern __IO uint32_t uwTick;
+extern volatile uint32_t uwTick;
 
 void      SysTick_Init(void);
 void      SysTick_IncTick(void);

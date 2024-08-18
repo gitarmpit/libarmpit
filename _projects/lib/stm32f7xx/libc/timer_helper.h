@@ -1,8 +1,7 @@
 #ifndef TIMER_HELPER_H
 #define TIMER_HELPER_H
 
-#include "stm32f1xx_ll_tim.h"
-
+#include "stm32f7xx_ll_tim.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -21,11 +20,14 @@ typedef struct {
   uint8_t channel;
 } TIM_Channel;
 
+#define TIM_DisableTimer(tim) LL_TIM_DisableCounter(tim)
+#define TIM_EnableTimer(tim)  LL_TIM_EnableCounter(tim)
 
 void TIM_SetUpdatePeriod_us (TIM_TypeDef *timer, uint32_t us);
 
 void TIM_SetupCounter(TIM_TypeDef *timer, uint32_t period_us, tim_handler th, void* ctx);
 void TIM_SetHandler(TIM_TypeDef *timer, tim_handler th, void* ctx);
+
 
 void TIM_SetupCounterTIM1(uint32_t period_us, tim_handler th, void* ctx);
 void TIM_SetupCounterTIM2(uint32_t period_us, tim_handler th, void* ctx);

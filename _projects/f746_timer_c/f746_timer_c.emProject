@@ -1,0 +1,66 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="f746_timer_c" version="2" target="8">
+  <configuration
+    Name="Debug"
+    c_preprocessor_definitions="DEBUG"
+    gcc_debugging_level="Level 3"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="None" />
+  <configuration
+    Name="Release"
+    c_preprocessor_definitions="NDEBUG"
+    gcc_debugging_level="Level 2"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="Level 2 balanced" />
+  <project Name="f746_timer_c">
+    <configuration
+      LIBRARY_IO_TYPE="RTT"
+      Name="Common"
+      Target="STM32F746ZGTx"
+      arm_architecture="v7EM"
+      arm_compiler_variant="SEGGER"
+      arm_core_type="Cortex-M7"
+      arm_endian="Little"
+      arm_fp_abi="Hard"
+      arm_fpu_type="FPv5-SP-D16"
+      arm_linker_heap_size="1024"
+      arm_linker_process_stack_size="0"
+      arm_linker_stack_size="2048"
+      arm_linker_variant="SEGGER"
+      arm_simulator_memory_simulation_parameter="RAM;0x00000000;0x00004000;ROM;0x00200000;0x100000;ROM;0x08000000;0x100000;RAM;0x20000000;0x10000;RAM;0x20010000;0x40000"
+      arm_target_device_name="STM32F746ZG"
+      arm_target_interface_type="SWD"
+      c_preprocessor_definitions="USE_FULL_LL_DRIVER;HSE_VALUE=8000000;HSI_VALUE=16000000;LSE_VALUE=32768;LSI_VALUE=32000;VDD_VALUE=3300;PREFETCH_ENABLE=0;ART_ACCELERATOR_ENABLE=0;STM32F746xx"
+      c_user_include_directories="$(ProjectDir)/../lib/stm32f7xx/libc;$(ProjectDir)/../lib/stm32f7xx/Drivers/STM32F7xx_HAL_Driver/Inc;$(ProjectDir)/../lib/stm32f7xx/Drivers/CMSIS/Device/ST/STM32F7xx/Include;$(ProjectDir)/../lib/stm32f7xx/Drivers/CMSIS/Include"
+      debug_register_definition_file="$(ProjectDir)/STM32F746_Registers.xml"
+      debug_stack_pointer_start="__stack_end__"
+      debug_start_from_entry_point_symbol="Yes"
+      debug_target_connection="J-Link"
+      gcc_entry_point="Reset_Handler"
+      link_linker_script_file="$(ProjectDir)/STM32F7xx_Flash.icf"
+      linker_memory_map_file="$(ProjectDir)/STM32F746ZGTx_MemoryMap.xml"
+      macros="DeviceHeaderFile=$(PackagesDir)/STM32F7xx/Device/Include/stm32f7xx.h;DeviceSystemFile=$(PackagesDir)/STM32F7xx/Device/Source/system_stm32f7xx.c;DeviceVectorsFile=$(PackagesDir)/STM32F7xx/Source/stm32f746xx_Vectors.s;DeviceFamily=STM32F7xx;DeviceSubFamily=STM32F746;Target=STM32F746ZGTx"
+      project_directory=""
+      project_type="Executable"
+      target_reset_script="TargetInterface.resetAndStop()" />
+    <folder
+      Name="Drivers"
+      exclude=""
+      filter=""
+      path="../lib/stm32f7xx/Drivers"
+      recurse="Yes" />
+    <folder
+      Name="libc"
+      exclude=""
+      filter=""
+      path="../lib/stm32f7xx/libc"
+      recurse="No" />
+    <folder Name="src" exclude="" filter="" path="src" recurse="No" />
+    <folder
+      Name="startup"
+      exclude=""
+      filter=""
+      path="../lib/stm32f7xx/startup"
+      recurse="No" />
+  </project>
+</solution>
