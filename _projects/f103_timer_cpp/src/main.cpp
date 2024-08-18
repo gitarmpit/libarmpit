@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include "main.h"
 #include "system_init.h"
 #include "gpio_helper.h"
 #include "timer_cpp.h"
 #include "button.h"
 #include "button_handler.h"
+#include "systick.h"
 
 static GPIO_PIN* led;
 
@@ -64,6 +64,12 @@ static void testPWM() {
   t->SetupPWM(1, 40, 20);
   t->DisableCounter();
   t->EnableCounter();
+
+  SysTick_Delay(5000);
+  t->UpdateDs(1, 30);
+  SysTick_Delay(5000);
+  t->UpdatePeriodDs(1, 20, 10);
+
   while(1)
     ;
 }

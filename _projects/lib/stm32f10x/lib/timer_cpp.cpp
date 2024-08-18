@@ -237,6 +237,20 @@ void TIMER::DisableCounter() {
   LL_TIM_DisableCounter(_tim);
 }
 
+void TIMER::UpdatePeriodDs(uint8_t channel, uint32_t period_us, uint32_t ds_us) {
+
+  uint16_t presc, arr;
+  uint32_t timClk = GetTIMx_CLK();
+
+  CalculateTimerValues(timClk, period_us, &presc, &arr);
+  // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
+
+  LL_TIM_SetPrescaler(_tim, presc);
+  LL_TIM_SetAutoReload(_tim, arr);
+  UpdateDs (channel, ds_us);
+  
+}
+
 
 void TIMER::UpdateDs(uint8_t channel, uint32_t ds_us) {
   uint32_t presc = LL_TIM_GetPrescaler(_tim);
