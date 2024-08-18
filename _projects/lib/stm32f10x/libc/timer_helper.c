@@ -69,7 +69,9 @@ static uint32_t GetTIMx_CLK(int isAPB1) {
   return timx_clk;
 }
 
+
 static void CalculateTimerValues(uint32_t timClk, uint32_t us, uint16_t* presc, uint16_t* arr) {
+
   uint64_t timerCount = (uint64_t)timClk * (uint64_t)us / 1000000llu;
 
   if (timerCount == 0) {
@@ -89,89 +91,114 @@ static void CalculateTimerValues(uint32_t timClk, uint32_t us, uint16_t* presc, 
   --(*presc);
 }
 
-void TIM_SetUpdatePeriod_us(TIM_TypeDef* timer, uint32_t us) {
-  uint32_t addr = (uint32_t)timer;
-  int isAPB1    = (addr < APB2PERIPH_BASE);
-  uint16_t presc, arr;
+static void CalculateTimerValues_ns(uint32_t timClk, uint32_t ns, uint16_t* presc, uint16_t* arr) {
 
-  uint32_t timClk = GetTIMx_CLK(isAPB1);
+  uint64_t timerCount = (uint64_t)timClk * (uint64_t)ns / 1000000000llu;
 
-  CalculateTimerValues(timClk / 2, us, &presc, &arr);
-  // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
+  if (timerCount == 0) {
+    timerCount = 1;
+  }
 
-  LL_TIM_SetPrescaler(timer, presc);
-  LL_TIM_SetAutoReload(timer, arr);
+  const uint32_t maxVal = 0xFFFF;
+
+  *presc = 1;
+
+  if (timerCount > maxVal) {
+    *presc     = (uint16_t)(timerCount / maxVal) + 1;
+    timerCount = timerCount / *presc + 1;
+  }
+
+  *arr = (uint16_t)(timerCount - 1);
+  --(*presc);
 }
 
-static void _TIM_SetUpCounter(TIM_TypeDef* tim, uint32_t periph, IRQn_Type IRQn, uint32_t us) {
+
+void TIM_SetUpdatePeriod_us(TIM_TypeDef* tim, uint32_t us) {
+  uint16_t presc, arr;
+
+  uint32_t timClk = GetTIMx_CLK(IS_APB1(tim));
+
+  // Here the perioud means how many times per second the interrupt is generated
+  // So technically it is a half a period
+  // So if it fires every second, it is a two-second period 
+  // Divide by two to make it behave just like the PWM period
+  CalculateTimerValues(timClk, us, &presc, &arr);
+  // CalculateTimerValues(timClk / 2, us, &presc, &arr);
+  // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
+
+  LL_TIM_SetPrescaler(tim, presc);
+  LL_TIM_SetAutoReload(tim, arr);
+}
+
+
+static void _TIM_EnableClock(BOOL isAPB1, uint32_t periph) {
+  if (isAPB1) {
+    LL_APB1_GRP1_EnableClock(periph);
+  } else {
+    LL_APB2_GRP1_EnableClock(periph);
+  }
+}
+
+static void _TIM_SetupCounter(TIM_TypeDef* tim, BOOL isAPB1, uint32_t periph, IRQn_Type IRQn, uint32_t us) {
+
+  _TIM_EnableClock(isAPB1, periph);
+
   LL_TIM_SetCounterMode(tim, LL_TIM_COUNTERMODE_UP);
-  LL_TIM_EnableARRPreload(tim);
 
   TIM_SetUpdatePeriod_us(tim, us);
 
+  //LL_TIM_GenerateEvent_UPDATE(tim);
+
+  
   LL_TIM_EnableIT_UPDATE(tim);
+  LL_TIM_ClearFlag_UPDATE(tim);
+  LL_TIM_EnableCounter(tim);
+
+  __NVIC_ClearPendingIRQ(IRQn);
 
   NVIC_SetPriority(IRQn, 0);
   NVIC_EnableIRQ(IRQn);
 
-  LL_TIM_EnableCounter(tim);
+  // LL_TIM_EnableARRPreload(tim);
 }
 
-void TIM_SetupCounterTIM1(uint32_t period_us, tim_handler th, void* ctx) {
-  tim1_handler = th;
-  tim1_ctx     = ctx;
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
-  _TIM_SetUpCounter(TIM1, LL_APB2_GRP1_PERIPH_TIM1, TIM1_UP_IRQn, period_us);
-}
-
-void TIM_SetupCounterTIM2(uint32_t period_us, tim_handler th, void* ctx) {
-  tim2_handler = th;
-  tim2_ctx     = ctx;
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
-  _TIM_SetUpCounter(TIM2, LL_APB1_GRP1_PERIPH_TIM2, TIM2_IRQn, period_us);
-}
-
-void TIM_SetupCounterTIM3(uint32_t period_us, tim_handler th, void* ctx) {
-  tim3_handler = th;
-  tim3_ctx     = ctx;
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM3);
-  _TIM_SetUpCounter(TIM3, LL_APB1_GRP1_PERIPH_TIM3, TIM3_IRQn, period_us);
-}
-
-void TIM_SetupCounterTIM4(uint32_t period_us, tim_handler th, void* ctx) {
-  tim4_handler = th;
-  tim4_ctx     = ctx;
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM4);
-  _TIM_SetUpCounter(TIM4, LL_APB1_GRP1_PERIPH_TIM4, TIM4_IRQn, period_us);
-}
-
-void TIM_SetupCounter(TIM_TypeDef* timer, uint32_t period_us, tim_handler th, void* ctx) {
-  if (timer == TIM1) {
-    TIM_SetupCounterTIM1(period_us, th, ctx);
-  } else if (timer == TIM2) {
-    TIM_SetupCounterTIM2(period_us, th, ctx);
-  } else if (timer == TIM3) {
-    TIM_SetupCounterTIM3(period_us, th, ctx);
+void TIM_SetupCounter(TIM_TypeDef* tim, uint32_t period_us, tim_handler th, void* ctx) {
+  if (tim == TIM1) {
+    _TIM_SetupCounter(TIM1, FALSE, LL_APB2_GRP1_PERIPH_TIM1, TIM1_UP_TIM10_IRQn, period_us);
+  } else if (tim == TIM2) {
+    _TIM_SetupCounter(TIM2, TRUE, LL_APB1_GRP1_PERIPH_TIM2, TIM2_IRQn, period_us);
+  } else if (tim == TIM3) {
+    _TIM_SetupCounter(TIM3, TRUE, LL_APB1_GRP1_PERIPH_TIM3, TIM3_IRQn, period_us);
+  } else if (tim == TIM4) {
+    _TIM_SetupCounter(TIM4, TRUE, LL_APB1_GRP1_PERIPH_TIM4, TIM4_IRQn, period_us);
   }
+  TIM_SetHandler(tim, th, ctx);
 }
 
-void TIM_SetHandler(TIM_TypeDef* timer, tim_handler th, void* ctx) {
-  if (timer == TIM1) {
+void TIM_SetHandler(TIM_TypeDef* tim, tim_handler th, void* ctx) {
+  if (tim == TIM1) {
     tim1_handler = th;
     tim1_ctx     = ctx;
-  } else if (timer == TIM2) {
+  } else if (tim == TIM2) {
     tim2_handler = th;
     tim2_ctx     = ctx;
-  } else if (timer == TIM3) {
+  } else if (tim == TIM3) {
     tim3_handler = th;
     tim3_ctx     = ctx;
+  } else if (tim == TIM4) {
+    tim4_handler = th;
+    tim4_ctx     = ctx;
   }
 }
 
-void TIM_SetupPWM(TIM_TypeDef* tim, int channel, uint32_t period_us, uint32_t ds_us) {
-  uint32_t addr = (uint32_t)tim;
-  int isAPB1    = (addr < APB2PERIPH_BASE);
+////////////////////////////////////////////////////////////////////////////////
+// PWM
+
+
+static void _TIM_SetupPWM(TIM_TypeDef* tim, int channel, BOOL isAPB1, uint32_t periph, uint32_t period_us, uint32_t ds_us) {
   uint16_t presc, arr;
+
+  _TIM_EnableClock(isAPB1, periph);
 
   uint32_t timClk = GetTIMx_CLK(isAPB1);
   CalculateTimerValues(timClk, period_us, &presc, &arr);
@@ -225,6 +252,24 @@ void TIM_SetupPWM(TIM_TypeDef* tim, int channel, uint32_t period_us, uint32_t ds
   LL_TIM_GenerateEvent_UPDATE(tim);
 }
 
+TIM_Channel TIM_SetupPWM(TIM_TypeDef* tim, uint8_t channel, uint32_t period_us, uint32_t ds_us)
+{
+  if (tim == TIM1) {
+    _TIM_SetupPWM(TIM1, channel, FALSE, LL_APB2_GRP1_PERIPH_TIM1, period_us, ds_us);
+  } else if (tim == TIM2) {
+    _TIM_SetupPWM(TIM2, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM2, period_us, ds_us);
+  } else if (tim == TIM3) {
+    _TIM_SetupPWM(TIM3, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM3, period_us, ds_us);
+  } else if (tim == TIM4) {
+    _TIM_SetupPWM(TIM4, channel, TRUE, LL_APB1_GRP1_PERIPH_TIM4, period_us, ds_us);
+  }
+
+  TIM_Channel ch = {tim, channel};
+  return ch;
+}
+
+
+/*
 void TIM_SetupPWM_TIM1(uint8_t channel, uint32_t period_us, uint32_t ds_us) {
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
   TIM_SetupPWM(TIM1, channel, period_us, ds_us);
@@ -242,24 +287,40 @@ TIM_Channel TIM_SetupPWM_TIM3(uint8_t channel, uint32_t period_us, uint32_t ds_u
   return ch;
 }
 
+*/
+
+void TIM_UpdatePeriodDs(TIM_Channel* ch, uint32_t period_us, uint32_t ds_us) {
+
+  uint16_t presc, arr;
+  uint32_t timClk = GetTIMx_CLK(IS_APB1(ch->tim));
+
+  CalculateTimerValues(timClk, period_us, &presc, &arr);
+  // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
+
+  LL_TIM_SetPrescaler(ch->tim, presc);
+  LL_TIM_SetAutoReload(ch->tim, arr);
+
+  TIM_UpdateDs(ch, ds_us);
+}
+
+
 void TIM_UpdateDs(TIM_Channel* ch, uint32_t ds_us) {
-  uint32_t presc = LL_TIM_GetPrescaler(ch->timer);
-  int isAPB1     = ((uint32_t)ch->timer < APB2PERIPH_BASE);
-  uint32_t t_clk = GetTIMx_CLK(isAPB1);
+  uint32_t presc = LL_TIM_GetPrescaler(ch->tim);
+  uint32_t t_clk = GetTIMx_CLK(IS_APB1(ch->tim));
 
   uint16_t ccr_val = (uint64_t)ds_us * (uint64_t)t_clk / 1000000ull / (uint64_t)(presc + 1);
   if (ch->channel == 1) {
-    uint32_t tmp = LL_TIM_OC_GetCompareCH1(ch->timer);
-    LL_TIM_OC_SetCompareCH1(ch->timer, ccr_val);
+    uint32_t tmp = LL_TIM_OC_GetCompareCH1(ch->tim);
+    LL_TIM_OC_SetCompareCH1(ch->tim, ccr_val);
   } else if (ch->channel == 2) {
-    uint32_t tmp = LL_TIM_OC_GetCompareCH2(ch->timer);
-    LL_TIM_OC_SetCompareCH2(ch->timer, ccr_val);
+    uint32_t tmp = LL_TIM_OC_GetCompareCH2(ch->tim);
+    LL_TIM_OC_SetCompareCH2(ch->tim, ccr_val);
   } else if (ch->channel == 3) {
-    uint32_t tmp = LL_TIM_OC_GetCompareCH3(ch->timer);
-    LL_TIM_OC_SetCompareCH3(ch->timer, ccr_val);
+    uint32_t tmp = LL_TIM_OC_GetCompareCH3(ch->tim);
+    LL_TIM_OC_SetCompareCH3(ch->tim, ccr_val);
   } else if (ch->channel == 4) {
-    uint32_t tmp = LL_TIM_OC_GetCompareCH4(ch->timer);
-    LL_TIM_OC_SetCompareCH4(ch->timer, ccr_val);
+    uint32_t tmp = LL_TIM_OC_GetCompareCH4(ch->tim);
+    LL_TIM_OC_SetCompareCH4(ch->tim, ccr_val);
   }
 }
 

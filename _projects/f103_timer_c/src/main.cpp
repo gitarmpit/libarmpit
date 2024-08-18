@@ -1,5 +1,6 @@
 #include "gpio_helper.h"
 #include "system_init.h"
+#include "systick.h"
 #include "timer_helper.h"
 #include <stdio.h>
 
@@ -138,7 +139,12 @@ static void testTimer() {
   led = &pin1;
 
   GPIO_SetPin(&pin1);
-  TIM_SetupCounterTIM4(10, Timer_Callback, NULL);
+  TIM_SetupCounter(TIM4, 4, NULL, NULL);
+  SysTick_Delay(5000);
+  TIM_SetHandler(TIM4, Timer_Callback, NULL);
+  SysTick_Delay(5000);
+  TIM_SetUpdatePeriod_us(TIM4, 8);
+
   while (1)
     ;
 }
@@ -146,7 +152,12 @@ static void testTimer() {
 static void testPWM2() {
   GPIO_PIN pin1 = GPIO_GetPin("A0");    // TIM2 channel 1
   GPIO_Setup_OutAltPP(&pin1);
-  TIM_SetupPWM_TIM2(1, 180, 40);
+  TIM_Channel ch1 = TIM_SetupPWM(TIM2, 1, 8, 4);
+  SysTick_Delay(5000);
+  TIM_UpdateDs(&ch1, 6);
+  SysTick_Delay(5000);
+  TIM_UpdatePeriodDs(&ch1, 16, 8);
+  
   //TIM_SetupPWM_OnPin("B11", 800, 600);
   while (1)
     ;
@@ -159,8 +170,8 @@ int main(void) {
   SystemClock_Config_HSE();
 
   //testBlinky();
-  //testPWM2();
-  testTimer();
+  testPWM2();
+  //testTimer();
 
   //testUpdateDs();
   //testButton2();

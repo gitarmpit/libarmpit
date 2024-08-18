@@ -26,9 +26,11 @@ extern tim_handler  tim13_handler;
 extern tim_handler  tim14_handler;
 
 typedef struct {
-  TIM_TypeDef *timer;
+  TIM_TypeDef *tim;
   uint8_t channel;
 } TIM_Channel;
+
+#define IS_APB1(tim)    ((uint32_t)tim < APB2PERIPH_BASE)
 
 #define TIM_DisableTimer(tim) LL_TIM_DisableCounter(tim)
 #define TIM_EnableTimer(tim)  LL_TIM_EnableCounter(tim)
@@ -46,6 +48,7 @@ void TIM_SetHandler(TIM_TypeDef *timer, tim_handler th, void* ctx);
 TIM_Channel TIM_SetupPWM(TIM_TypeDef* tim, uint8_t channel, uint32_t period_us, uint32_t ds_us);
 
 void TIM_UpdateDs (TIM_Channel* ch, uint32_t ds_us);
+void TIM_UpdatePeriodDs(TIM_Channel* ch, uint32_t period_us, uint32_t ds_us);
 
 /*
 void TIM_SetupPWM_TIM1_A8(uint32_t period_us, uint32_t ds_us);
@@ -75,9 +78,10 @@ void TIM_SetupPWM_TIM3_C6(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM3_C7(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM3_C8(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM3_C9(uint32_t period_us, uint32_t ds_us);
-*/
+
 
 void TIM_SetupPWM_OnPin(const char* pin_name, uint32_t period_us, uint32_t ds_us);
+*/
 
 
 #ifdef __cplusplus

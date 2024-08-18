@@ -242,12 +242,10 @@ static void CalculateTimerValues_ns(uint32_t timClk, uint32_t ns, uint16_t* pres
 }
 
 
-void TIM_SetUpdatePeriod_us(TIM_TypeDef* timer, uint32_t us) {
-  uint32_t addr = (uint32_t)timer;
-  int isAPB1    = (addr < APB2PERIPH_BASE);
+void TIM_SetUpdatePeriod_us(TIM_TypeDef* tim, uint32_t us) {
   uint16_t presc, arr;
 
-  uint32_t timClk = GetTIMx_CLK(isAPB1);
+  uint32_t timClk = GetTIMx_CLK(IS_APB1(tim));
 
   // Here the perioud means how many times per second the interrupt is generated
   // So technically it is a half a period
@@ -257,16 +255,14 @@ void TIM_SetUpdatePeriod_us(TIM_TypeDef* timer, uint32_t us) {
   // CalculateTimerValues(timClk / 2, us, &presc, &arr);
   // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
 
-  LL_TIM_SetPrescaler(timer, presc);
-  LL_TIM_SetAutoReload(timer, arr);
+  LL_TIM_SetPrescaler(tim, presc);
+  LL_TIM_SetAutoReload(tim, arr);
 }
 
-void TIM_SetUpdatePeriod_ns(TIM_TypeDef* timer, uint32_t ns) {
-  uint32_t addr = (uint32_t)timer;
-  int isAPB1    = (addr < APB2PERIPH_BASE);
+void TIM_SetUpdatePeriod_ns(TIM_TypeDef* tim, uint32_t ns) {
   uint16_t presc, arr;
 
-  uint32_t timClk = GetTIMx_CLK(isAPB1);
+  uint32_t timClk = GetTIMx_CLK(IS_APB1(tim));
 
   // Here the period means how many times per second the interrupt is generated
   // So technically it is a half a period
@@ -276,8 +272,8 @@ void TIM_SetUpdatePeriod_ns(TIM_TypeDef* timer, uint32_t ns) {
   // CalculateTimerValues(timClk / 2, us, &presc, &arr);
   // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
 
-  LL_TIM_SetPrescaler(timer, presc);
-  LL_TIM_SetAutoReload(timer, arr);
+  LL_TIM_SetPrescaler(tim, presc);
+  LL_TIM_SetAutoReload(tim, arr);
 }
 
 static void _TIM_EnableClock(BOOL isAPB1, uint32_t periph) {
@@ -427,13 +423,15 @@ void TIM_SetHandler(TIM_TypeDef* timer, tim_handler th, void* ctx) {
   }
 }
 
+////////////////////////////////////////////////////////
+
 static void _TIM_SetupPWM(TIM_TypeDef* tim, int channel, BOOL isAPB1, uint32_t periph, uint32_t period_us, uint32_t ds_us) {
   uint16_t presc, arr;
 
   _TIM_EnableClock(isAPB1, periph);
 
   uint32_t timClk = GetTIMx_CLK(isAPB1);
-  CalculateTimerValues_ns(timClk, period_us*1000, &presc, &arr);
+  CalculateTimerValues(timClk, period_us, &presc, &arr);
   // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
 
   LL_TIM_SetPrescaler(tim, presc);
@@ -539,25 +537,39 @@ TIM_Channel TIM_SetupPWM(TIM_TypeDef* tim, uint8_t channel, uint32_t period_us, 
   return ch;
 }
 
+void TIM_UpdatePeriodDs(TIM_Channel* ch, uint32_t period_us, uint32_t ds_us) {
+
+  uint16_t presc, arr;
+  uint32_t timClk = GetTIMx_CLK(IS_APB1(ch->tim));
+
+  CalculateTimerValues(timClk, period_us, &presc, &arr);
+  // LL_TIM_SetClockDivision(timer, LL_TIM_CLOCKDIVISION_DIV2);
+
+  LL_TIM_SetPrescaler(ch->tim, presc);
+  LL_TIM_SetAutoReload(ch->tim, arr);
+
+  TIM_UpdateDs(ch, ds_us);
+}
+
 
 void TIM_UpdateDs(TIM_Channel* ch, uint32_t ds_us) {
-  uint32_t presc = LL_TIM_GetPrescaler(ch->timer);
-  int isAPB1     = ((uint32_t)ch->timer < APB2PERIPH_BASE);
+  uint32_t presc = LL_TIM_GetPrescaler(ch->tim);
+  int isAPB1     = ((uint32_t)ch->tim < APB2PERIPH_BASE);
   uint32_t t_clk = GetTIMx_CLK(isAPB1);
 
   uint16_t ccr_val = (uint64_t)ds_us * (uint64_t)t_clk / 1000000ull / (uint64_t)(presc + 1);
   if (ch->channel == 1) {
-    uint32_t tmp = LL_TIM_OC_GetCompareCH1(ch->timer);
-    LL_TIM_OC_SetCompareCH1(ch->timer, ccr_val);
+    uint32_t tmp = LL_TIM_OC_GetCompareCH1(ch->tim);
+    LL_TIM_OC_SetCompareCH1(ch->tim, ccr_val);
   } else if (ch->channel == 2) {
-    uint32_t tmp = LL_TIM_OC_GetCompareCH2(ch->timer);
-    LL_TIM_OC_SetCompareCH2(ch->timer, ccr_val);
+    uint32_t tmp = LL_TIM_OC_GetCompareCH2(ch->tim);
+    LL_TIM_OC_SetCompareCH2(ch->tim, ccr_val);
   } else if (ch->channel == 3) {
-    uint32_t tmp = LL_TIM_OC_GetCompareCH3(ch->timer);
-    LL_TIM_OC_SetCompareCH3(ch->timer, ccr_val);
+    uint32_t tmp = LL_TIM_OC_GetCompareCH3(ch->tim);
+    LL_TIM_OC_SetCompareCH3(ch->tim, ccr_val);
   } else if (ch->channel == 4) {
-    uint32_t tmp = LL_TIM_OC_GetCompareCH4(ch->timer);
-    LL_TIM_OC_SetCompareCH4(ch->timer, ccr_val);
+    uint32_t tmp = LL_TIM_OC_GetCompareCH4(ch->tim);
+    LL_TIM_OC_SetCompareCH4(ch->tim, ccr_val);
   }
 }
 
