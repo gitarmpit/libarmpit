@@ -11,15 +11,26 @@
 #define IN_PIN_GPIO_Port GPIOB
 
 GPIO_PIN* led;
-static uint32_t cnt;
-static uint32_t st;
+static uint32_t cnt1;
+static uint32_t cnt2;
 static void Timer_Callback(void*) {
   //GPIO_TogglePin(led);
-  ++cnt;
-  if (cnt >= 1000000) {
-    st = SysTick_GetTick();
-    TIM_DisableTimer(TIM1);
+  printf ("tim1\n");
+  if (cnt1 == 0) {
+    //TIM_SetupCounter(TIM2, 1, 0, 0);
+    //TIM_SetUpdatePeriod_ns(TIM2, 200);
   }
+  else if (cnt1 == 1) {
+    TIM_DisableTimer(TIM2);
+    printf ("tim1 disabled\n");
+  }
+  ++cnt1;
+}
+
+static void Timer_Callback2(void*) {
+    //TIM_DisableTimer(TIM2);
+    //GPIO_TogglePin(led);
+    ++cnt2;
 }
 
 static void testTimer() {
@@ -28,17 +39,26 @@ static void testTimer() {
   led = &pin1;
 
   GPIO_SetPin(&pin1);
-  TIM_SetupCounterTIM1(1, Timer_Callback, NULL);
-  TIM_DisableTimer(TIM1);
-  TIM_EnableTimer(TIM1);
+  
+  //TIM_DisableTimer(TIM1);
+  //TIM_EnableTimer(TIM1);
+
+  //TIM_SetUpdatePeriod_ns(TIM2, 1000);
+  TIM_SetupCounter(TIM1, 1000000, Timer_Callback, NULL);
+
+  TIM_SetupCounter(TIM2, 1, 0, 0);
+  TIM_SetUpdatePeriod_ns(TIM2, 500);
+
+
   //SysTick_Delay(1000);
   //printf ("%d\n", cnt);
 
   while (1) {
     SysTick_Delay(1000);
-    printf("%d\n", st);
+    printf("%d, %llu\n", cnt1, __cnt);
   }
 }
+
 
 int main(void) {
   System_Config();
@@ -46,10 +66,9 @@ int main(void) {
   SystemClock_Config_HSE(enableBypass);
   // SystemClock_Config_HSI();
 
+
   testTimer();
 
   while (1) {
-    SysTick_Delay(1000);
-    printf("%d\n", st);
   }
 }
