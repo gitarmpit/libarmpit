@@ -1,8 +1,10 @@
-#ifndef TIMER_HELPER_H
-#define TIMER_HELPER_H
+#ifndef _TIMER_H
+#define _TIMER_H
 
-#include "stm32f7xx_ll_tim.h"
+#include "stm32f1xx_ll_tim.h"
+
 #include <stdint.h>
+#include "config.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -14,43 +16,36 @@ extern tim_handler  tim1_handler;
 extern tim_handler  tim2_handler;
 extern tim_handler  tim3_handler;
 extern tim_handler  tim4_handler;
-extern tim_handler  tim5_handler;
-extern tim_handler  tim6_handler;
-extern tim_handler  tim7_handler;
-extern tim_handler  tim8_handler;
-extern tim_handler  tim9_handler;
-extern tim_handler  tim10_handler;
-extern tim_handler  tim11_handler;
-extern tim_handler  tim12_handler;
-extern tim_handler  tim13_handler;
-extern tim_handler  tim14_handler;
 
 typedef struct {
   TIM_TypeDef *tim;
   uint8_t channel;
 } TIM_Channel;
 
-#define IS_APB1(tim)    ((uint32_t)tim < APB2PERIPH_BASE)
-
 #define TIM_DisableTimer(tim) LL_TIM_DisableCounter(tim)
 #define TIM_EnableTimer(tim)  LL_TIM_EnableCounter(tim)
+#define IS_APB1(tim)    ((uint32_t)tim < APB2PERIPH_BASE)
+
 
 void TIM_SetUpdatePeriod_us (TIM_TypeDef *timer, uint32_t us);
-void TIM_SetUpdatePeriod_ns (TIM_TypeDef *timer, uint32_t ns);
 
 void TIM_SetupCounter(TIM_TypeDef *timer, uint32_t period_us, tim_handler th, void* ctx);
 void TIM_SetHandler(TIM_TypeDef *timer, tim_handler th, void* ctx);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // PWM
 
 TIM_Channel TIM_SetupPWM(TIM_TypeDef* tim, uint8_t channel, uint32_t period_us, uint32_t ds_us);
-
-void TIM_UpdateDs (TIM_Channel* ch, uint32_t ds_us);
 void TIM_UpdatePeriodDs(TIM_Channel* ch, uint32_t period_us, uint32_t ds_us);
+void TIM_UpdateDs(TIM_Channel* ch, uint32_t ds_us);
 
 /*
+void TIM_SetupPWM_TIM1(uint8_t channel, uint32_t period_us, uint32_t ds_us);
+void TIM_SetupPWM_TIM2(uint8_t channel, uint32_t period_us, uint32_t ds_us);
+TIM_Channel TIM_SetupPWM_TIM3(uint8_t channel, uint32_t period_us, uint32_t ds_us);
+
+void TIM_UpdateDs (TIM_Channel* ch, uint32_t ds_us);
+
 void TIM_SetupPWM_TIM1_A8(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM1_A9(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM1_A10(uint32_t period_us, uint32_t ds_us);
@@ -74,15 +69,14 @@ void TIM_SetupPWM_TIM3_B1(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM3_B4(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM3_B5(uint32_t period_us, uint32_t ds_us);
 
+// Missing on  LQFP48 
 void TIM_SetupPWM_TIM3_C6(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM3_C7(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM3_C8(uint32_t period_us, uint32_t ds_us);
 void TIM_SetupPWM_TIM3_C9(uint32_t period_us, uint32_t ds_us);
 
-
 void TIM_SetupPWM_OnPin(const char* pin_name, uint32_t period_us, uint32_t ds_us);
 */
-
 
 #ifdef __cplusplus
 }

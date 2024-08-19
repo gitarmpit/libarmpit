@@ -1,5 +1,5 @@
-#ifndef _SYSTEM_INIT_H
-#define _SYSTEM_INIT_H
+#ifndef _CONFIG_H
+#define _CONFIG_H
 
 #include <stdint.h>
 

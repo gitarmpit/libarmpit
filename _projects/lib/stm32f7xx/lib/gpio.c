@@ -1,7 +1,16 @@
-#include "gpio_helper.h"
+#include "gpio.h"
 #include <string.h>
 #include <stdlib.h>
 #include "stm32f7xx_ll_bus.h"
+
+void GPIO_SetAF(GPIO_PIN* pin, uint32_t af) {
+
+  if (POSITION_VAL(pin->Pin) < 0x00000008U) {
+    LL_GPIO_SetAFPin_0_7(pin->GPIOx, pin->Pin, af);
+  } else {
+    LL_GPIO_SetAFPin_8_15(pin->GPIOx, pin->Pin, af);
+  }
+}
 
 GPIO_PIN GPIO_GetPin(const char *pin_name)
 {

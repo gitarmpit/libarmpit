@@ -1,7 +1,7 @@
-#include "gpio_helper.h"
-#include "system_init.h"
+#include "gpio.h"
+#include "config.h"
 #include "systick.h"
-#include "timer_helper.h"
+#include "timer.h"
 #include <stdio.h>
 
 GPIO_PIN* led;
@@ -30,6 +30,26 @@ static void testTimer() {
   }
 }
 
+static void testPWM1() {
+  
+  GPIO_PIN a8 = GPIO_GetPin("A8");
+  GPIO_Setup_OutAltPP(&a8);
+  GPIO_SetAF(&a8, 1);
+
+  TIM_Channel ch = TIM_SetupPWM(TIM1, 1, 2, 1);
+  TIM_UpdatePeriodDs_ns(&ch, 32, 15);
+}
+
+
+static void testPWM3() {
+  
+  GPIO_PIN b0 = GPIO_GetPin("B0");
+  GPIO_Setup_OutAltPP(&b0);
+  GPIO_SetAF(&b0, 2);
+
+  TIM_Channel ch = TIM_SetupPWM(TIM3, 3, 400, 200);
+}
+
 
 int main(void) {
   System_Config();
@@ -38,7 +58,9 @@ int main(void) {
   // SystemClock_Config_HSI();
 
 
-  testTimer();
+  testPWM1();
+
+  //testTimer();
 
   while (1) {
   }

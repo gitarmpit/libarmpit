@@ -33,7 +33,7 @@
       arm_fpu_type=""
       arm_linker_heap_size="1024"
       arm_linker_process_stack_size="0"
-      arm_linker_stack_size="2048"
+      arm_linker_stack_size="4096"
       arm_linker_variant="SEGGER"
       arm_rtl_variant="SEGGER"
       arm_simulator_memory_simulation_parameter="ROM;0x08000000;0x00020000;RAM;0x20000000;0x00005000"
@@ -60,8 +60,10 @@
       Name="Debug"
       debug_leave_target_running="No"
       debug_target_connection="J-Link"
+      debug_type_file="$(StudioDir)/bin/libc++.xml"
       gdb_server_autostart_server="Yes"
       gdb_server_command_line="&quot;$(JLinkDir)/JLinkGDBServerCL&quot;  -device &quot;$(DeviceName)&quot; -if SWD"
+      libcxx="Yes (No Exceptions)"
       linker_printf_fp_enabled="No"
       speed="8000" />
     <configuration

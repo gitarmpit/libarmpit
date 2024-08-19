@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "system_init.h"
-#include "gpio_helper.h"
+#include "config.h"
+#include "gpio.h"
 #include "timer_cpp.h"
 #include "button.h"
 #include "button_handler.h"

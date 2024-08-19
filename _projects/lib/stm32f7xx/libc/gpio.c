@@ -1,7 +1,16 @@
-#include "gpio_helper.h"
+#include "gpio.h"
 #include <string.h>
 #include <stdlib.h>
-#include "stm32f1xx_ll_bus.h"
+#include "stm32f7xx_ll_bus.h"
+
+void GPIO_SetAF(GPIO_PIN* pin, uint32_t af) {
+
+  if (POSITION_VAL(pin->Pin) < 0x00000008U) {
+    LL_GPIO_SetAFPin_0_7(pin->GPIOx, pin->Pin, af);
+  } else {
+    LL_GPIO_SetAFPin_8_15(pin->GPIOx, pin->Pin, af);
+  }
+}
 
 GPIO_PIN GPIO_GetPin(const char *pin_name)
 {
@@ -21,27 +30,27 @@ GPIO_PIN GPIO_GetPin(const char *pin_name)
         case 'a':
         case 'A':
             pin.GPIOx = GPIOA;
-            port = LL_APB2_GRP1_PERIPH_GPIOA;
+            port = LL_AHB1_GRP1_PERIPH_GPIOA;
             break;
         case 'b':
         case 'B':
             pin.GPIOx = GPIOB;
-            port = LL_APB2_GRP1_PERIPH_GPIOB;
+            port = LL_AHB1_GRP1_PERIPH_GPIOB;
             break;
         case 'c':
         case 'C':
             pin.GPIOx = GPIOC;
-            port = LL_APB2_GRP1_PERIPH_GPIOC;
+            port = LL_AHB1_GRP1_PERIPH_GPIOC;
             break;
         case 'd':
         case 'D':
             pin.GPIOx = GPIOD;
-            port = LL_APB2_GRP1_PERIPH_GPIOD;
+            port = LL_AHB1_GRP1_PERIPH_GPIOD;
             break;
         case 'e':
         case 'E':
             pin.GPIOx = GPIOE;
-            port = LL_APB2_GRP1_PERIPH_GPIOE;
+            port = LL_AHB1_GRP1_PERIPH_GPIOE;
             break;
         default:
             break;
@@ -57,9 +66,9 @@ GPIO_PIN GPIO_GetPin(const char *pin_name)
             else
             {
                 pin.Pin = pin_array[pin_no];
-                if (!LL_APB2_GRP1_IsEnabledClock(port))
+                if (!LL_AHB1_GRP1_IsEnabledClock(port))
                 {
-                    LL_APB2_GRP1_EnableClock(port);
+                    LL_AHB1_GRP1_EnableClock(port);
                 }
             }
         }

@@ -5,7 +5,7 @@
 #include "stm32f7xx_ll_pwr.h"
 
 #include "systick.h"
-#include "system_init.h"
+#include "config.h"
 
 static void MPU_Config(void)
 {

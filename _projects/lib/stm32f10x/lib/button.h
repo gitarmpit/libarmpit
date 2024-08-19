@@ -1,7 +1,7 @@
 #ifndef _BUTTON_H
 #define _BUTTON_H
 
-#include "gpio_helper.h"
+#include "gpio.h"
 
 /* The default behavior is active low: button is configured as a weak pull-up
  * So to active it, the switch needs to be connected from the input port to ground

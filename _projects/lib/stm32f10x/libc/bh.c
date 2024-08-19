@@ -1,6 +1,6 @@
 #include "bh.h"
 #include "systick.h"
-#include "timer_helper.h"
+#include "timer.h"
 
 #define MAX_BUTTONS 32
 

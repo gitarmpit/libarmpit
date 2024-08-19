@@ -1,7 +1,7 @@
-#ifndef GPIO_HELPER_H
-#define GPIO_HELPER_H
+#ifndef _GPIO_H
+#define _GPIO_H
 
-#include "stm32f1xx_ll_gpio.h"
+#include "stm32f7xx_ll_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,11 +14,12 @@ typedef struct
 } GPIO_PIN;
 
 GPIO_PIN GPIO_GetPin(const char *pin_name);
+void GPIO_SetAF(GPIO_PIN* pin, uint32_t af);
 
 #define GPIO_Setup_OutPP(pin)                                                    \
   do {                                                                           \
     LL_GPIO_SetPinMode((pin)->GPIOx, (pin)->Pin, LL_GPIO_MODE_OUTPUT);           \
-    LL_GPIO_SetPinSpeed((pin)->GPIOx, (pin)->Pin, LL_GPIO_SPEED_FREQ_HIGH);      \
+    LL_GPIO_SetPinSpeed((pin)->GPIOx, (pin)->Pin, LL_GPIO_SPEED_FREQ_VERY_HIGH);      \
     LL_GPIO_SetPinOutputType((pin)->GPIOx, (pin)->Pin, LL_GPIO_OUTPUT_PUSHPULL); \
   } while (0)
 
@@ -29,6 +30,7 @@ GPIO_PIN GPIO_GetPin(const char *pin_name);
     LL_GPIO_SetPinOutputType((pin)->GPIOx, (pin)->Pin, LL_GPIO_OUTPUT_PUSHPULL); \
   } while (0)
 
+#define GPIO_SetOutput(val) (pin)->GPIOx->ODR = val
 
 #define GPIO_Setup_In_Pulldown(pin)                                   \
   do {                                                                \

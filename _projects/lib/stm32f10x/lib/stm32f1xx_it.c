@@ -35,14 +35,3 @@ void DebugMon_Handler(void) {}
 
 void PendSV_Handler(void) {}
 
-
-void RCC_IRQHandler(void) {}
-
-void ADC1_2_IRQHandler(void) {}
-
-
-void I2C1_ER_IRQHandler(void) {}
-
-void SPI1_IRQHandler(void) {}
-
-void USART1_IRQHandler(void) {}

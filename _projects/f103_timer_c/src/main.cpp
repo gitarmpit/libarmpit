@@ -1,7 +1,7 @@
-#include "gpio_helper.h"
-#include "system_init.h"
+#include "gpio.h"
+#include "config.h"
 #include "systick.h"
-#include "timer_helper.h"
+#include "timer.h"
 #include <stdio.h>
 
 // #define __HAL_RCC_DMA1_CLK_DISABLE()      (RCC->AHBENR &= ~(RCC_AHBENR_DMA1EN))
@@ -162,7 +162,6 @@ static void testPWM2() {
   while (1)
     ;
 }
-
 
  
 int main(void) {

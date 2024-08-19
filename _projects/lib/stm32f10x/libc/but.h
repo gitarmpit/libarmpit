@@ -1,8 +1,8 @@
 #ifndef _BUT_H
 #define _BUT_H
 
-#include "system_init.h"
-#include "gpio_helper.h"
+#include "config.h"
+#include "gpio.h"
 
 #ifdef __cplusplus
 extern "C" {

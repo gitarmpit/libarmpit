@@ -1,5 +1,5 @@
-#ifndef _SYSTEM_INIT_H
-#define _SYSTEM_INIT_H
+#ifndef _CONFIG_H
+#define _CONFIG_H
 
 #include <stdint.h>
 
@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 void System_Config(void);
-void SystemClock_Config_HSE(void);
+void SystemClock_Config_HSE(BOOL enableBypass);
 void SystemClock_Config_HSI(void);
 
 
