@@ -22,7 +22,7 @@ static void testTimer() {
   //TIM_EnableTimer(TIM1);
 
   //TIM_SetUpdatePeriod_ns(TIM2, 1000);
-  TIM_SetupCounter(TIM1, 1000000, Timer_Callback, NULL);
+  TIM_SetupCounter(TIM1, 40, Timer_Callback, NULL);
 
 
   while (1) {
