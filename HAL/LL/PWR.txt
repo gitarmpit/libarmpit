@@ -14,3 +14,71 @@ LL_PWR_EnablePVD
 LL_PWR_EnableWakeUpPin
 
 ==============================
+HAL
+start:
+
+  if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+  {
+    /* Clear Standby flag */
+    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+  }
+
+
+  /* Disable all used wakeup sources: PWR_WAKEUP_PIN1 */
+  HAL_PWR_DisableWakeUpPin(PWR_WAKEUP_PIN1);
+
+  /* Clear all related wakeup flags*/
+  __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+  
+  /* Enable WakeUp Pin PWR_WAKEUP_PIN1 connected to PA.00 */
+  HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+
+  /* Enter the Standby mode */
+  HAL_PWR_EnterSTANDBYMode();
+
+==================
+LL
+main:
+  /* Check if the system was resumed from StandBy mode */
+  if (LL_PWR_IsActiveFlag_SB() != 0)
+  { 
+    /* Clear Standby flag */
+    LL_PWR_ClearFlag_SB(); 
+    
+    /* Change LED speed to SLOW to indicate exit from standby mode */
+    LedSpeed = LED_BLINK_SLOW;
+  }
+
+  /* Check and Clear the Wakeup flag */
+  if (LL_PWR_IsActiveFlag_WU() != 0)
+  {
+    LL_PWR_ClearFlag_WU();
+  }
+
+Enter standby:
+
+
+  /* Disable all used wakeup sources */
+  LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);
+  
+  /* Clear all wake up Flag */
+  LL_PWR_ClearFlag_WU();
+    
+  /* Enable wakeup pin */
+  LL_PWR_EnableWakeUpPin(LL_PWR_WAKEUP_PIN1);
+  
+  /* As default User push-button state is high level, need to clear all wake up Flag again */
+  LL_PWR_ClearFlag_WU();
+
+  /** Request to enter STANDBY mode
+    * Following procedure describe in STM32F1xx Reference Manual
+    * See PWR part, section Low-power modes, Standby mode
+    */
+  /* Set STANDBY mode when CPU enters deepsleep */
+  LL_PWR_SetPowerMode(LL_PWR_MODE_STANDBY);
+  
+  /* Set SLEEPDEEP bit of Cortex System Control Register */
+  LL_LPM_EnableDeepSleep();
+  __WFI();
+
+
