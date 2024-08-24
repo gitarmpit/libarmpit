@@ -1,0 +1,62 @@
+Cortex M3:
+sleep mode stops the processor clock
+deep sleep mode stops the system clock and switches off the PLL and flash memory.
+
+SLEEPDEEP bit of the SCR selects which sleep mode is used
+
+
+WFI : wait for interrupt 
+WFE : wait for event 
+
+The Wait For Event instruction, WFE, causes entry to sleep mode depending on the value of a
+one-bit event register. When the processor executes a WFE instruction, it checks the value of the
+event register:
+0 The processor stops executing instructions and enters sleep mode.
+1 The processor clears the register to 0 and continues executing instructions without
+entering sleep mode.
+
+
+SLEEPONEXIT:
+
+If the SLEEPONEXIT bit of the SCR is set to 1, when the processor completes the execution of
+all exception handlers it returns to Thread mode and immediately enters sleep mode. Use this
+mechanism in applications that only require the processor to run when an exception occurs
+
+SCR 
+
+[2] SLEEPDEEP   0 = sleep, 1 = deep sleep 
+
+[1] SLEEPONEXIT  0 = do not sleep when returning to Thread mode
+                 1 = enter sleep, or deep sleep, on return from an ISR
+
+Setting this bit to 1 enables an interrupt driven application to avoid returning to an empty
+main application. 
+
+
+================================
+Sleep, Stop, Standby 
+
+Sleep mode (CPU clock off, all peripherals including Cortex®-M3 core peripherals like
+NVIC, SysTick, etc. are kept running) Voltage regulator on
+
+Sleep (Sleep now or Sleep-on -exit)  
+enter: WFI or WFE   
+Wake up: any interrupt (WFI) or wakeup event (WFE)  
+
+-------------------
+Stop:  All 1.8V domain clocks OFF, HSI HSE off,  Vreg: On or in low power mode   
+
+Enter: PDDS and LPDS bits + SLEEPDEEP bit + WFI or WFE      
+Wakeup: Any EXTI line (configured in the  EXTI registers)
+-------------------
+Standby 
+All 1.8V domain  clocks OFF, HSI HSE off, Vreg OFF 
+
+Enter:  PDDS bit + SLEEPDEEP bit +  WFI or WFE 
+Wakeup: WKUP pin rising edge, RTC alarm, external reset in NRST pin, IWDG reset
+
+
+
+
+
+

@@ -1,0 +1,87 @@
+  LL_PWR_EnableBkUpAccess();
+
+LSI:
+  /* Enable LSE only if disabled.*/
+  if (LL_RCC_LSE_IsReady() == 0)
+  {
+    LL_RCC_ForceBackupDomainReset();
+    LL_RCC_ReleaseBackupDomainReset();
+    LL_RCC_LSE_Enable();
+    while (LL_RCC_LSE_IsReady() != 1)
+        ;
+    LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);
+  }
+
+LSI:
+  LL_RCC_LSI_Enable();
+  while (LL_RCC_LSI_IsReady() != 1)
+     ;
+
+  /* Reset backup domain only if LSI is not yet selected as RTC clock source */
+  if (LL_RCC_GetRTCClockSource() != LL_RCC_RTC_CLKSOURCE_LSI)
+  {
+    LL_RCC_ForceBackupDomainReset();
+    LL_RCC_ReleaseBackupDomainReset();
+    LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);
+  }
+
+
+LL_RCC_EnableRTC();
+
+
+LL_RTC_DisableWriteProtection(RTC);
+
+LL_RTC_EnterInitMode(RTC);
+
+  LL_RTC_SetAsynchPrescaler(RTC, RTC_ASYNCH_PREDIV);
+
+LL_RTC_ExitInitMode(RTC);
+
+LL_RTC_EnableWriteProtection(RTC);
+
+============================================
+Configure alarm:
+
+LL_RTC_DisableWriteProtection(RTC);
+LL_RTC_EnterInitMode(RTC)
+
+  RTC_ALARM_Config(12, 00, 25);
+
+  LL_RTC_ClearFlag_ALR(RTC);
+  LL_RTC_EnableIT_ALR(RTC);
+
+  /* RTC Alarm Interrupt Configuration: EXTI configuration */
+  LL_EXTI_EnableIT_0_31(LL_EXTI_LINE_17);
+  LL_EXTI_EnableRisingTrig_0_31(LL_EXTI_LINE_17);
+  
+  /*##-6- Configure the NVIC for RTC Alarm ###############################*/
+  NVIC_SetPriority(RTC_Alarm_IRQn, 0x0F);
+  NVIC_EnableIRQ(RTC_Alarm_IRQn);
+
+LL_RTC_ExitInitMode(RTC);
+
+LL_RTC_EnableWriteProtection(RTC);
+
+
+---------------
+void RTC_ALARM_Config(uint8_t fHour, uint8_t fMin, uint8_t fSec)
+{
+  RTC_AlarmStruct.hour = fHour;
+  RTC_AlarmStruct.min  = fMin;
+  RTC_AlarmStruct.sec  = fSec;
+
+  LL_RTC_ALARM_Set(RTC,((RTC_AlarmStruct.hour * 3600) +
+                        (RTC_AlarmStruct.min * 60) +
+                        RTC_AlarmStruct.sec));
+}
+
+
+-----------
+WaitForSynchro_RTC:
+
+LL_RTC_ClearFlag_RS(RTC);
+while(LL_RTC_IsActiveFlag_RS(RTC) != 1)
+  ;
+
+
+  
