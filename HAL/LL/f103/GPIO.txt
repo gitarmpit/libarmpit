@@ -1,0 +1,77 @@
+LL_GPIO_PIN_x  x=0 to 15
+
+ports:
+GPIOA ... GPIOH
+
+
+
+  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+
+
+==========================================
+LL_GPIO_InitTypeDef
+  Pin, Mode, Speed, OutputType, Pull
+
+
+Mode:  LL_GPIO_MODE_ANALOG, LL_GPIO_MODE_FLOATING, LL_GPIO_MODE_INPUT, 
+       LL_GPIO_MODE_OUTPUT, LL_GPIO_MODE_ALTERNATE
+
+Speed: LL_GPIO_SPEED_FREQ_LOW  MEDIUM  HIGH 
+
+OutputType: LL_GPIO_OUTPUT_PUSHPULL, LL_GPIO_OUTPUT_OPENDRAIN
+
+Pull: LL_GPIO_PULL_DOWN, LL_GPIO_PULL_UP
+
+
+=========================================
+LL_GPIO_AF_EVENTOUT_PIN_0 .. 15 
+
+LL_GPIO_AF_EVENTOUT_PORT_A .. E 
+
+LL_GPIO_AF_EXTI_PORTA .. G 
+
+LL_GPIO_AF_EXTI_LINE0 .. 15 
+
+========================================
+
+LL_GPIO_SetOutputPin(LED2_GPIO_PORT, LED2_PIN);
+LL_GPIO_ResetOutputPin
+LL_GPIO_TogglePin 
+
+LL_GPIO_AF_*
+
+=========================================
+LL_GPIO_SetPinPull(GPIOx, uint32_t Pin, uint32_t Pull)
+LL_GPIO_SetPinMode(GPIO_TypeDef *GPIOx, uint32_t Pin, uint32_t Mode)
+LL_GPIO_SetPinSpeed(GPIO_TypeDef *GPIOx, uint32_t Pin, uint32_t  Speed)
+LL_GPIO_SetPinOutputType(GPIO_TypeDef *GPIOx, uint32_t Pin, uint32_t OutputType)
+
+
+==============================
+Need to add: 
+
+LL_GPIO_Setup_InFloat
+LL_GPIO_Setup_InPullup
+LL_GPIO_Setup_InPulldown 
+LL_GPIO_Setup_InAnalog
+
+LL_GPIO_Setup_OutPP
+LL_GPIO_Setup_OutOD
+LL_GPIO_Setup_OutAltPP
+LL_GPIO_Setup_OutAltOD
+LL_GPIO_Pullup
+LL_GPIO_Pulldown
+
+LL_GPIO_SetSpeedLow
+LL_GPIO_SetSpeedMedium
+LL_GPIO_SetSpeedHigh
+
+LL_GPIO_SetAF
+
+
+
+

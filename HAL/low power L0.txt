@@ -1,0 +1,23 @@
+__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+
+
+
+// Disable the power voltage detector   PVD
+
+CLEAR_BIT(PWR->CR, PWR_CR_PVDE);
+
+
+
+
+Power-on reset (POR) / Power-down reset (PDR),
+
+Brownout reset (BOR)  : no BOR on 1.65V devices (l053)
+
+
+decrease the voltage coming to VDD at least to 1.8V (or down to 1.65V)
+
+
+IWDG + LST = OFF 
+
+
+

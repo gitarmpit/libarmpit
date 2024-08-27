@@ -1,0 +1,6 @@
+#include "stm32f1xx_ll_gpio.h"
+
+LL_GPIO_AF_Remap_SWJ_NOJTAG();
+
+// Disable SW-DP !!!
+LL_GPIO_AF_DisableRemap_SWJ();
