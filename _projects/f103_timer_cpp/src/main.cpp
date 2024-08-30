@@ -5,6 +5,9 @@
 #include "button.h"
 #include "button_handler.h"
 #include "systick.h"
+#include "stm32f1xx_ll_pwr.h"
+#include "stm32f1xx_ll_rcc.h"
+
 
 static GPIO_PIN* led;
 
@@ -90,22 +93,93 @@ static void testTimer() {
 }
 
 
+static void Sleep() {
+  CLEAR_BIT(SCB->SCR, (uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+  CLEAR_BIT(PWR->CR, (PWR_CR_PDDS | PWR_CR_LPDS_Msk));
+  __WFI();
+}
+
+// Lpreg, Main reg off, 0.8-0.9mA
+static void Stop() {
+  SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
+  CLEAR_BIT(PWR->CR, PWR_CR_PDDS);
+  SET_BIT(PWR->CR, PWR_CR_LPDS_Msk);
+
+  __WFI();
+}
+
+// Main reg on, 0.9-1mA
+static void Stop2() {
+  SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
+  CLEAR_BIT(PWR->CR, PWR_CR_PDDS);
+  CLEAR_BIT(PWR->CR, PWR_CR_LPDS_Msk);
+  __WFI();
+}
+
+
+// Deep sleep: standby 20uA
+static void StandBy() {
+  SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
+  SET_BIT(PWR->CR, PWR_CR_PDDS);
+  CLEAR_BIT(PWR->CSR, PWR_CSR_WUF_Msk);
+
+  // Enable wakeup pin
+  SET_BIT(PWR->CSR, PWR_CSR_EWUP_Msk);
+
+  __WFI();
+}
+
+
 int main(void) {
 
   System_Config();
-  SystemClock_Config_HSE();
+  SystemClock_Config_HSE(); // 24mA
 
-  /*
-  while (1) {
-    printf("%d\n", SysTick_GetTick());
-    GPIO_TogglePin(&pin1);
-    SysTick_Delay(1000);
+  LL_GPIO_AF_DisableRemap_SWJ();
+
+
+  if (LL_PWR_IsActiveFlag_SB()) {
+      LL_PWR_ClearFlag_SB();
+      GPIO_PIN pin1 = GPIO_GetPin("B8");  // LED: B8
+      GPIO_Setup_OutPP(&pin1);
+      GPIO_SetPin(&pin1);
+      SysTick_Delay(4000);
   }
-  */
+
+  // Disable wakeup pin
+  CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP_Msk);
+  if (LL_PWR_IsActiveFlag_WU()) {
+    LL_PWR_ClearFlag_WU();
+  }
+
+
+
+  //SysTick_Delay(5000);
+
+  //LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_16);
+
+
+  LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_AFIO);
+  SysTick->CTRL = 0;
+  StandBy();
+
+  //System_Config();
+  
+  //Stop2();
+
+  // Stop();
+
+  //SystemClock_Config_HSE(); // 24mA
+
+  while (1) {
+    //printf("%d\n", SysTick_GetTick());
+    //GPIO_TogglePin(&pin1);
+    //SysTick_Delay(5000);
+  }
 
   // testButtonHandler();
 
-  testPWM();
+  //testPWM();
   //testTimer();
 
   while (1)

@@ -1,5 +1,6 @@
 __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
 
+// PWR_CR_VOS
 
 
 // Disable the power voltage detector   PVD

@@ -16,8 +16,8 @@ void System_Config(void) {
 
   NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 15, 0));
 
-  NVIC_SetPriority(RCC_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-  NVIC_EnableIRQ(RCC_IRQn);
+  //NVIC_SetPriority(RCC_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  //NVIC_EnableIRQ(RCC_IRQn);
 
   LL_GPIO_AF_Remap_SWJ_NONJTRST();
   LL_GPIO_AF_Remap_SWJ_NOJTAG();
