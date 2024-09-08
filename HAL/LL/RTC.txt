@@ -1,6 +1,6 @@
   LL_PWR_EnableBkUpAccess();
 
-LSI:
+LSE:
   /* Enable LSE only if disabled.*/
   if (LL_RCC_LSE_IsReady() == 0)
   {
@@ -34,8 +34,9 @@ LL_RTC_DisableWriteProtection(RTC);
 LL_RTC_EnterInitMode(RTC);
 
   LL_RTC_SetAsynchPrescaler(RTC, RTC_ASYNCH_PREDIV);
+  LL_RTC_SetSynchPrescaler ??? needed ?
 
-LL_RTC_ExitInitMode(RTC);
+LL_RTC_ExitInitMode(RTC);  or LL_RTC_DisableInitMode
 
 LL_RTC_EnableWriteProtection(RTC);
 

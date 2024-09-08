@@ -1,5 +1,5 @@
-#ifndef _TIMER_H
-#define _TIMER_H
+#ifndef _TIMER_CPP_H
+#define _TIMER_CPP_H
 
 #include "stm32f1xx_ll_bus.h"
 #include "stm32f1xx_ll_tim.h"
