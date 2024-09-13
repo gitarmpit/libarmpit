@@ -34,7 +34,7 @@ private:
 public:
   void SetUpdatePeriod_us(uint32_t us);
   void SetupCounter(uint32_t period_us);
-  TIM_Channel SetupPWM(uint8_t channel, uint32_t period_us, uint32_t ds_us);
+  TIM_Channel SetupPWM(uint8_t channel, uint32_t period_us, uint32_t ds_us, bool complimentary_out = false, uint16_t dead_time = 0);
   void EnableCounter();
   void DisableCounter();
   void UpdatePeriodDs(uint8_t channel, uint32_t period_us, uint32_t ds_us);
@@ -47,6 +47,7 @@ public:
       _irqHandler->HandleInterrupt();
     }
   }
+
   void SetIrqPriority(uint32_t IRQ_priority) { _IRQ_priority = IRQ_priority; }
 
 protected:
