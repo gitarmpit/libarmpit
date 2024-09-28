@@ -25,6 +25,14 @@
 // "Triple:d=8,o=5,b=635:c,e,g,c,e,g,c,e,g,c6,e6,g6,c6,e6,g6,c6,e6,g6,c7,e7,g7,c7,e7,g7,c7,e7,g7";
 //
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+static void delay (int ms) {
+  for (int i = 0; i < ms*3; ++i) {
+  }
+}
+#pragma GCC pop_options
+
 static const int nfreq[][14] = {
     // a   a#      b        c       c#   d    d#     e       f      f#    g   g#
     {27, 29, 31, 16, 16, 17, 18, 19, 20, 22, 22, 23, 24, 26},
@@ -56,7 +64,7 @@ void Buzzer::PlayTone(uint16_t freq, uint16_t durationMs) {
   _timer->UpdatePWM(period, _volume * (period - period / 10) / 100);
 
   if (durationMs != 0) {
-    SysTick_Delay(durationMs);
+    delay(durationMs);
     _timer->UpdatePWM(period, 0);
   }
 }
@@ -211,13 +219,13 @@ bool Buzzer::PlayTune(const char* tune) {
         PlayTone(freq);
       }
       if (duron_ms) {
-        SysTick_Delay(duron_ms);
+        delay(duron_ms);
       }
       if (duroff_ms != 0) {
         //_timer->SetupPWM(0, 0);
-        _timer->UpdatePWM(0, 0);
-        //_timer->Stop();
-        SysTick_Delay(duroff_ms);
+        //_timer->UpdatePWM(0, 0);
+        _timer->Stop();
+        delay(duroff_ms);
       }
     }
 

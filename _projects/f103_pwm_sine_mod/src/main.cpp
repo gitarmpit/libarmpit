@@ -18,7 +18,6 @@ public:
   virtual void HandleInterrupt()  {
     
     float ds = 1.0 + sin (_step*_cnt*M_PI/180. - M_PI/2.0);
-    //float ds = sin (_step*_cnt*M_PI/180.);
     ds = _period*ds/2.0;
     //printf ("%d %f\n", _cnt, ds);
     _ch->timer->UpdateDs(_ch->channel, ds);

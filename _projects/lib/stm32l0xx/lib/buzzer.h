@@ -7,13 +7,13 @@
 // https://en.wikipedia.org/wiki/Ring_Tone_Text_Transfer_Language
 // d: default duration (1/8th), o: octave, b: beat(tempo)
 
-#define barbie2 "barbie2:d=8,0=5,b=150:f#,d#,f#,b,2g#"
+#define barbie2 "barbie2:d=8,o=5,b=150:f#,d#,f#,b,2g#"
 #define  cuca  "cuca:d=8,o=5,b=200:2p,p,c,c,c,4f.,4a,c,c,c,4f.,al,2a,p,4f,f,e,e,d,d,4c,4p."
 #define  cuca_short "cs:d=8,o=5,b=200:2p,p,c,c,c,4f.,4a,c,c,c,4f.,4a"
 #define  chiz "hiz:d=8,o=5,b=200:e,c,e,c,f,e,d,p,g4,g4,g4,16a4,16b4,c,c,c,p"
 #define  nokia "nokia:d=8,o=5,b=220:e6,d6,4f#,4g#,c#6,b,4d,4e,b,a,4c#,4e,1a"
-#define  barbie "barbie:d=8,0=5,b=150:g#,e,g#,c#6,4a,4p,f#,d#,f#,b,4g#"
-#define  barbie2 "barbie2:d=8,0=5,b=150:f#,d#,f#,b,2g#"
+#define  barbie "barbie:d=8,o=5,b=150:g#,e,g#,c#6,4a,4p,f#,d#,f#,b,4g#"
+#define  barbie2 "barbie2:d=8,o=5,b=150:f#,d#,f#,b,2g#"
 #define  polonez1 "polonez:d=8,o=5,b=120:4e.,16d#,16e,f,e,c,16cl,16b4,4a4"
 #define  polonez2 "polonez:d=8,o=5,b=120:16d#,16e,f,e,c,16cl,16b4,4a4"
 #define  pv "pv:d=8,o=5,b=120:c,eb,g,eb,4f,eb,d,4g,4f,2c,eb,g,bb,bb,4c6,bb,ab,2g,4a,4b,d6,c6,4g.,4d,c,g.,16f,2ab,bb,ab,4g,f,eb,4g,4f,2c"

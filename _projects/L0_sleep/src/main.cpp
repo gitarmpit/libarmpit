@@ -1,4 +1,5 @@
 #include "config.h"
+#include "stm32l0xx_ll_cortex.h"
 #include "stm32l0xx_ll_rcc.h"
 
 #include "stm32l0xx_ll_pwr.h"
@@ -126,9 +127,6 @@ static void EnterSTOPMode()
 // 1.8 uA without Ultra low power
 static void StandBy() {
 
-  // Enable wakeup pin
-  LL_PWR_ClearFlag_WU();
-
   //SET_BIT(PWR->CR, PWR_CR_PDDS);
   //CLEAR_BIT(PWR->CSR, PWR_CSR_WUF_Msk);
 
@@ -145,8 +143,8 @@ static void StandBy() {
   // MODIFY_REG(PWR->CR, PWR_CR_VOS, PWR_CR_VOS_0);
 
   // Set SLEEPDEEP bit of Cortex System Control Register
-  // LL_LPM_EnableDeepSleep();
-  SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
+  LL_LPM_EnableDeepSleep();
+  //SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
   // LL_PWR_EnableNVMKeptOff();
   
   LL_PWR_EnableUltraLowPower();
@@ -154,7 +152,7 @@ static void StandBy() {
   //SET_BIT(PWR->CSR, PWR_CSR_EWUP_Msk);
   //CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP_Msk);
   
-  // GPIO_floating();
+  //GPIO_floating();
 
   __WFI();
 }
@@ -220,22 +218,6 @@ static void lowPowerRun() {
 
 }
 
-static void testStandBy() {
-  // Check standby flag
-  if (LL_PWR_IsActiveFlag_SB()) {
-      LL_PWR_ClearFlag_SB();
-      //CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1);
-      LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);  
-      GPIO_PIN pin = GPIO_GetPin("A3");
-      GPIO_Setup_OutPP (&pin);
-      GPIO_SetPin(&pin);
-      SysTick_Delay(1000);
-  }
-  LL_PWR_EnableWakeUpPin(LL_PWR_WAKEUP_PIN1);  // A0
-  StandBy();
-}
-
-
 static void testRTC(void) {
 
   //GPIO_PIN c13 = GPIO_GetPin ("c13");
@@ -256,10 +238,8 @@ static void testRTC(void) {
   LL_RTC_EnterInitMode(RTC);
   RTC->TR = 0;
   RTC->DR = 0;
-  
 
-
-  LL_RTC_SetSynchPrescaler(RTC, 283); //36800
+  //LL_RTC_SetSynchPrescaler(RTC, 283); //36800
 
   LL_RTC_EnableShadowRegBypass(RTC);
 
@@ -315,13 +295,21 @@ static void testRTC(void) {
 static void setupRTCForStandby(void) {
 
   LL_PWR_EnableBkUpAccess();
+
+#if 0
   LL_RCC_LSI_Enable();
   while (LL_RCC_LSI_IsReady() != 1)
      ;
+  LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);
+#else 
+  LL_RCC_LSE_Enable();
+  while (LL_RCC_LSE_IsReady() != 1)
+     ;
+  LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);
+#endif
 
   LL_RCC_ForceBackupDomainReset();
   LL_RCC_ReleaseBackupDomainReset();
-  LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);
 
   LL_RCC_EnableRTC();
 
@@ -340,7 +328,7 @@ static void setupRTCForStandby(void) {
   
   //LL_RTC_ALMA_SetMinute (RTC, 1);
   //LL_RTC_ALMA_SetHour (RTC, 1);
-  LL_RTC_ALMA_SetSecond (RTC, __LL_RTC_CONVERT_BIN2BCD(3));
+  LL_RTC_ALMA_SetSecond (RTC, __LL_RTC_CONVERT_BIN2BCD(5));
 
   //LL_RTC_ALMA_SetMask(RTC, LL_RTC_ALMA_MASK_MINUTES);
   //LL_RTC_ALMA_SetMask(RTC, LL_RTC_ALMA_MASK_HOURS);
@@ -359,23 +347,57 @@ static void run(void) {
   // Check standby flag
   if (LL_PWR_IsActiveFlag_SB()) {
     LL_PWR_ClearFlag_SB();
+    if (LL_PWR_IsActiveFlag_WU()) {
+      LL_PWR_ClearFlag_WU();
+    }
+    LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);
     CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
     LPBuzzerTimer timer;
     Buzzer* buzzer = Buzzer::GetInstance();
     buzzer->Init(&timer);
     buzzer->SetVolume(10);
     // buzzer->Stop();
-
     //buzzer->PlayTune("Melody:d=2,o=5,b=120:16c,16c,16c,g");
-
     buzzer->PlayTone(2000, 200);
     buzzer->Stop();
 
-    // beep();
   }
-  setupRTCForStandby();
+  // setupRTCForStandby();
+  LL_PWR_EnableWakeUpPin(LL_PWR_WAKEUP_PIN1);    // A0
   StandBy();
 }
+
+static void testStandBy() {
+  // Check standby flag
+  if (LL_PWR_IsActiveFlag_WU()) {
+    LL_PWR_ClearFlag_WU();
+  }
+  else {
+  }
+
+  setupRTCForStandby();
+
+  if (LL_PWR_IsActiveFlag_SB()) {
+    LL_PWR_ClearFlag_SB();
+    // CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1);
+    LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);
+
+    LPBuzzerTimer timer;
+    Buzzer* buzzer = Buzzer::GetInstance();
+    buzzer->Init(&timer);
+    buzzer->SetVolume(10);
+    //buzzer->PlayTune(barbie);
+    buzzer->PlayTone(2000, 100);
+    buzzer->Stop();
+    for (int i = 0; i < 3000; ++i) {
+      
+    }
+  }
+  LL_PWR_EnableWakeUpPin(LL_PWR_WAKEUP_PIN1);    // A0
+//  setupRTCForStandby();
+  StandBy();
+}
+
 
 static void testGPIO() {
 
@@ -467,16 +489,17 @@ static void testBuzzer(void) {
   LPBuzzerTimer timer;
   Buzzer* buzzer = Buzzer::GetInstance();
   buzzer->Init(&timer);
-  buzzer->SetVolume(10);
+  buzzer->SetVolume(20);
   // buzzer->Stop();
 
-  buzzer->PlayTune("Melody:d=2,o=5,b=120:16c,16c,16c,g");
+  //buzzer->PlayTune("Melody:d=2,o=5,b=120:16c,16c,16c,g");
 
-  buzzer->PlayTone(2000, 200);
+  buzzer->PlayTone(1000, 200);
   buzzer->Stop();
   buzzer->PlayTune(barbie);
   buzzer->Stop();
-
+  while(1)
+  ;
 }
 
 static void testMCO(void) {
@@ -496,33 +519,43 @@ static void testMCO(void) {
 // MSI 2Mhz + SysTick: 300uA
 int main(void) {
 
+  if (LL_PWR_IsActiveFlag_SB()) {
+    LL_PWR_ClearFlag_SB();
+  }
+
+  if (LL_PWR_IsActiveFlag_WU()) {
+    LL_PWR_ClearFlag_WU();
+  }
+
   System_Config();
-  GPIO_floating();
-  GPIO_PIN pa14 = GPIO_GetPin("A14");
-  GPIO_Setup_OutAltPP(&pa14);
-  GPIO_SetAF(&pa14, 4);
+  //GPIO_floating();
+  //GPIO_PIN pa14 = GPIO_GetPin("A14");
+  //GPIO_Setup_OutAltPP(&pa14);
+  //GPIO_SetAF(&pa14, 4);
 
   //testTimer();
   //testPWM();
   //testLPTIM2();
 
-  //testBuzzer();
   lowPowerRun();
+  //testBuzzer();
   //testLPTIM_PWM();
   //GPIO_floating();
-  SystemCoreClockUpdate();
-  SysTick_Init();
+  //SystemCoreClockUpdate();
+  //SysTick_Init();
 
 
   //testMCO();
 
-  testRTC();
+  //testRTC();
 
 
-  //testStandBy();
+  testStandBy();
   //setupRTCForStandby();
 
-  //run();
+  // run();
+
+  //StandBy();
 
   while(1)
     ;
