@@ -6,4 +6,4 @@ Debug/
 *.filters
 *.user
 /.project
-/.vs
+.vs/
