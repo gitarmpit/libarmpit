@@ -1,0 +1,66 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="L053_48_battery_beeper" version="2" target="8">
+  <configuration
+    Name="Debug"
+    c_preprocessor_definitions="DEBUG"
+    gcc_debugging_level="Level 3"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="None" />
+  <configuration
+    Name="Release"
+    c_preprocessor_definitions="NDEBUG"
+    gcc_debugging_level="Level 2"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="Level 2 balanced" />
+  <project Name="L053_48_battery_beeper">
+    <configuration
+      LIBRARY_IO_TYPE="RTT"
+      Name="Common"
+      Target="STM32L053C8Tx"
+      arm_architecture="v6M"
+      arm_compiler_variant="SEGGER"
+      arm_core_type="Cortex-M0+"
+      arm_endian="Little"
+      arm_fp_abi="Soft"
+      arm_fpu_type="None"
+      arm_linker_heap_size="1024"
+      arm_linker_process_stack_size="0"
+      arm_linker_stack_size="512"
+      arm_linker_variant="SEGGER"
+      arm_simulator_memory_simulation_parameter="ROM;0x08000000;0x00010000;RAM;0x20000000;0x00002000"
+      arm_target_device_name="STM32L053C8"
+      arm_target_interface_type="SWD"
+      c_preprocessor_definitions="STM32L053xx;USE_FULL_LL_DRIVER;HSE_VALUE=8000000;LSE_VALUE=32768;HSE_STARTUP_TIMEOUT=100;LSE_STARTUP_TIMEOUT=5000;MSI_VALUE=2097000;HSI_VALUE=16000000;LSI_VALUE=37000;VDD_VALUE=3300;PREFETCH_ENABLE=0;INSTRUCTION_CACHE_ENABLE=1;DATA_CACHE_ENABLE=1"
+      c_user_include_directories="$(ProjectDir)/../lib/stm32l0xx/lib;$(ProjectDir)/../lib/stm32l0xx/Drivers/STM32L0xx_HAL_Driver;$(ProjectDir)/../lib/stm32l0xx/Drivers/CMSIS"
+      debug_register_definition_file="$(ProjectDir)/STM32L0x3_Registers.xml"
+      debug_stack_pointer_start="__stack_end__"
+      debug_start_from_entry_point_symbol="Yes"
+      debug_target_connection="J-Link"
+      gcc_entry_point="Reset_Handler"
+      link_linker_script_file="$(ProjectDir)/STM32L0xx_Flash.icf"
+      linker_memory_map_file="$(ProjectDir)/STM32L053C8Tx_MemoryMap.xml"
+      macros=""
+      project_directory=""
+      project_type="Executable"
+      target_reset_script="TargetInterface.resetAndStop()" />
+    <folder
+      Name="Drivers"
+      exclude=""
+      filter=""
+      path="../lib/stm32l0xx/Drivers"
+      recurse="Yes" />
+    <folder
+      Name="lib"
+      exclude=""
+      filter=""
+      path="../lib/stm32l0xx/lib"
+      recurse="No" />
+    <folder Name="src" exclude="" filter="" path="src" recurse="No" />
+    <folder
+      Name="startup"
+      exclude=""
+      filter=""
+      path="../lib/stm32l0xx/startup"
+      recurse="No" />
+  </project>
+</solution>

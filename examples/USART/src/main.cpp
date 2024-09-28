@@ -2,12 +2,13 @@
 #include "RCC_Helper.h"
 #include "debug.h"
 #include "GPIO_Helper.h"
-
+#include <stdio.h>
 
 //send an incrementing counter value continuously
 static void usart_test_tx()
 {
-	USART* usart = GPIO_Helper::SetupUSART(USART1_PA_9_10, 9600);
+	//USART* usart = GPIO_Helper::SetupUSART(USART1_PA_9_10, 9600);
+	USART* usart = GPIO_Helper::SetupUSART(USART1_PB_6_7, 9600);
 
     uint8_t i = 0;
     while (1)
@@ -29,6 +30,7 @@ static void usart_test_rx()
     {
         usart->WaitRXNE();
         in = usart->Receive();
+        printf ("%d\n", in);
     }
 }
 
@@ -104,8 +106,8 @@ int main()
 	RCC_EnableHSI_168Mhz();
 #endif
 	Debug_EnableCYCCNT(TRUE);
-	usart_test_tx();
-    //usart_test_rx();
+	//usart_test_tx();
+    usart_test_rx();
     //usart_test_DMA_Rx();
     //usart_test_DMA_Tx();
 
