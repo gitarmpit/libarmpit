@@ -29,6 +29,9 @@ GPIO_PIN GPIO_GetPin(const char *pin_name);
     LL_GPIO_SetPinOutputType((pin)->GPIOx, (pin)->Pin, LL_GPIO_OUTPUT_PUSHPULL); \
   } while (0)
 
+#define GPIO_Setup_Floating(pin) \
+  LL_GPIO_SetPinMode((pin)->GPIOx, (pin)->Pin, LL_GPIO_MODE_FLOATING)
+
 
 #define GPIO_Setup_In_Pulldown(pin)                                   \
   do {                                                                \

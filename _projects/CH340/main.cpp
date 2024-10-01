@@ -1,10 +1,6 @@
 #include <windows.h>
 #include <iostream>
 
-bool WriteToSerial(HANDLE hSerial, const std::string &data) {
-    DWORD bytesWritten;
-    return WriteFile(hSerial, data.c_str(), data.size(), &bytesWritten, NULL) && (bytesWritten == data.size());
-}
 
 bool WriteByte(HANDLE hSerial, unsigned char byte) {
     DWORD bytesWritten;
@@ -18,14 +14,51 @@ bool ReadFromSerial(HANDLE hSerial, char *buffer, DWORD bytesToRead) {
     return result && (bytesRead > 0);
 }
 
-bool ReadByte(HANDLE hSerial, unsigned char *byte) {
+bool ReadByte_(HANDLE hSerial, unsigned char *byte) {
     DWORD bytesRead;
     return ReadFile(hSerial, byte, sizeof(*byte), &bytesRead, NULL) && (bytesRead == sizeof(*byte));
 }
 
+bool ReadByte(HANDLE hSerial, unsigned char& byte) {
+    DWORD bytesRead;
+    BOOL rc = ReadFile(hSerial, &byte, 1, &bytesRead, NULL);
+    return rc;
+}
+
+
+static void testSend(HANDLE hSerial) {
+
+    unsigned char b = 0x0; 
+    while (true)
+    {
+        printf("sending: %d\n", b);
+        if (!WriteByte(hSerial, b++))
+        {
+            std::cerr << "Error writing byte to serial port." << std::endl;
+        }
+        ::Sleep(1000);
+    }
+
+}
+
+static void testReceive(HANDLE hSerial) {
+
+    unsigned char b = 0;
+    while (true)
+    {
+        if (!ReadByte(hSerial, b))
+        {
+            std::cerr << "Read error." << std::endl;
+        }
+        printf("received: %d\n", b);
+    }
+
+}
+
+
 int main() {
     // Open serial port
-    HANDLE hSerial = CreateFile("COM7",
+    HANDLE hSerial = CreateFileA("COM8",
                                  GENERIC_READ | GENERIC_WRITE,
                                  0,
                                  NULL,
@@ -34,14 +67,15 @@ int main() {
                                  NULL);
     
     if (hSerial == INVALID_HANDLE_VALUE) {
-        std::cerr << "Error opening COM7: " << GetLastError() << std::endl;
+        std::cerr << "Error opening COM8: " << GetLastError() << std::endl;
         return 1;
     }
 
     // Set up the serial port parameters
     DCB dcbSerialParams = {0};
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    dcbSerialParams.BaudRate = CBR_9600; // Set baud rate
+    dcbSerialParams.BaudRate = CBR_300;
+        00; // Set baud rate
     dcbSerialParams.ByteSize = 8;         // Data bits = 8
     dcbSerialParams.StopBits = ONESTOPBIT; // 1 stop bit
     dcbSerialParams.Parity   = NOPARITY;   // No parity
@@ -52,36 +86,8 @@ int main() {
         return 1;
     }
 
-    // Write string to serial port
-    std::string dataToSend = "Hello, Serial!";
-    if (WriteToSerial(hSerial, dataToSend)) {
-        std::cout << "Sent: " << dataToSend << std::endl;
-    } else {
-        std::cerr << "Error writing string to serial port." << std::endl;
-    }
-
-    // Write a single byte to serial port
-    unsigned char byteToSend = 0x01; // Example byte
-    if (WriteByte(hSerial, byteToSend)) {
-        std::cout << "Sent byte: " << static_cast<int>(byteToSend) << std::endl;
-    } else {
-        std::cerr << "Error writing byte to serial port." << std::endl;
-    }
-
-    // Read from serial port
-    char receivedData[101]; // Buffer for received data (100 + null terminator)
-    if (ReadFromSerial(hSerial, receivedData, 100)) {
-        std::cout << "Received: " << receivedData << std::endl;
-    } else {
-        std::cerr << "Error reading from serial port." << std::endl;
-    }
-
-    unsigned char receivedByte;
-    if (ReadByte(hSerial, &receivedByte)) {
-        std::cout << "Received byte: " << static_cast<int>(receivedByte) << std::endl;
-    } else {
-        std::cerr << "Error reading byte from serial port." << std::endl;
-    }
+    // testSend(hSerial);
+    testReceive(hSerial);
 
     // Close the serial port
     CloseHandle(hSerial);
