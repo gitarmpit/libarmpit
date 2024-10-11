@@ -14,6 +14,8 @@ extern "C" {
 
 void System_Config(void);
 void SystemClock_Config_MSI(void);
+void SystemClock_Config_HSI_32(void);
+void SystemClock_Config_HSI_16(void);
 void System_EnableRTC(void);
 
 #ifdef __cplusplus

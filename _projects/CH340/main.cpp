@@ -1,95 +1,83 @@
-#include <windows.h>
-#include <iostream>
+#include "UART.h"
+#include "pctime.h"
+#include "Session.h"
 
+static uint8_t calculateCRC(uint8_t* data, int length) {
+	uint8_t crc = 0x00;
+	const uint8_t polynomial = 0x31;
 
-bool WriteByte(HANDLE hSerial, unsigned char byte) {
-    DWORD bytesWritten;
-    return WriteFile(hSerial, &byte, sizeof(byte), &bytesWritten, NULL) && (bytesWritten == sizeof(byte));
-}
+	for (int i = 0; i < length; i++) {
+		crc ^= data[i];
 
-bool ReadFromSerial(HANDLE hSerial, char *buffer, DWORD bytesToRead) {
-    DWORD bytesRead;
-    bool result = ReadFile(hSerial, buffer, bytesToRead, &bytesRead, NULL);
-    buffer[bytesRead] = '\0'; // Null-terminate the string
-    return result && (bytesRead > 0);
-}
+		for (uint8_t j = 0; j < 8; j++) {
+			if (crc & 0x80) {
+				crc = (crc << 1) ^ polynomial;
+			}
+			else {
+				crc <<= 1;
+			}
+		}
+	}
 
-bool ReadByte_(HANDLE hSerial, unsigned char *byte) {
-    DWORD bytesRead;
-    return ReadFile(hSerial, byte, sizeof(*byte), &bytesRead, NULL) && (bytesRead == sizeof(*byte));
-}
-
-bool ReadByte(HANDLE hSerial, unsigned char& byte) {
-    DWORD bytesRead;
-    BOOL rc = ReadFile(hSerial, &byte, 1, &bytesRead, NULL);
-    return rc;
+	return crc;
 }
 
 
-static void testSend(HANDLE hSerial) {
 
-    unsigned char b = 0x0; 
-    while (true)
-    {
-        printf("sending: %d\n", b);
-        if (!WriteByte(hSerial, b++))
-        {
-            std::cerr << "Error writing byte to serial port." << std::endl;
-        }
-        ::Sleep(1000);
-    }
+static void setTime(Session& session) {
 
 }
 
-static void testReceive(HANDLE hSerial) {
-
-    unsigned char b = 0;
-    while (true)
-    {
-        if (!ReadByte(hSerial, b))
-        {
-            std::cerr << "Read error." << std::endl;
-        }
-        printf("received: %d\n", b);
-    }
-
-}
+typedef enum {
+	SETTIME,
+	GETTIME,
+	SETALARM,
+	GETALARM
+} RTC_CMD;
 
 
-int main() {
-    // Open serial port
-    HANDLE hSerial = CreateFileA("COM8",
-                                 GENERIC_READ | GENERIC_WRITE,
-                                 0,
-                                 NULL,
-                                 OPEN_EXISTING,
-                                 FILE_ATTRIBUTE_NORMAL,
-                                 NULL);
-    
-    if (hSerial == INVALID_HANDLE_VALUE) {
-        std::cerr << "Error opening COM8: " << GetLastError() << std::endl;
-        return 1;
-    }
+int main(int argc, char* argv[]) {
 
-    // Set up the serial port parameters
-    DCB dcbSerialParams = {0};
-    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    dcbSerialParams.BaudRate = CBR_300;
-        00; // Set baud rate
-    dcbSerialParams.ByteSize = 8;         // Data bits = 8
-    dcbSerialParams.StopBits = ONESTOPBIT; // 1 stop bit
-    dcbSerialParams.Parity   = NOPARITY;   // No parity
+	if (argc != 2) {
+		printf("Usage: <settime|gettime>\n");
+		exit(1);
+	}
 
-    if (!SetCommState(hSerial, &dcbSerialParams)) {
-        std::cerr << "Error setting serial port parameters: " << GetLastError() << std::endl;
-        CloseHandle(hSerial);
-        return 1;
-    }
+	RTC_CMD cmd = RTC_CMD::SETTIME;
 
-    // testSend(hSerial);
-    testReceive(hSerial);
+	if (!_strcmpi(argv[1], "settime")) {
+		printf("setting time\n");
+		cmd = RTC_CMD::SETTIME;
+	}
+	else if (!_strcmpi(argv[1], "gettime")) {
+		printf("getting time\n");
+		cmd = RTC_CMD::GETTIME;
+	}
+	else {
+		printf("Command unknown: %s\n", argv[1]);
+		exit(1);
+	}
 
-    // Close the serial port
-    CloseHandle(hSerial);
-    return 0;
+	Session session("COM8", CBR_1200);
+	bool rc = session.Handshake();
+	if (!rc) {
+		printf("Handshake error\n");
+		exit(1);
+	}
+
+	printf("Handshake OK\n");
+
+	if (cmd == RTC_CMD::SETTIME) {
+		session.SetTime();
+		printf("SetTime sent\n");
+	}
+	else if (cmd == RTC_CMD::GETTIME) {
+		STM32_TIME time;
+		if (session.GetTime(time)) {
+			printf("%4d-%02d-%02d %02d:%02d:%02d\n", time.year, time.month, time.day, time.hour, time.minute, time.second);
+		}
+		else {
+			printf("GetTime error\n");
+		}
+	}
 }

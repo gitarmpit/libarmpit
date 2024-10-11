@@ -14,18 +14,11 @@ typedef struct
 } GPIO_PIN;
 
 GPIO_PIN GPIO_GetPin(const char *pin_name);
-void GPIO_SetAF(GPIO_PIN* pin, uint32_t af);
+void GPIO_Setup_OutAltPP(GPIO_PIN* pin, uint32_t af);
 
 #define GPIO_Setup_OutPP(pin)                                                    \
   do {                                                                           \
     LL_GPIO_SetPinMode((pin)->GPIOx, (pin)->Pin, LL_GPIO_MODE_OUTPUT);           \
-    LL_GPIO_SetPinSpeed((pin)->GPIOx, (pin)->Pin, LL_GPIO_SPEED_FREQ_HIGH);      \
-    LL_GPIO_SetPinOutputType((pin)->GPIOx, (pin)->Pin, LL_GPIO_OUTPUT_PUSHPULL); \
-  } while (0)
-
-#define GPIO_Setup_OutAltPP(pin)                                                    \
-  do {                                                                           \
-    LL_GPIO_SetPinMode((pin)->GPIOx, (pin)->Pin, LL_GPIO_MODE_ALTERNATE);           \
     LL_GPIO_SetPinSpeed((pin)->GPIOx, (pin)->Pin, LL_GPIO_SPEED_FREQ_HIGH);      \
     LL_GPIO_SetPinOutputType((pin)->GPIOx, (pin)->Pin, LL_GPIO_OUTPUT_PUSHPULL); \
   } while (0)

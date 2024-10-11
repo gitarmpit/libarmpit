@@ -47,7 +47,7 @@ static uint8_t calculateCRC(uint8_t* data, uint8_t length) {
 	return crc;
 }
 
-static void MX_LPUART1_UART_Init(void)
+static void MX_LPUART1_UART_Init(uint32_t baudRate)
 {
   LL_LPUART_InitTypeDef LPUART_InitStruct = {0};
 
@@ -77,7 +77,7 @@ static void MX_LPUART1_UART_Init(void)
   GPIO_InitStruct.Alternate = LL_GPIO_AF_4;
   LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  LPUART_InitStruct.BaudRate = 300;
+  LPUART_InitStruct.BaudRate = baudRate;
   LPUART_InitStruct.DataWidth = LL_LPUART_DATAWIDTH_8B;
   LPUART_InitStruct.StopBits = LL_LPUART_STOPBITS_1;
   LPUART_InitStruct.Parity = LL_LPUART_PARITY_NONE;
@@ -102,7 +102,7 @@ static void initUART() {
   GPIO_SetAF(&rx, 4);
 
   LL_USART_InitTypeDef USART_InitStruct = {0};
-  USART_InitStruct.BaudRate             = 1200;
+  USART_InitStruct.BaudRate             = 600;
   USART_InitStruct.DataWidth            = LL_USART_DATAWIDTH_8B;
   USART_InitStruct.StopBits             = LL_USART_STOPBITS_1;
   USART_InitStruct.Parity               = LL_USART_PARITY_NONE;
@@ -241,13 +241,13 @@ static bool testReceiveTime() {
 }
 
 // 54uA  L053C8T6 48-pin
-static void lowPowerRun() {
+static void lowPowerRun(uint32_t range) {
 
   LL_FLASH_SetLatency(LL_FLASH_LATENCY_0);
   while(LL_FLASH_GetLatency()!= LL_FLASH_LATENCY_0)
     ;
 
-  LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1); // 1.2V
+  LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE3); // 1.2V
 
   while (LL_PWR_IsActiveFlag_VOS() != 0)
     ;
@@ -257,7 +257,7 @@ static void lowPowerRun() {
   while(LL_RCC_MSI_IsReady() != 1)
     ;
 
-  LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_0); // 64 KHz
+  LL_RCC_MSI_SetRange(range); 
   LL_RCC_MSI_SetCalibTrimming(0);
 
   LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
@@ -281,7 +281,7 @@ static void testRecv(void) {
   while(1) {
     bool rc = receiveByte(b);
     if (rc)
-      printf ("b: %x\n", b);
+      printf ("b: %d\n", b);
   }
 }
 
@@ -296,17 +296,30 @@ static void testSend(void) {
 }
 
 
+static void testSend2(void) {
+  uint8_t b = 0;
+  while(1) {
+    printf ("sending: %d\n", b);
+    sendByte(b++);
+    for (int i = 0; i < 10; ++i) {
+    }
+    //SysTick_Delay(100);
+  }
+}
+
+
 int main(void) {
   System_Config();
 
   SystemCoreClockUpdate();
-  lowPowerRun();
+  lowPowerRun(LL_RCC_MSIRANGE_0);
 
   //SysTick_Init();
   //initUART();
-  MX_LPUART1_UART_Init();
+  //SystemClock_Config_HSI_16();
+  MX_LPUART1_UART_Init(1200);
   //testRecv();
-  testSend();
+  testSend2();
 
   
   while (1) {

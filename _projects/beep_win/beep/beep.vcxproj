@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{28db922e-db25-45d2-bf81-d9947c2c808a}</ProjectGuid>
-    <RootNamespace>CH340cpp</RootNamespace>
+    <ProjectGuid>{4d786bcb-2f1a-4689-8157-8e71b7069795}</ProjectGuid>
+    <RootNamespace>beep</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -108,6 +108,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -124,19 +125,15 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="buzzer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="pctime.cpp" />
-    <ClCompile Include="Session.cpp" />
-    <ClCompile Include="test.cpp" />
-    <ClCompile Include="UART.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pctime.h" />
-    <ClInclude Include="Session.h" />
-    <ClInclude Include="UART.h" />
+    <ClInclude Include="buzzer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

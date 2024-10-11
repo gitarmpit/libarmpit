@@ -1,8 +1,9 @@
 #include "buzzer.h"
-#include "systick.h"
 #include <ctype.h>
 #include <stdlib.h>
-#include "low_power.h"
+#include <utilapiset.h>
+#include <Windows.h>
+#include <cmath>
 
 //
 
@@ -38,6 +39,63 @@ static const int nfreq[][14] = {
     {1760, 1865, 1976, 1047, 1047, 1109, 1175, 1245, 1319, 1319, 1397, 1480, 1568, 1661},
     {3520, 3729, 3951, 2093, 2093, 2217, 2349, 2489, 2637, 2637, 2794, 2960, 3136, 3322}};
 
+
+const int SAMPLE_RATE = 44100; // Sample rate in Hz
+const int DURATION_MS = 500; // Duration for each note
+
+// Function to generate a simple sine wave
+void generateSineWave(short* buffer, int frequency, int durationMs) {
+    int totalSamples = (SAMPLE_RATE * durationMs) / 1000;
+    for (int i = 0; i < totalSamples; i++) {
+        buffer[i] = (short)(32767 * sin((2.0 * M_PI * frequency * i) / SAMPLE_RATE));
+    }
+}
+
+void playNote(int frequency, int durationMs) {
+    int totalSamples = (SAMPLE_RATE * durationMs) / 1000;
+    short* waveBuffer = new short[totalSamples];
+
+    // Generate the sine wave for the specified frequency
+    generateSineWave(waveBuffer, frequency, durationMs);
+
+    // Set up the wave format
+    WAVEFORMATEX waveFormat;
+    waveFormat.wFormatTag = WAVE_FORMAT_PCM;
+    waveFormat.nChannels = 1; // Mono
+    waveFormat.nSamplesPerSec = SAMPLE_RATE;
+    waveFormat.nAvgBytesPerSec = SAMPLE_RATE * sizeof(short);
+    waveFormat.nBlockAlign = sizeof(short);
+    waveFormat.wBitsPerSample = 16;
+    waveFormat.cbSize = 0;
+
+    // Open the wave output device
+    HWAVEOUT hWaveOut;
+    waveOutOpen(&hWaveOut, WAVE_MAPPER, &waveFormat, 0, 0, CALLBACK_NULL);
+
+    // Prepare the header
+    WAVEHDR waveHeader;
+    waveHeader.lpData = (LPSTR)waveBuffer;
+    waveHeader.dwBufferLength = totalSamples * sizeof(short);
+    waveHeader.dwFlags = 0;
+    waveHeader.dwLoops = 0;
+
+    waveOutPrepareHeader(hWaveOut, &waveHeader, sizeof(WAVEHDR));
+
+    // Play the sound
+    waveOutWrite(hWaveOut, &waveHeader, sizeof(WAVEHDR));
+
+    // Wait for the sound to finish playing
+    while (!(waveHeader.dwFlags & WHDR_DONE)) {
+        Sleep(10);
+    }
+
+    // Clean up
+    waveOutUnprepareHeader(hWaveOut, &waveHeader, sizeof(WAVEHDR));
+    waveOutClose(hWaveOut);
+    delete[] waveBuffer;
+}
+
+
 Buzzer::Buzzer() {
   _volume = 100;
   _cyclic = false;
@@ -46,35 +104,8 @@ Buzzer::Buzzer() {
   _b = 120;
 }
 
-void Buzzer::Init(BuzzerTimer* timer) {
-  _timer = timer;
-  _timer->SetupPWM(0, 0);
-  _timer->Stop();
-}
-
-void Buzzer::Beep(uint16_t freq, uint16_t durationMs) {
-  uint32_t period = 1000000 / freq;
-  //    _timer->UpdatePWM(period, _volume * 5);
-  _timer->UpdatePWM(period, _volume * (period - period / 10) / 100);
-
-  if (durationMs != 0) {
-    delay_ms(durationMs);
-    _timer->Stop();
-  }
-}
-
-void Buzzer::Stop() {
-  _timer->Stop();
-}
-
-void Buzzer::SetVolume(uint8_t vol)    // 1 - 100
-{
-  _volume = vol;
-  if (vol < 1) {
-    _volume = 1;
-  } else if (vol > 100) {
-    _volume = 100;
-  }
+void Buzzer::PlayTone(uint16_t freq, uint16_t durationMs) {
+    playNote(freq, durationMs);
 }
 
 int Buzzer::find_char(const char* str, const char* c) {
@@ -210,16 +241,10 @@ bool Buzzer::PlayTune(const char* tune) {
   while (true) {
     if (parse_note(&tune[pos], &freq, &duron_ms, &duroff_ms)) {
       if (freq) {
-        Beep(freq);
-      }
-      if (duron_ms) {
-        delay_ms(duron_ms);
+        PlayTone(freq, duron_ms);
       }
       if (duroff_ms != 0) {
-        //_timer->SetupPWM(0, 0);
-        //_timer->UpdatePWM(0, 0);
-        _timer->Stop();
-        delay_ms(duroff_ms);
+        ::Sleep(duroff_ms);
       }
     }
 
@@ -230,31 +255,7 @@ bool Buzzer::PlayTune(const char* tune) {
     pos += cpos + 1;
   }
 
-  _timer->Stop();
   return true;
 }
 
-///////////////////////////////////////////////
-// LPTIMER1  Buzzer Timer 
-
-LPBuzzerTimer::LPBuzzerTimer() {
-
-  GPIO_PIN pin = GPIO_GetPin("B2");
-  int af = 2;
-  GPIO_Setup_OutAltPP(&pin, af);
-
-  _lptimer = LPTIMER::GetInstance();
-}
-
-void LPBuzzerTimer::SetupPWM(uint32_t period_us, uint32_t ds_us) {
-  _lptimer->SetupPWM(period_us, ds_us);
-}
-
-void LPBuzzerTimer::UpdatePWM(uint32_t period_us, uint32_t ds_us) {
-  _lptimer->UpdatePeriodDs(period_us, ds_us);
-}
-
-void LPBuzzerTimer::Stop() {
-  _lptimer->StopTimer();
-}
 

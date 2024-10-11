@@ -5,13 +5,19 @@
 
 #define POSITION_VAL(VAL)     (__CLZ(__RBIT(VAL)))
 
-void GPIO_SetAF(GPIO_PIN* pin, uint32_t af) {
+void GPIO_Setup_OutAltPP(GPIO_PIN* pin, uint32_t af) {
+
+  LL_GPIO_SetPinSpeed(pin->GPIOx, pin->Pin, LL_GPIO_SPEED_FREQ_HIGH);  
+  LL_GPIO_SetPinOutputType(pin->GPIOx, pin->Pin, LL_GPIO_OUTPUT_PUSHPULL);
 
   if (POSITION_VAL(pin->Pin) < 0x00000008U) {
     LL_GPIO_SetAFPin_0_7(pin->GPIOx, pin->Pin, af);
   } else {
     LL_GPIO_SetAFPin_8_15(pin->GPIOx, pin->Pin, af);
   }
+
+  LL_GPIO_SetPinMode(pin->GPIOx, pin->Pin, LL_GPIO_MODE_ALTERNATE); 
+
 }
 
 
