@@ -8,13 +8,21 @@ void beep_init(void) {
   g_buzzer->SetVolume(10);
 }
 
-void beep_alarm(void) {
+void beep_alarmA(void) {
   if (g_buzzer) {
-    g_buzzer->PlayTune(cuca_short2);
+    g_buzzer->PlayTune(cuca_fast);
     g_buzzer->Stop();
   }
   // buzzer->PlayTone(2000, 100);
 }
+
+void beep_alarmB(void) {
+  if (g_buzzer) {
+    g_buzzer->PlayTune(barbie2);
+    g_buzzer->Stop();
+  }
+}
+
 
 void beep_success(void) {
   if (g_buzzer) {

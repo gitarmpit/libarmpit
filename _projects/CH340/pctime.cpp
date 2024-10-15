@@ -35,3 +35,75 @@ uint8_t calculateCRC(uint8_t* data, uint8_t length) {
     return crc;
 }
 
+bool parseAlarmString(const char* input, STM32_ALARM& a) {
+
+	std::stringstream ss(input);
+	int i = 0;
+	while (ss.good())
+	{
+		std::string s;
+		getline(ss, s, ':');
+		if (s.empty()) {
+			return false;
+		}
+		int n = ::atoi(s.c_str());
+		if (i == 0) {
+			if (n < -1 || n > 23) {
+				printf("invalid hour: %s\n", s.c_str());
+				exit(1);
+			}
+			a.hour = n;
+		}
+		else if (i == 1) {
+			if (n < -1 || n > 59) {
+				printf("invalid min: %s\n", s.c_str());
+				exit(1);
+			}
+			a.minute = n;
+		}
+		else if (i == 2) {
+			if (n < -1 || n > 59) {
+				printf("invalid sec: %s\n", s.c_str());
+				exit(1);
+			}
+			a.second = n;
+		}
+		else if (i == 3) {
+			if (n < -1 || n > 31) {
+				printf("invalid day: %s\n", s.c_str());
+				exit(1);
+			}
+			a.day = n;
+		}
+		else if (i == 4) {
+			if (n != 0 && n != 1) {
+				printf("invalid value for isWeekDay (should be 0 or 1): %s\n", s.c_str());
+				exit(1);
+			}
+			a.isWeekDay = n;
+			if (a.isWeekDay && (a.day < 1 || a.day > 7)) {
+				printf("isWeekDay is selected, day has to be between 1 and 7 but is: %d\n", a.day);
+				exit(1);
+			}
+		}
+		else if (i == 5) {
+			if (n != 0 && n != 1) {
+				printf("invalid value for isWeekDay (should be 0 or 1): %s\n", s.c_str());
+				exit(1);
+			}
+			a.skipWeeks = n;
+		}
+		else if (i == 6) {
+			if (n != 0 && n != 1) {
+				printf("invalid alarm number (should be 0(A) or 1(B)): %s\n", s.c_str());
+				exit(1);
+			}
+			a.alarmNo = n;
+		}
+
+		++i;
+	}
+	return (i == 7);
+}
+
+

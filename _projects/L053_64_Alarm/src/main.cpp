@@ -10,37 +10,42 @@
 #include "gpio.h"
 
 void RunSession();
+void testRX();
+void testTX(int baudRate);
 
 
-static void setupRTCAlarm(void) {
-
-  disableAlarm();
-  setAlarm();
-  enableAlarm();
-}
 
 
 static void run(void) {
 
   if (!LL_RCC_IsEnabledRTC()) {
     initRTC();
-    setupRTCAlarm();
   }
 
-  if (LL_PWR_IsActiveFlag_WU()) {
+  if (LL_PWR_IsActiveFlag_SB() && LL_PWR_IsActiveFlag_WU()) {
     LL_PWR_ClearFlag_WU();
-    LL_PWR_EnableBkUpAccess();
-    LL_RTC_DisableWriteProtection(RTC);
-    LL_RTC_ClearFlag_ALRA(RTC);
-  }
-
-  if (LL_PWR_IsActiveFlag_SB()) {
     LL_PWR_ClearFlag_SB();
     if (LL_RTC_IsActiveFlag_ALRA(RTC)) {
-      beep_alarm();
+      clearAlarmA();
+      beep_alarmA();
+    } 
+    else if (LL_RTC_IsActiveFlag_ALRB(RTC)) {
+      clearAlarmB();
+      beep_alarmB();
+    } 
+    else  {
+      LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);    // A0
+      disableAlarmA();
+      disableAlarmB();
+      beep_handshake_ok();
+      delay_ms(1000);
+      RunSession();
+      enableAlarmA();
+      enableAlarmB();
     }
   }
 
+  LL_PWR_EnableWakeUpPin(LL_PWR_WAKEUP_PIN1);    // A0
   standby();
 }
 
@@ -58,9 +63,11 @@ static void check_reset(void) {
       int cnt = RTC->BKP0R;
       if (cnt == 2) {
         RTC->BKP0R = 0;
-        disableAlarm();
+        disableAlarmA();
+        disableAlarmB();
         RunSession();
-        enableAlarm();
+        enableAlarmA();
+        enableAlarmB();
       } 
       else {
         ++cnt;
@@ -73,12 +80,14 @@ static void check_reset(void) {
 
 int main(void) {
   System_Config();
+  LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);    // A0
+  GPIO_PIN p = GPIO_GetPin("A0");
+  GPIO_Setup_In_Pulldown(&p);
 
   lowPowerRun(LL_RCC_MSIRANGE_0);
+  //testTX(1200);
 
   beep_init();
-
-  check_reset();
   run();
 
   while(1)

@@ -26,7 +26,7 @@ static uint8_t calculateCRC(uint8_t* data, int length) {
 
 PcSession::PcSession(USART_TypeDef* USARTx, int baudRate) : _uart(USARTx) {
 
-  _wait_cnt = 10000;
+  _wait_cnt = 20000;
   LL_USART_Disable(USARTx);
 
   // A9, AF4
@@ -60,6 +60,9 @@ bool PcSession::ReceiveAck() {
   bool rc = false;
   if (_uart.receiveByte(ack, _wait_cnt)) {
     rc = (ack == STM32_ACK);
+  }
+  else {
+    g_buzzer->Beep(100, 100);
   }
   return rc;
 }
@@ -104,10 +107,35 @@ bool PcSession::ReceiveTime(STM32_TIME& time) {
   return rc;
 }
 
+bool PcSession::ReceiveAlarm(STM32_ALARM& a) {
+  bool rc = false;
+
+  if (_uart.receiveMsg((uint8_t*)&a, sizeof a, _wait_cnt)) {
+    uint8_t expected_crc;
+    if (_uart.receiveByte(expected_crc, _wait_cnt)) {
+      uint8_t crc = calculateCRC((uint8_t*)&a, sizeof a);
+      rc  = (crc == expected_crc);
+    }
+  }
+
+  if (rc) {
+    SendAck();
+  }
+
+  return rc;
+}
+
 
 bool PcSession::SendTime(STM32_TIME& time) {
   _uart.sendMsg((uint8_t*)&time, sizeof time);
   uint8_t crc = calculateCRC((uint8_t*)&time, sizeof time);
+  _uart.sendByte(crc);
+  return ReceiveAck();
+}
+
+bool PcSession::SendAlarm(STM32_ALARM& a) {
+  _uart.sendMsg((uint8_t*)&a, sizeof a);
+  uint8_t crc = calculateCRC((uint8_t*)&a, sizeof a);
   _uart.sendByte(crc);
   return ReceiveAck();
 }

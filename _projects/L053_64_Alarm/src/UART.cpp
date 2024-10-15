@@ -67,7 +67,7 @@ void UART_Comm::sendByte(uint8_t byte) {
 bool UART_Comm::sendMsg(uint8_t* buffer, uint32_t nBytes) {
     for (uint32_t i = 0; i < nBytes; i++) {
         sendByte(buffer[i]);
-        delay_ms(10);
+        delay_ms(20);
     }
     return true;
 }

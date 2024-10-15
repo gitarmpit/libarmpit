@@ -30,6 +30,18 @@ bool Session::SetTime() {
 	return ReceiveAck();
 }
 
+bool Session::SetAlarm(const STM32_ALARM& a) {
+
+	uint8_t cmd = STM32_CMD_SETALARM;
+	_uart.Write(&cmd, 1);
+
+	_uart.Write((uint8_t*)&a, sizeof a);
+	uint8_t crc = calculateCRC((uint8_t*)&a, sizeof a);
+	_uart.Write(&crc, 1);
+	return ReceiveAck();
+}
+
+
 bool Session::GetTime(STM32_TIME& time) {
 	uint8_t cmd = STM32_CMD_GETTIME;
 	_uart.Write(&cmd, 1);
@@ -56,6 +68,36 @@ bool Session::GetTime(STM32_TIME& time) {
 	}
 
 	return false;
+}
+
+bool Session::GetAlarm(STM32_ALARM& a) {
+
+	uint8_t cmd = STM32_CMD_GETALARM;
+	_uart.Write(&cmd, 1);
+
+	for (int i = 0; i < 10; ++i) {
+		if (!_uart.Read((uint8_t*)&a, sizeof a, 10000)) {
+			return false;
+		}
+		uint8_t crc = calculateCRC((uint8_t*)&a, sizeof a);
+
+		uint8_t expected_crc;
+		if (!_uart.Read(&expected_crc, 1, 1000)) {
+			return false;
+		}
+
+		if (crc == expected_crc) {
+			SendAck();
+			return true;
+		}
+		else {
+			printf("crc error\n");
+			continue;
+		}
+	}
+
+	return false;
+
 }
 
 

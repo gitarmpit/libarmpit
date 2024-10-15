@@ -20,6 +20,17 @@ typedef struct {
 
 } STM32_TIME;
 
+typedef struct {
+  int8_t day;  // date or weekday
+  uint8_t isWeekDay;
+  int8_t hour;
+  int8_t minute;
+  int8_t second;
+  uint8_t skipWeeks; // 0 = every week, 1 = skip one week, etc
+  uint8_t alarmNo; // 0 = A, 1 = B
+} STM32_ALARM;
+
+
 
 #define RTC_TR_RESERVED_MASK    ((uint32_t)(RTC_TR_HT  | RTC_TR_HU  | \
                                             RTC_TR_MNT | RTC_TR_MNU | \
@@ -32,11 +43,25 @@ typedef struct {
 
 
 void initRTC(void);
-void setAlarm(void);
+
+void setAlarmA (STM32_ALARM* t);
+void setAlarmB (STM32_ALARM* t);
+
+void disableAlarmA(void);
+void disableAlarmB(void);
 void disableAlarm(void);
-void enableAlarm(void);
+
+void enableAlarmA(void);
+void enableAlarmB(void);
+
+void clearAlarmA(void);
+void clearAlarmB(void);
+
 void setRTCTime (const STM32_TIME* t);
 void getRTCTime (STM32_TIME* t);
+
+void getAlarmA (STM32_ALARM* t);
+void getAlarmB (STM32_ALARM* t);
 
 #ifdef __cplusplus
 }

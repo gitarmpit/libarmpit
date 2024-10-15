@@ -14,14 +14,10 @@ bool RunSession() {
 
   bool rc = session.Handshake();
 
-  if (rc) {
-    //beep_handshake_ok();
-  } else {
+  if (!rc) {
     beep_failure();
     return false;
   }
-
-  //delay_ms(1000);
 
   uint8_t cmd;
   if (!session.ReceiveCommand(cmd)) {
@@ -31,16 +27,12 @@ bool RunSession() {
 
   rc = false;
   if (cmd == STM32_CMD_SETTIME) {
-    //g_buzzer->PlayTune("t:d=4,o=7,b=400:a,a");
-    //delay_ms(200);
     STM32_TIME t;
     if (session.ReceiveTime(t)) {
-      //printf("%d-%d-%d  %d:%d:%d.%d, dow: %d\n", t.year, t.month, t.day, t.hour, t.minute, t.second, t.ms, t.dow);
       setRTCTime(&t);
       rc = true;
     }
   } else if (cmd == STM32_CMD_GETTIME) {
-    //g_buzzer->PlayTune("t:d=4,o=7,b=400:a,a,a,a");
     STM32_TIME t;
     getRTCTime(&t);
     for (int i = 0; i < 10; ++i) {
@@ -50,8 +42,29 @@ bool RunSession() {
       }
     }
   }
+  else if (cmd == STM32_CMD_GETALARM) {
+    STM32_ALARM alarmA;
+    getAlarmA(&alarmA);
+    STM32_ALARM alarmB;
+    getAlarmB(&alarmB);
+    rc = session.SendAlarm(alarmA);
+    if (rc) {
+      session.SendAlarm(alarmB);
+    }
 
-  //delay_ms(100);
+  }
+  else if (cmd == STM32_CMD_SETALARM) {
+    STM32_ALARM a;
+    if (session.ReceiveAlarm(a)) {
+      if (a.alarmNo == 0) {
+        setAlarmA(&a);
+      }
+      else {
+        setAlarmB(&a);
+      }
+      rc = true;
+    }
+  }
 
   if (rc) {
     beep_success();
@@ -61,6 +74,46 @@ bool RunSession() {
 
   return rc;
 }
+
+void testRX() {
+  LL_USART_Disable(USART1);
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+  uart.init(1200);
+  uint8_t b;
+  while(1) {
+    if (uart.receiveByte(b, 5000)) {
+      printf ("%d\n", b);
+    }
+  }
+}
+
+void testTX(int baudRate) {
+  LL_USART_Disable(USART1);
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+  uart.init(baudRate);
+  uint8_t b = 0x4f;
+  while(1) {
+    uart.sendByte(b);
+    //uart.sendByte(b & 0x7f);
+    delay_ms(10);
+    //++b;
+  }
+}
+
 
 #if 0
 bool testReceiveTime2() {

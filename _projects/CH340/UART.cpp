@@ -162,43 +162,6 @@ bool UART::Read(uint8_t* buf, DWORD bytesToRead, int timeoutMs) {
     return rc;
 }
 
-DWORD UART::Read(uint8_t* buf, int timeoutMs) {
-
-    bool rc = false;
-    DWORD totalBytesRead = 0; // Total bytes read so far
-
-    DWORD rxBytes = 0;
-    while (rxBytes = WaitRead(timeoutMs)) {
-
-        DWORD bytesRead = 0;
-
-        if (ReadFile(_hSerial, buf + totalBytesRead, rxBytes, &bytesRead, NULL)) {
-            totalBytesRead += bytesRead;
-            if (bytesRead == 0) {
-                break;
-            }
-        }
-        else {
-            auto err = GetLastError();
-            printf("Read error: 0x%x (%s)\n", err, GetErrorMessage(err).c_str());
-            exit(1);
-        }
-    }
-
-    return totalBytesRead;
-}
-
-DWORD UART::Read(uint8_t* buf, DWORD bytesToRead) {
-
-    DWORD bytesRead = 0;
-    if (!ReadFile(_hSerial, buf, bytesToRead, &bytesRead, NULL)) {
-        auto err = GetLastError();
-        printf("Read error: 0x%x (%s)\n", err, GetErrorMessage(err).c_str());
-        exit(1);
-    }
-
-    return bytesRead;
-}
 
 
 bool UART::SetTimeout(int timeoutMs)

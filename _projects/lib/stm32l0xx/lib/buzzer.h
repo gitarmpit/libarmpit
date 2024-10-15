@@ -25,7 +25,7 @@
 #define  rt_triple "Triple:d=8,o=5,b=635:c,e,g,c,e,g,c,e,g,c6,e6,g6,c6,e6,g6,c6,e6,g6,c7,e7,g7,c7,e7,g7,c7,e7,g7"
 #define  rt2 "r1:d=8,o=6,b=100:c,e,g,e,c,g,e,g,c,g,c,e,c,g,e,g,e,c"
 #define  cuca_short2 "cs:d=8,o=4,b=200:2p,p,c,c,c,4f.,4a,c,c,c,4f.,4a"
-#define  cuca_fast "cs:d=8,o=4,b=300:c,c,c,4f.,4a,c,c,c,4f.,4a"
+#define  cuca_fast "cs:d=8,o=5,b=300:c,c,c,4f.,4a,c,c,c,4f.,4a"
 #define funeral "funeral:d=4,o=5,b=100:c.,c,8c,c.,d#,8d,d,8c,c,8c,2c."
 #define startrek "startrek:d=4,o=5,b=50:8f.,16a#,d#.6,8d6,16a#.,16g.,16c.6,f6"
 #define phone_ring "phone:d=32,o=6,b=600:cl,gl,cl,gl,cl,gl,cl,gl,cl,gl,cl,gl,cl,gl,cl,gl,cl,gl,cl,gl,cl,gl,1p,1p,1p,1p"

@@ -36,29 +36,104 @@ typedef enum {
 } RTC_CMD;
 
 
-int main(int argc, char* argv[]) {
+static void testSend() {
 
-	if (argc != 2) {
-		printf("Usage: <settime|gettime>\n");
+	UART uart;
+	if (!uart.Initialize("COM8", CBR_1200)) {
 		exit(1);
 	}
+	uint8_t b = 0;
+
+	while (true)
+	{
+		//printf("sending %d\n", b);
+		uart.Write(&b, 1);
+		++b;
+		::Sleep(1000);
+	}
+
+}
+
+static void testRecv() {
+
+	UART uart;
+	if (!uart.Initialize("COM8", CBR_1200)) {
+		exit(1);
+	}
+	uint8_t b = 0;
+	int total = 0;
+	int nerrors = 0;
+
+	while (true)
+	{
+		if (uart.Read(&b, 1, 10000)) {
+			//printf("%02x\n", b & 0x7f);
+			//b &= 0x7f;
+			++total;
+
+			if (b != 0x4f) {
+				++nerrors;
+				printf("total: %d, errors: %d, %%: %f\n", total, nerrors, (float)nerrors / (float)total * 100.0);
+			}
+
+		}
+		if ((total % 1000) == 0)
+			printf("total: %d, errors: %d, %%: %f\n", total, nerrors, (float)nerrors / (float)total * 100.0);
+
+	}
+
+}
+
+
+
+
+int main(int argc, char* argv[]) {
+	
+	// testRecv();
+
+	if (argc < 3) {
+		printf("Usage: <com port> <settime|gettime|setalarm|getalarm>\n");
+		exit(1);
+	}
+
+	const char* comPort = argv[1];
+	STM32_ALARM a;
 
 	RTC_CMD cmd = RTC_CMD::SETTIME;
 
-	if (!_strcmpi(argv[1], "settime")) {
+	if (!_strcmpi(argv[2], "settime")) {
 		printf("setting time\n");
 		cmd = RTC_CMD::SETTIME;
 	}
-	else if (!_strcmpi(argv[1], "gettime")) {
+	else if (!_strcmpi(argv[2], "gettime")) {
 		printf("getting time\n");
 		cmd = RTC_CMD::GETTIME;
 	}
+	else if (!_strcmpi(argv[2], "setalarm")) {
+		printf("setting alarm\n");
+		cmd = RTC_CMD::SETALARM;
+		if (argc != 4) {
+			printf("Usage: <com port> <settime|gettime|setalarm|getalarm>\n");
+			exit(1);
+		}
+		const char* alarmstr = argv[3];
+		if (!parseAlarmString(alarmstr, a)) {
+			printf("error parsing alarm string: %s\n", alarmstr);
+			exit(1);
+		}
+		printf("Setting alarm: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skip weeks: %d, alarmNo: %d\n", 
+			a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipWeeks, a.alarmNo);
+	}
+	else if (!_strcmpi(argv[2], "getalarm")) {
+		cmd = RTC_CMD::GETALARM;
+		printf("getting alarm\n");
+	}
 	else {
-		printf("Command unknown: %s\n", argv[1]);
+		printf("Command unknown: %s\n", argv[2]);
 		exit(1);
 	}
 
-	Session session("COM8", CBR_1200);
+	Session session(comPort, CBR_1200);
 	bool rc = session.Handshake();
 	if (!rc) {
 		printf("Handshake error\n");
@@ -68,8 +143,8 @@ int main(int argc, char* argv[]) {
 	printf("Handshake OK\n");
 
 	if (cmd == RTC_CMD::SETTIME) {
-		session.SetTime();
-		printf("SetTime sent\n");
+		bool rc = session.SetTime();
+		printf("SetTime sent: %d\n", rc);
 	}
 	else if (cmd == RTC_CMD::GETTIME) {
 		STM32_TIME time;
@@ -78,6 +153,27 @@ int main(int argc, char* argv[]) {
 		}
 		else {
 			printf("GetTime error\n");
+		}
+	}
+	else if (cmd == RTC_CMD::SETALARM) {
+		bool rc = session.SetAlarm(a);
+		printf("SetAlarm sent: %d\n", rc);
+	}
+	else if (cmd == RTC_CMD::GETALARM) {
+		STM32_ALARM a;
+		if (session.GetAlarm(a)) {
+			printf("Got alarm A: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skip weeks: %d\n",
+				a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipWeeks);
+		}
+		else {
+			printf("GetAlarm error\n");
+		}
+		if (session.GetAlarm(a)) {
+			printf("Got alarm B: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skip weeks: %d\n",
+				a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipWeeks);
+		}
+		else {
+			printf("GetAlarm error\n");
 		}
 	}
 }

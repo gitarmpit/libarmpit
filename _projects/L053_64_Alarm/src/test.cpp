@@ -103,6 +103,27 @@ void testRTCAlarm(void) {
     
 }
 
+void setAlarmA(void) {
+  LL_PWR_EnableBkUpAccess();
+  LL_RTC_DisableWriteProtection(RTC);
+
+  // Run every minute
+  // LL_RTC_ALMA_SetSecond (RTC, 0x5);
+  // LL_RTC_ALMA_SetMask(RTC, LL_RTC_ALMA_MASK_MINUTES | LL_RTC_ALMA_MASK_HOURS | LL_RTC_ALMA_MASK_DATEWEEKDAY);
+
+  // Run every hour
+  LL_RTC_ALMA_SetMinute (RTC, 0x1);
+  LL_RTC_ALMA_SetSecond (RTC, 0x10);
+  LL_RTC_ALMA_SetMask(RTC, LL_RTC_ALMA_MASK_HOURS | LL_RTC_ALMA_MASK_DATEWEEKDAY);
+  
+  // Run every day when hour = 12
+  //LL_RTC_ALMA_SetMask(RTC, LL_RTC_ALMA_MASK_SECONDS | LL_RTC_ALMA_MASK_MINUTES | LL_RTC_ALMA_MASK_DATEWEEKDAY);
+  //LL_RTC_ALMA_SetHour (RTC, __LL_RTC_CONVERT_BIN2BCD(9));
+
+  LL_RTC_EnableWriteProtection(RTC);
+}
+
+
 void RTC_Calib(void) {
   LL_PWR_EnableBkUpAccess();
   LL_RCC_LSI_Enable();

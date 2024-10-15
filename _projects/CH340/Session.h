@@ -8,6 +8,9 @@
 #define STM32_ACK 0xaa
 #define STM32_CMD_SETTIME    0x1
 #define STM32_CMD_GETTIME    0x2
+#define STM32_CMD_SETALARM   0x3
+#define STM32_CMD_GETALARM   0x4
+
 
 
 class Session {
@@ -16,6 +19,8 @@ public:
 	bool Handshake();
 	bool SetTime();
 	bool GetTime(STM32_TIME& t);
+	bool GetAlarm(STM32_ALARM& a);
+	bool SetAlarm(const STM32_ALARM& a);
 private:
 	void SendHandshake();
 	bool ReceiveHandshake();

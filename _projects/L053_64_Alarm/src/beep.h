@@ -8,7 +8,8 @@
 extern Buzzer* g_buzzer;
 
 void beep_init(void);
-void beep_alarm(void);
+void beep_alarmA(void);
+void beep_alarmB(void);
 
 void beep_handshake_ok(void);
 void beep_success(void);
