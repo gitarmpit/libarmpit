@@ -85,11 +85,31 @@ static void testRecv() {
 }
 
 
+static void testRecv2() {
+
+	UART uart;
+	if (!uart.Initialize("COM7", CBR_1200)) {
+		exit(1);
+	}
+	uint8_t b = 0;
+	int total = 0;
+	int nerrors = 0;
+
+	while (true)
+	{
+		if (uart.Read(&b, 1, 10000)) {
+			printf("%d\n", b);
+		}
+	}
+
+}
+
+
 
 
 int main(int argc, char* argv[]) {
 	
-	// testRecv();
+	testRecv2();
 
 	if (argc < 3) {
 		printf("Usage: <com port> <settime|gettime|setalarm|getalarm>\n");

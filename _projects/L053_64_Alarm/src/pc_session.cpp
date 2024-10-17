@@ -26,7 +26,7 @@ static uint8_t calculateCRC(uint8_t* data, int length) {
 
 PcSession::PcSession(USART_TypeDef* USARTx, int baudRate) : _uart(USARTx) {
 
-  _wait_cnt = 20000;
+  _wait_cnt = 10000;
   LL_USART_Disable(USARTx);
 
   // A9, AF4

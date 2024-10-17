@@ -110,8 +110,29 @@ void testTX(int baudRate) {
     uart.sendByte(b);
     //uart.sendByte(b & 0x7f);
     delay_ms(10);
-    //++b;
+    ++b;
   }
+}
+
+void testDMA_TX(int baudRate) {
+  LL_USART_Disable(USART1);
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+  uart.init(baudRate);
+  uint8_t buf[] = { 1, 2, 3, 4, 5, 6};
+  uart.startDMATX(buf, sizeof buf);
+  delay_ms(2000);
+  uint8_t buf2[] = { 11, 12, 13, 14, 15, 16};
+  uart.startDMATX(buf2, sizeof buf2);
+  while(1)
+    ;
+
 }
 
 

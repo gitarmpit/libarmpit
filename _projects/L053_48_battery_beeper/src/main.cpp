@@ -1,3 +1,4 @@
+#include "UART.h"
 #include "config.h"
 #include "stm32l0xx_ll_rcc.h"
 
@@ -6,7 +7,9 @@
 #include "stm32l0xx_ll_system.h"
 #include "buzzer.h"
 #include <stdio.h>
+#include "stm32l0xx_ll_usart.h"
 #include "systick.h"
+#include "low_power.h"
 
 void testMCO_LSE(void);
 void RTC_Calib(void);
@@ -160,9 +163,8 @@ static void run(void) {
   if (LL_PWR_IsActiveFlag_SB()) {
     LL_PWR_ClearFlag_SB();
 
-    LPBuzzerTimer timer;
     Buzzer* buzzer = Buzzer::GetInstance();
-    buzzer->Init(&timer);
+    buzzer->Init(LPBuzzerTimer::GetInstance());
     buzzer->SetVolume(10);
     //buzzer->PlayTone(2000, 100);
     buzzer->PlayTune(barbie);
@@ -171,25 +173,83 @@ static void run(void) {
   StandBy();
 }
 
-int main(void) {
-  System_Config();
-  lowPowerRun();
-  /*
-  */
+static void testTX(int baudRate) {
+  LL_USART_Disable(USART1);
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+  uart.init(baudRate);
+  uint8_t b = 0x4f;
+  while(1) {
+    uart.sendByte(b++);
+    delay_ms(1000);
+  }
+}
+
+static void check_reset() {
+
   if (LL_RCC_IsActiveFlag_PINRST()) {
     LL_RCC_ClearResetFlags();
     LL_PWR_ClearFlag_WU();
     LL_PWR_ClearFlag_SB();
     if (LL_RCC_IsEnabledRTC()) {
-      LPBuzzerTimer timer;
       Buzzer* buzzer = Buzzer::GetInstance();
-      buzzer->Init(&timer);
+      buzzer->Init(LPBuzzerTimer::GetInstance());
       buzzer->SetVolume(10);
-      buzzer->PlayTone(1000, 100);
+      buzzer->Beep(1000, 100);
       buzzer->Stop();
     }
   }
-  run();
+
+}
+
+void testDMA_TX(int baudRate) {
+  LL_USART_Disable(USART1);
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+  uart.init(baudRate);
+  const static int n = 1400;
+  uint8_t buf[n];
+  for (int i = 0; i < n; ++i) {
+    buf[i] = 11;
+  }
+  printf ("start\n");
+  uart.startDMATX(buf, sizeof buf, true);
+  printf ("done 1\n");
+
+  for (int i = 0; i < n; ++i) {
+    buf[i] = 12;
+  }
+
+  printf ("start\n");
+  uart.startDMATX(buf, sizeof buf, true);
+  printf ("done 2\n");
+
+  while(1)
+    ;
+
+}
+
+
+
+int main(void) {
+  System_Config();
+  lowPowerRun();
+ 
+  //testTX(1200);
+  testDMA_TX(1200);
+  // run();
 
   while(1)
     ;

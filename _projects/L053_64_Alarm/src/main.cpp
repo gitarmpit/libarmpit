@@ -12,6 +12,7 @@
 void RunSession();
 void testRX();
 void testTX(int baudRate);
+void testDMA_TX(int baudRate);
 
 
 
@@ -85,7 +86,8 @@ int main(void) {
   GPIO_Setup_In_Pulldown(&p);
 
   lowPowerRun(LL_RCC_MSIRANGE_0);
-  //testTX(1200);
+  // testDMA_TX(1200);
+  testTX(1200);
 
   beep_init();
   run();

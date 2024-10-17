@@ -169,9 +169,8 @@ static void run(void) {
     LL_PWR_ClearFlag_SB();
     CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
 
-    LPBuzzerTimer timer;
     Buzzer* buzzer = Buzzer::GetInstance();
-    buzzer->Init(&timer);
+    buzzer->Init(LPBuzzerTimer::GetInstance());
     buzzer->SetVolume(10);
     //buzzer->PlayTone(2000, 100);
     buzzer->PlayTune(barbie);
@@ -206,19 +205,18 @@ static void run2(void) {
     //CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
     //LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);    // A0
 
-    LPBuzzerTimer timer;
     Buzzer* buzzer = Buzzer::GetInstance();
-    buzzer->Init(&timer);
+    buzzer->Init(LPBuzzerTimer::GetInstance());
     buzzer->SetVolume(10);
     //buzzer->PlayTone(2000, 100);
     if (alarm_a) {
       //buzzer->PlayTune(barbie);
-      buzzer->PlayTone (3000, 100);
+      buzzer->Beep (3000, 100);
       buzzer->Stop();
   }
     else {
       //buzzer->PlayTune(mars_short);
-      buzzer->PlayTone (500, 300);
+      buzzer->Beep (500, 300);
       buzzer->Stop();
       for (int i = 0; i < 4000; ++i) {
       }
@@ -242,9 +240,8 @@ static void wakeup_pin2(void) {
     LL_PWR_ClearFlag_SB();
     // CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
 
-    LPBuzzerTimer timer;
     Buzzer* buzzer = Buzzer::GetInstance();
-    buzzer->Init(&timer);
+    buzzer->Init(LPBuzzerTimer::GetInstance());
     buzzer->SetVolume(10);
     //buzzer->PlayTone(2000, 100);
     buzzer->PlayTune(barbie);

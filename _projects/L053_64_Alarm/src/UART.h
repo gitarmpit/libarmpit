@@ -16,10 +16,15 @@ public:
   void sendByte(uint8_t byte);
   bool sendMsg(uint8_t* buffer, uint32_t nBytes);
   void deinit();
+  void startDMATX(uint8_t* buffer, uint32_t nBytes);
+  void startDMARX(uint8_t* buffer, uint32_t nBytes);
+
 ~UART_Comm() { deinit(); }
 
 private:
   USART_TypeDef* _USARTx;
+  uint32_t       _dmaChannelRX;
+  uint32_t       _dmaChannelTX;
 };
 
 #endif

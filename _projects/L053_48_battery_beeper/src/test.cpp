@@ -37,8 +37,7 @@ void testMCO_LSI(void) {
      ;
 
   GPIO_PIN mco = GPIO_GetPin("A8");
-  GPIO_Setup_OutAltPP (&mco);
-  GPIO_SetAF (&mco, 0);
+  GPIO_Setup_OutAltPP (&mco, 0);
 
   LL_RCC_ConfigMCO(LL_RCC_MCO1SOURCE_LSI, LL_RCC_MCO1_DIV_1);
 }
@@ -50,8 +49,7 @@ void testMCO_LSE(void) {
      ;
 
   GPIO_PIN mco = GPIO_GetPin("A8");
-  GPIO_Setup_OutAltPP (&mco);
-  GPIO_SetAF (&mco, 0);
+  GPIO_Setup_OutAltPP (&mco, 0);
 
   LL_RCC_ConfigMCO(LL_RCC_MCO1SOURCE_LSE, LL_RCC_MCO1_DIV_1);
 }
@@ -182,11 +180,10 @@ static void run2(void) {
     LL_PWR_ClearFlag_SB();
     CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
 
-    LPBuzzerTimer timer;
     Buzzer* buzzer = Buzzer::GetInstance();
-    buzzer->Init(&timer);
+    buzzer->Init(LPBuzzerTimer::GetInstance());
     buzzer->SetVolume(10);
-    buzzer->PlayTone(2000, 100);
+    buzzer->Beep(2000, 100);
     buzzer->Stop();
 
     LL_RTC_DisableWriteProtection(RTC);
@@ -209,11 +206,10 @@ static void run3(void) {
     LL_PWR_ClearFlag_SB();
     CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
 
-    LPBuzzerTimer timer;
     Buzzer* buzzer = Buzzer::GetInstance();
-    buzzer->Init(&timer);
+    buzzer->Init(LPBuzzerTimer::GetInstance());
     buzzer->SetVolume(10);
-    buzzer->PlayTone(2000, 100);
+    buzzer->Beep(2000, 100);
     buzzer->Stop();
   }
   //setupRTCForStandby();
@@ -242,11 +238,10 @@ static void run(void) {
     LL_PWR_ClearFlag_SB();
     CLEAR_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
 
-    LPBuzzerTimer timer;
     Buzzer* buzzer = Buzzer::GetInstance();
-    buzzer->Init(&timer);
+    buzzer->Init(LPBuzzerTimer::GetInstance());
     buzzer->SetVolume(10);
-    buzzer->PlayTone(2000, 100);
+    buzzer->Beep(2000, 100);
     buzzer->Stop();
 
     LL_RTC_DisableWriteProtection(RTC);

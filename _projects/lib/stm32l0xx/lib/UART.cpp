@@ -98,7 +98,7 @@ bool UART_Comm::sendMsg(uint8_t* buffer, uint32_t nBytes) {
     return true;
 }
 
-void UART_Comm::startDMATX(uint8_t* buffer, uint32_t nBytes) {
+void UART_Comm::startDMATX(uint8_t* buffer, uint32_t nBytes, bool wait) {
 
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
   LL_DMA_DisableChannel(DMA1, _dmaChannelTX);
@@ -120,6 +120,19 @@ void UART_Comm::startDMATX(uint8_t* buffer, uint32_t nBytes) {
   LL_USART_EnableDMAReq_TX(_USARTx);
 
   LL_DMA_EnableChannel(DMA1, _dmaChannelTX);
+
+  if (wait) {
+    if (_USARTx == USART1) {
+      while (!LL_DMA_IsActiveFlag_TC2(DMA1))
+        ;
+      LL_DMA_ClearFlag_TC2(DMA1);
+    }
+    else if (_USARTx == USART2) {
+      while (!LL_DMA_IsActiveFlag_TC4(DMA1))
+        ;
+      LL_DMA_ClearFlag_TC4(DMA1);
+    }
+  }
 
 }
 
