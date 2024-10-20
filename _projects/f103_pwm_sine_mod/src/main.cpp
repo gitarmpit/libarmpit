@@ -28,35 +28,12 @@ public:
 
   }
 
-  virtual void HandleInterrupt2()  {
-    
-    static int inc = 1;
-    static int cnt = 1;
-    float ds = 1.0 + sin (18.0*_cnt*M_PI/180. - M_PI/2.0);
-    //printf ("%d %f\n", _cnt, 500*ds);
-    // _ch->timer->UpdateDs(_ch->channel, cnt * 100);
-    _ch->timer->UpdateDs(_ch->channel, 500*ds);
-    
-    /*
-    cnt += inc;
-
-    if (cnt == 10 || cnt == 0) {
-      inc = -inc;
-    }
-    */
-
-    if (++_cnt >= _max) {
-      _cnt = 0;
-    }
-
-  }
-
 private:
   TIM_Channel* _ch;
-  uint16_t _period;
-  uint32_t _cnt;
-  uint32_t _max;
-  float _step;
+  uint16_t _period; // PWM period, us
+  uint32_t _cnt;    // current steps, wraps around at _max
+  uint32_t _max;    // number of steps
+  float _step;      // step size
 };
 
 
@@ -66,7 +43,7 @@ static void testPWM2() {
   GPIO_PIN pin1 = GPIO_GetPin("A0");    // TIM2 channel 1
   GPIO_Setup_OutAltPP(&pin1);
   TIMER* t = TIMER2::GetInstance();
-  int period = 50;
+  int period = 50; // us
   TIM_Channel ch = t->SetupPWM(1, period, 1);
   t->EnableCounter();
 
