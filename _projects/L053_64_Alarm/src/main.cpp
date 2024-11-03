@@ -8,11 +8,19 @@
 #include "rtc.h"
 #include "beep.h"
 #include "gpio.h"
+#include "systick.h"
+
+void testHDLC_TX();
+void testHDLC_RX();
+
+void testMSLP_TX();
+void testMSLP_RX();
 
 void RunSession();
 void testRX();
 void testTX(int baudRate);
 void testDMA_TX(int baudRate);
+void testDMA_RX(int baudRate);
 
 
 
@@ -23,16 +31,21 @@ static void run(void) {
     initRTC();
   }
 
+
   if (LL_PWR_IsActiveFlag_SB() && LL_PWR_IsActiveFlag_WU()) {
     LL_PWR_ClearFlag_WU();
     LL_PWR_ClearFlag_SB();
     if (LL_RTC_IsActiveFlag_ALRA(RTC)) {
       clearAlarmA();
-      beep_alarmA();
+      if (!isSkipAlarm(0)) {
+        beep_alarm(getAlarmTuneNo(0));
+      }
     } 
     else if (LL_RTC_IsActiveFlag_ALRB(RTC)) {
       clearAlarmB();
-      beep_alarmB();
+      if (!isSkipAlarm(1)) {
+        beep_alarm(getAlarmTuneNo(1));
+      }
     } 
     else  {
       LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);    // A0
@@ -84,13 +97,20 @@ int main(void) {
   LL_PWR_DisableWakeUpPin(LL_PWR_WAKEUP_PIN1);    // A0
   GPIO_PIN p = GPIO_GetPin("A0");
   GPIO_Setup_In_Pulldown(&p);
+  // SystemClock_Config_HSI_32();
 
   lowPowerRun(LL_RCC_MSIRANGE_0);
-  // testDMA_TX(1200);
-  testTX(1200);
-
+  //Systick_Tick_ms = 5;
+  //SysTick_Init();
   beep_init();
-  run();
+  //g_buzzer->PlayTune(barbie);
+
+  // testDMA_TX(1200);
+  // testTX(1200);
+  // testDMA_RX(115200);
+
+  //run();
+  testMSLP_TX();
 
   while(1)
     ;

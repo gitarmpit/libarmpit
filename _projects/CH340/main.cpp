@@ -32,14 +32,15 @@ typedef enum {
 	SETTIME,
 	GETTIME,
 	SETALARM,
-	GETALARM
+	GETALARM,
+	PLAYTUNE
 } RTC_CMD;
 
 
 static void testSend() {
 
 	UART uart;
-	if (!uart.Initialize("COM8", CBR_1200)) {
+	if (!uart.Initialize("COM7", CBR_115200)) {
 		exit(1);
 	}
 	uint8_t b = 0;
@@ -49,43 +50,33 @@ static void testSend() {
 		//printf("sending %d\n", b);
 		uart.Write(&b, 1);
 		++b;
-		::Sleep(1000);
+		//::Sleep(10);
 	}
 
 }
 
-static void testRecv() {
+static void testSend2() {
 
 	UART uart;
-	if (!uart.Initialize("COM8", CBR_1200)) {
+	if (!uart.Initialize("COM7", CBR_115200)) {
 		exit(1);
 	}
-	uint8_t b = 0;
-	int total = 0;
-	int nerrors = 0;
+	uint8_t cnt = 0;
+	const int len = 32;
+	uint8_t buf[len];
 
 	while (true)
 	{
-		if (uart.Read(&b, 1, 10000)) {
-			//printf("%02x\n", b & 0x7f);
-			//b &= 0x7f;
-			++total;
-
-			if (b != 0x4f) {
-				++nerrors;
-				printf("total: %d, errors: %d, %%: %f\n", total, nerrors, (float)nerrors / (float)total * 100.0);
-			}
-
+		for (int i = 0; i < len; ++i) {
+			buf[i] = cnt++;
 		}
-		if ((total % 1000) == 0)
-			printf("total: %d, errors: %d, %%: %f\n", total, nerrors, (float)nerrors / (float)total * 100.0);
-
+		uart.Write(buf, len);
 	}
 
 }
 
 
-static void testRecv2() {
+static void testRecv() {
 
 	UART uart;
 	if (!uart.Initialize("COM7", CBR_1200)) {
@@ -98,8 +89,9 @@ static void testRecv2() {
 	while (true)
 	{
 		if (uart.Read(&b, 1, 10000)) {
-			printf("%d\n", b);
+			printf("%x\n", b);
 		}
+		::Sleep(100);
 	}
 
 }
@@ -109,15 +101,16 @@ static void testRecv2() {
 
 int main(int argc, char* argv[]) {
 	
-	testRecv2();
+	testRecv();
 
 	if (argc < 3) {
-		printf("Usage: <com port> <settime|gettime|setalarm|getalarm>\n");
+		printf("Usage: <com port> <settime|gettime|setalarm|getalarm|playtune>\n");
 		exit(1);
 	}
 
 	const char* comPort = argv[1];
 	STM32_ALARM a;
+	uint8_t tuneNo = 0;
 
 	RTC_CMD cmd = RTC_CMD::SETTIME;
 
@@ -133,7 +126,7 @@ int main(int argc, char* argv[]) {
 		printf("setting alarm\n");
 		cmd = RTC_CMD::SETALARM;
 		if (argc != 4) {
-			printf("Usage: <com port> <settime|gettime|setalarm|getalarm>\n");
+			printf("Usage: <com port> <settime|gettime|setalarm|getalarm|playtune>\n");
 			exit(1);
 		}
 		const char* alarmstr = argv[3];
@@ -141,12 +134,20 @@ int main(int argc, char* argv[]) {
 			printf("error parsing alarm string: %s\n", alarmstr);
 			exit(1);
 		}
-		printf("Setting alarm: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skip weeks: %d, alarmNo: %d\n", 
-			a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipWeeks, a.alarmNo);
+		printf("Setting alarm: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skipFirst: %d, period: %d, wkOnly: %d, alarmNo: %d, alarm type: %d\n", 
+			a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipFirst, a.period, a.wkOnly, a.alarmNo, a.alarmType);
 	}
 	else if (!_strcmpi(argv[2], "getalarm")) {
 		cmd = RTC_CMD::GETALARM;
 		printf("getting alarm\n");
+	}
+	else if (!_strcmpi(argv[2], "playtune")) {
+		cmd = RTC_CMD::PLAYTUNE;
+		if (argc != 4) {
+			printf("Usage: <com port> <settime|gettime|setalarm|getalarm|playtune>\n");
+			exit(1);
+		}
+		tuneNo = ::atoi(argv[3]);
 	}
 	else {
 		printf("Command unknown: %s\n", argv[2]);
@@ -181,19 +182,19 @@ int main(int argc, char* argv[]) {
 	}
 	else if (cmd == RTC_CMD::GETALARM) {
 		STM32_ALARM a;
-		if (session.GetAlarm(a)) {
-			printf("Got alarm A: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skip weeks: %d\n",
-				a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipWeeks);
+		STM32_ALARM b;
+		if (session.GetAlarms(a, b)) {
+			printf("Got alarm A: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skipFirst: %d, period: %d, wkOnly: %d, alarm type: %d\n",
+				a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipFirst, a.period, a.wkOnly, a.alarmType);
+			printf("Got alarm B: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skipFirst: %d, period: %d, wkOnly: %d, alarm type: %d\n",
+				a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipFirst, a.period, a.wkOnly, a.alarmType);
 		}
 		else {
 			printf("GetAlarm error\n");
+			exit(1);
 		}
-		if (session.GetAlarm(a)) {
-			printf("Got alarm B: h: %02d, m: %02d, s: %02d, d: %02d, is wd: %d, skip weeks: %d\n",
-				a.hour, a.minute, a.second, a.day, a.isWeekDay, a.skipWeeks);
-		}
-		else {
-			printf("GetAlarm error\n");
-		}
+	}
+	else if (cmd == RTC_CMD::PLAYTUNE) {
+		session.PlayTune(tuneNo);
 	}
 }

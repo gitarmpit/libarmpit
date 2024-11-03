@@ -248,8 +248,8 @@ int main(void) {
   lowPowerRun();
  
   //testTX(1200);
-  testDMA_TX(1200);
-  // run();
+  //testDMA_TX(1200);
+  run();
 
   while(1)
     ;

@@ -11,6 +11,7 @@ Session::Session(const char* port, int baudRate) {
 bool Session::Handshake() {
 	while (true) {
 		if (ReceiveHandshake()) {
+			printf("receive handshake ok\n");
 			SendHandshake();
 			break;
 		}
@@ -72,31 +73,37 @@ bool Session::GetTime(STM32_TIME& time) {
 
 bool Session::GetAlarm(STM32_ALARM& a) {
 
-	uint8_t cmd = STM32_CMD_GETALARM;
-	_uart.Write(&cmd, 1);
-
-	for (int i = 0; i < 10; ++i) {
-		if (!_uart.Read((uint8_t*)&a, sizeof a, 10000)) {
-			return false;
-		}
-		uint8_t crc = calculateCRC((uint8_t*)&a, sizeof a);
-
-		uint8_t expected_crc;
-		if (!_uart.Read(&expected_crc, 1, 1000)) {
-			return false;
-		}
-
-		if (crc == expected_crc) {
-			SendAck();
-			return true;
-		}
-		else {
-			printf("crc error\n");
-			continue;
-		}
+	if (!_uart.Read((uint8_t*)&a, sizeof a, 10000)) {
+		return false;
 	}
 
-	return false;
+	uint8_t expected_crc;
+	if (!_uart.Read(&expected_crc, 1, 1000)) {
+		return false;
+	}
+
+	uint8_t crc = calculateCRC((uint8_t*)&a, sizeof a);
+
+	if (crc != expected_crc) {
+		printf("crc error\n");
+		return false;
+	}
+
+	SendAck();
+	return true;
+}
+bool Session::GetAlarms(STM32_ALARM& a, STM32_ALARM& b) {
+
+	uint8_t cmd = STM32_CMD_GETALARM;
+	_uart.Write(&cmd, 1);
+	return (GetAlarm(a) && GetAlarm(b));
+}
+
+bool Session::PlayTune(uint8_t tuneNo) {
+	uint32_t cmd = STM32_CMD_PLAYTUNE;
+	_uart.Write((uint8_t*)&cmd, 1);
+	_uart.Write(&tuneNo, 1);
+	return ReceiveAck();
 
 }
 
@@ -109,12 +116,14 @@ void Session::SendHandshake() {
 bool Session::ReceiveHandshake() {
 	uint32_t cmd = 0;
 	bool rc = _uart.Read((uint8_t*)&cmd, sizeof cmd, 10000);
+	printf("receive handshake, rc: %d\n", rc);
 	return (rc && (cmd == STM32_CMD_START));
 }
 
 bool Session::ReceiveAck() {
 	uint8_t ack = 0;
 	bool rc = _uart.Read(&ack, sizeof ack, 1000);
+	printf("receive ack, rc: %d\n", rc);
 	return (rc && (ack == STM32_ACK));
 }
 

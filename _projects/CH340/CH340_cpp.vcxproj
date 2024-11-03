@@ -127,6 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="crc.c" />
+    <ClCompile Include="hdlc.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pctime.cpp" />
     <ClCompile Include="Session.cpp" />
@@ -134,6 +136,8 @@
     <ClCompile Include="UART.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="crc.h" />
+    <ClInclude Include="hdlc.h" />
     <ClInclude Include="pctime.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="UART.h" />

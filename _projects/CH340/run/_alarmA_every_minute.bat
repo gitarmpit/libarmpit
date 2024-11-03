@@ -8,7 +8,8 @@ set SEC=30
 set DAY=-1
 set ISWD=0
 set WSKIP=0
-set ALARM=0
+set ALARMN=0
+set ALARMTYPE=1
 
 :: every minute at 11 second mark
-CH340_cpp.exe COM8 setalarm %HR%:%MIN%:%SEC%:%DAY%:%ISWD%:%WSKIP%:%ALARM%
+CH340_cpp.exe COM7 setalarm %HR%:%MIN%:%SEC%:%DAY%:%ISWD%:%WSKIP%:%ALARMN%:%ALARMTYPE%

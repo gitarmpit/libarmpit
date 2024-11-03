@@ -8,6 +8,7 @@
 #endif
 
 extern volatile uint32_t uwTick;
+extern uint8_t Systick_Tick_ms;
 
 void      SysTick_Init(void);
 void      SysTick_IncTick(void);

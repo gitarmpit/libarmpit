@@ -1,3 +1,3 @@
 @echo off
 
-CH340_cpp.exe COM8 settime
+CH340_cpp.exe COM%1 settime

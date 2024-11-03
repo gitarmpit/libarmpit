@@ -21,16 +21,28 @@ typedef struct {
 } STM32_TIME;
 
 typedef struct {
-  int8_t day;  // date or weekday
-  uint8_t isWeekDay;
-  int8_t hour;
-  int8_t minute;
-  int8_t second;
-  uint8_t skipWeeks; // 0 = every week, 1 = skip one week, etc
-  uint8_t alarmNo; // 0 = A, 1 = B
+    int8_t day;  // date or weekday
+    int8_t isWeekDay;
+    int8_t hour;
+    int8_t minute;
+    int8_t second;
+    int8_t skipFirst; // how many runs to skip
+    int8_t period; // 0 = every time 1 = every other, etc.
+    int8_t wkOnly; // weekdays only
+    int8_t alarmNo; // 0 = A, 1 = B
+    int8_t alarmTune;
+
 } STM32_ALARM;
 
+#define BKP_TUNE_POS         0
+#define BKP_SKIP_POS         4
+#define BKP_PERIOD_POS       8
+#define BKP_PERIOD_CNT_POS  12
+#define BKP_WKONLY_POS      16
 
+
+
+#define BKP_SETTING_MASK    0xf
 
 #define RTC_TR_RESERVED_MASK    ((uint32_t)(RTC_TR_HT  | RTC_TR_HU  | \
                                             RTC_TR_MNT | RTC_TR_MNU | \
@@ -62,6 +74,9 @@ void getRTCTime (STM32_TIME* t);
 
 void getAlarmA (STM32_ALARM* t);
 void getAlarmB (STM32_ALARM* t);
+
+BOOL isSkipAlarm (int8_t alarmNo);
+int8_t getAlarmTuneNo(int8_t alarmNo);
 
 #ifdef __cplusplus
 }

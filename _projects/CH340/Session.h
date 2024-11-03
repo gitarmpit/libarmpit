@@ -10,7 +10,7 @@
 #define STM32_CMD_GETTIME    0x2
 #define STM32_CMD_SETALARM   0x3
 #define STM32_CMD_GETALARM   0x4
-
+#define STM32_CMD_PLAYTUNE   0x5
 
 
 class Session {
@@ -19,13 +19,15 @@ public:
 	bool Handshake();
 	bool SetTime();
 	bool GetTime(STM32_TIME& t);
-	bool GetAlarm(STM32_ALARM& a);
+	bool GetAlarms(STM32_ALARM& a, STM32_ALARM& b);
 	bool SetAlarm(const STM32_ALARM& a);
+	bool PlayTune(uint8_t tuneNo);
 private:
 	void SendHandshake();
 	bool ReceiveHandshake();
 	bool ReceiveAck();
 	void SendAck();
+	bool GetAlarm(STM32_ALARM&);
 
 	UART _uart;
 };

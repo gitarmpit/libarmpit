@@ -1,10 +1,153 @@
 #include "gpio.h"
 
 #include "UART.h"
+#include <cstdlib>
 #include <stdio.h>
 #include "beep.h"
 #include "low_power.h"
 #include "pc_session.h"
+#include "stm32l0xx_ll_cortex.h"
+#include "stm32l0xx_ll_dma.h"
+#include "systick.h"
+#include "MSLP.h"
+
+void testMSLP_TX() {
+  int baudRate = 1200;
+
+  // A9, AF4
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+
+  uart.init(baudRate);
+  uart.startDMARX();
+
+  const int ds = 16;
+  uint8_t data[ds];
+  for (int i = 0; i < ds; ++i) {
+    data[i] = i+1;
+  }  
+
+  data[1] = 0x7E;
+  data[2] = 0x7D;
+  data[3] = 0x7F;
+  
+  srand (READ_REG(*((uint32_t *)UID_BASE)));
+  uint16_t seq =(uint16_t) rand();
+
+  SerialDev_UART comm (&uart);
+  MSLP mslp (&comm, seq);
+
+  //mslp.Connect();
+  mslp.SendData(data, sizeof data);
+
+  //mslp.SendData(data, 1);
+
+  while(1)
+    ;
+
+}
+
+/*
+void testHDLC_TX() {
+  int baudRate = 1200;
+
+  // A9, AF4
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+
+  uart.init(baudRate);
+  uart.startDMARX();
+
+  uint8_t data[DATA_SIZE];
+  for (int i = 0; i < DATA_SIZE; ++i) {
+    data[i] = i+1;
+  }  
+
+  data[1] = 0x7E;
+  data[2] = 0x7D;
+  data[3] = 0x7F;
+  
+  srand (READ_REG(*((uint32_t *)UID_BASE)));
+  uint16_t seq =(uint16_t) rand();
+
+  UART_IComm comm (&uart);
+  HDLC hdlc (&comm, seq);
+
+  hdlc.SendSYN(seq);
+  hdlc.SendData(data, sizeof data);
+
+  hdlc.SendData(data, 1);
+
+  while(1)
+    ;
+}
+
+void testHDLC_RX() {
+  int baudRate = 1200;
+
+  // A9, AF4
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+
+  uart.init(baudRate);
+  uart.startDMARX();
+
+  uint8_t data[DATA_SIZE];
+
+  srand (READ_REG(*((uint32_t *)UID_BASE)));
+  uint16_t seq =(uint16_t) rand();
+
+  UART_IComm comm (&uart);
+  HDLC hdlc (&comm, seq);
+
+  //srand (READ_REG(*((uint32_t *)UID_BASE)));
+  //printf ("%d\n", RAND_MAX);
+
+  //while(1) {
+  //  printf ("%d\n", rand());
+  //  delay_ms(1000);
+  //}
+
+  while (1) {
+    uint16_t dataSize;
+    if (hdlc.ReceiveData(data, dataSize)) {
+      if (dataSize) {
+        for (int i = 0; i < dataSize; ++i) {
+          printf("%x ", data[i]);
+        }
+        printf("\n");
+        //delay_ms(10);
+      }
+    }
+    else {
+      printf ("receivedData failed\n");
+      break;
+    }
+  }
+
+
+  while(1)
+    ;
+}
+*/
 
 
 bool RunSession() {
@@ -47,10 +190,7 @@ bool RunSession() {
     getAlarmA(&alarmA);
     STM32_ALARM alarmB;
     getAlarmB(&alarmB);
-    rc = session.SendAlarm(alarmA);
-    if (rc) {
-      session.SendAlarm(alarmB);
-    }
+    rc = session.SendAlarm(alarmA, alarmB);
 
   }
   else if (cmd == STM32_CMD_SETALARM) {
@@ -63,6 +203,14 @@ bool RunSession() {
         setAlarmB(&a);
       }
       rc = true;
+    }
+  }
+  else if (cmd == STM32_CMD_PLAYTUNE) {
+    uint8_t tuneNo;
+    rc = session.GetTuneNo(tuneNo);
+    if (rc) {
+      beep_alarm(tuneNo);
+      return true;
     }
   }
 
@@ -109,7 +257,7 @@ void testTX(int baudRate) {
   while(1) {
     uart.sendByte(b);
     //uart.sendByte(b & 0x7f);
-    delay_ms(10);
+    delay_ms(1000);
     ++b;
   }
 }
@@ -125,14 +273,51 @@ void testDMA_TX(int baudRate) {
 
   UART_Comm uart(USART1);
   uart.init(baudRate);
-  uint8_t buf[] = { 1, 2, 3, 4, 5, 6};
-  uart.startDMATX(buf, sizeof buf);
-  delay_ms(2000);
+  uint8_t buf[256];
+  for (int i = 0; i < 256; ++i) {
+    buf[i] = i;
+  }
+  uart.sendDMA(buf, sizeof buf);
   uint8_t buf2[] = { 11, 12, 13, 14, 15, 16};
-  uart.startDMATX(buf2, sizeof buf2);
+  uart.sendDMA(buf2, sizeof buf2);
   while(1)
     ;
 
+}
+
+void testDMA_RX(int baudRate) {
+  LL_USART_Disable(USART1);
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+  uart.init(baudRate);
+  const uint8_t len = 8;
+  uint8_t buf[len] = {0xff};
+  uart.startDMARX();
+  int cnt = 0;
+  while (1) {
+    bool rc = uart.receiveMsgDMA(buf, len, 40000);
+    if (rc) {
+      for (int i = 0; i < len; ++i) {
+        printf ("%d ", buf[i]);
+        if (buf[i] != (cnt % 256)) {
+          //printf ("expected: %d, got: %d, cnt: %d\n", cnt % 256, buf[i], cnt);
+          //while(1);
+        }
+        ++cnt;
+      }
+      printf ("\n");
+      //SysTick_Delay(4);
+    }
+    else {
+      printf ("read timed out\n");
+    }
+  }
 }
 
 

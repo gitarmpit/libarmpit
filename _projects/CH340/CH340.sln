@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CH340", "CH340.csproj", "{C
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CH340_cpp", "CH340_cpp.vcxproj", "{28DB922E-DB25-45D2-BF81-D9947C2C808A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Alarm_UI", "..\Alarm_UI\Alarm_UI.vcxproj", "{2B03F0EA-1407-4D90-9C89-B278629B4F99}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HDLC_test", "..\HDLC_test\HDLC_test.vcxproj", "{AB142935-0257-47BA-A77C-5E29CA454608}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +45,30 @@ Global
 		{28DB922E-DB25-45D2-BF81-D9947C2C808A}.Release|x64.Build.0 = Release|x64
 		{28DB922E-DB25-45D2-BF81-D9947C2C808A}.Release|x86.ActiveCfg = Release|Win32
 		{28DB922E-DB25-45D2-BF81-D9947C2C808A}.Release|x86.Build.0 = Release|Win32
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Debug|Any CPU.Build.0 = Debug|x64
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Debug|x64.ActiveCfg = Debug|x64
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Debug|x64.Build.0 = Debug|x64
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Debug|x86.ActiveCfg = Debug|Win32
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Debug|x86.Build.0 = Debug|Win32
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Release|Any CPU.ActiveCfg = Release|x64
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Release|Any CPU.Build.0 = Release|x64
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Release|x64.ActiveCfg = Release|x64
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Release|x64.Build.0 = Release|x64
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Release|x86.ActiveCfg = Release|Win32
+		{2B03F0EA-1407-4D90-9C89-B278629B4F99}.Release|x86.Build.0 = Release|Win32
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Debug|Any CPU.Build.0 = Debug|x64
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Debug|x64.ActiveCfg = Debug|x64
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Debug|x64.Build.0 = Debug|x64
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Debug|x86.ActiveCfg = Debug|Win32
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Debug|x86.Build.0 = Debug|Win32
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Release|Any CPU.ActiveCfg = Release|x64
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Release|Any CPU.Build.0 = Release|x64
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Release|x64.ActiveCfg = Release|x64
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Release|x64.Build.0 = Release|x64
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Release|x86.ActiveCfg = Release|Win32
+		{AB142935-0257-47BA-A77C-5E29CA454608}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

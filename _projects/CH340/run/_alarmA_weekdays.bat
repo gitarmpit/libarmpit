@@ -10,6 +10,7 @@ set SEC=0
 set DAY=4
 set ISWD=1
 set WSKIP=0
-set ALARM=0
+set ALARMN=0
+set ALARMTYPE=1
 
-CH340_cpp.exe COM8 setalarm %HR%:%MIN%:%SEC%:%DAY%:%ISWD%:%WSKIP%:%ALARM%
+CH340_cpp.exe COM8 setalarm %HR%:%MIN%:%SEC%:%DAY%:%ISWD%:%WSKIP%:%ALARMN%:%ALARMTYPE%

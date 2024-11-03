@@ -131,7 +131,7 @@ bool UART::Read(uint8_t* buf, DWORD bytesToRead, int timeoutMs) {
 
     while (totalBytesRead < bytesToRead) {
         DWORD rxBytes = WaitRead(timeoutMs);
-        //printf("rxBytes: %d\n", rxBytes);
+        // printf("rxBytes: %d\n", rxBytes);
         if (rxBytes == 0) {
             break;
         }
@@ -155,7 +155,7 @@ bool UART::Read(uint8_t* buf, DWORD bytesToRead, int timeoutMs) {
     }
 
     if (totalBytesRead == bytesToRead) {
-        //printf("read ok\n");
+        // printf("read ok\n");
         rc = true; 
     }
 
@@ -186,6 +186,9 @@ bool UART::SetTimeout(int timeoutMs)
 
 bool UART::Write(const uint8_t* buf, DWORD length) {
     DWORD bytesWritten;
+    if (length == 1) {
+        printf("sending one byte: %x\n", *buf);
+    }
     if (!WriteFile(_hSerial, buf, length, &bytesWritten, NULL)) {
         auto err = GetLastError();
         printf("Write error: 0x%x (%s)\n", err, GetErrorMessage(err).c_str());

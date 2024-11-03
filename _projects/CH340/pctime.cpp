@@ -37,6 +37,7 @@ uint8_t calculateCRC(uint8_t* data, uint8_t length) {
 
 bool parseAlarmString(const char* input, STM32_ALARM& a) {
 
+
 	std::stringstream ss(input);
 	int i = 0;
 	while (ss.good())
@@ -87,23 +88,32 @@ bool parseAlarmString(const char* input, STM32_ALARM& a) {
 			}
 		}
 		else if (i == 5) {
-			if (n != 0 && n != 1) {
-				printf("invalid value for isWeekDay (should be 0 or 1): %s\n", s.c_str());
-				exit(1);
-			}
-			a.skipWeeks = n;
+			a.skipFirst = n;
 		}
 		else if (i == 6) {
+			a.period = n;
+		}
+		else if (i == 7) {
+			if (n != 0 && n != 1) {
+				printf("invalid wkOnly value (should be 0 or 1): %s\n", s.c_str());
+				exit(1);
+			}
+			a.wkOnly = n;
+		}
+		else if (i == 8) {
 			if (n != 0 && n != 1) {
 				printf("invalid alarm number (should be 0(A) or 1(B)): %s\n", s.c_str());
 				exit(1);
 			}
 			a.alarmNo = n;
 		}
+		else if (i == 9) {
+			a.alarmType = n;
+		}
 
 		++i;
 	}
-	return (i == 7);
+	return (i == 10);
 }
 
 
