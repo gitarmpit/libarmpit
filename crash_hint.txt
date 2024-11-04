@@ -3,3 +3,4 @@ and WDG was called, and it is not one of the handlers like hard fault that typic
 mostly likely it is the timer and the timer interrupts in timer.cpp are disabled by ifdef or a timer is mistakenly 
 disabled by ifdef. 
 
+
