@@ -1,2 +1,2 @@
-AppData\Local\SEGGER\SEGGER Embedded Studio\v3
+AppData\Local\SEGGER\SEGGER Embedded Studio\v8
  

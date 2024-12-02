@@ -128,6 +128,7 @@
     <item name="EditPasteAsNewDocument"><key>Alt+Shift+V</key></item>
     <item name="EditRedo"><key>Ctrl+Y</key><alt>Alt+Shift+Backspace</alt></item>
     <item name="EditRedoAll"><key>Ctrl+K, Ctrl+Y</key></item>
+    <item name="EditRenameSymbol"><key>Ctrl+Shift+R</key></item>
     <item name="EditReplace"><key>Ctrl+H</key></item>
     <item name="EditRestoreTextSize"><key>Ctrl+0</key></item>
     <item name="EditScrollToBottom"><key>Ctrl+Q, End</key></item>
@@ -239,7 +240,6 @@
     <item name="HTMLUnderline"><key>Ctrl+L, U</key><alt>Meta+U</alt></item>
     <item name="HelpF1Help"><key>F1</key></item>
     <item name="MacroPlayRecording"><key>Ctrl+Shift+P</key></item>
-    <item name="MacroStartRecording"><key>Ctrl+Shift+R</key></item>
     <item name="NewFileComparison"><key>Ctrl+K, F</key></item>
     <item name="OpenPackagesDirectory"><key>Ctrl+Q, F, P</key></item>
     <item name="OpenProjectDirectory"><key>Ctrl+Q, F, J</key></item>
