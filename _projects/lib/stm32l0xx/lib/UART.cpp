@@ -7,10 +7,25 @@
 #include <stdio.h>
 #include "low_power.h"
 
+
+extern "C" void USART1_IRQHandler(void) {
+  if (LL_USART_IsActiveFlag_IDLE(USART1)) {
+    LL_USART_ClearFlag_IDLE (USART1);
+  }
+}
+
+
+extern "C" void DMA1_Channel2_3_IRQHandler(void) {
+  if (LL_DMA_IsActiveFlag_TC3(DMA1)) {
+    LL_DMA_ClearFlag_TC3(DMA1);
+    printf ("TC\n");
+  }
+}
+
+
 UART_Comm::UART_Comm(USART_TypeDef* USARTx) : _USARTx(USARTx) {
   deinit();
   _rxBufReadPos = 0;
-  _last_rxBufWritePos = 0;
 }
 
 void UART_Comm::init(uint32_t baudRate) {
@@ -44,6 +59,8 @@ void UART_Comm::init(uint32_t baudRate) {
   while((!(LL_USART_IsActiveFlag_TEACK(_USARTx))) || (!(LL_USART_IsActiveFlag_REACK(_USARTx)))) { 
   }
 
+  LL_USART_EnableIT_IDLE(_USARTx);
+
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
 
   // TX
@@ -73,6 +90,17 @@ void UART_Comm::init(uint32_t baudRate) {
   LL_DMA_EnableIT_TC(DMA1, _dmaChannelRX);
   LL_DMA_EnableIT_TE(DMA1, _dmaChannelRX);
   LL_USART_EnableDMAReq_RX(_USARTx);
+
+  if (_USARTx == USART1) {
+    // NVIC_SetPriority(USART1_IRQn, 0);
+    // NVIC_EnableIRQ(USART1_IRQn);
+    NVIC_SetPriority(DMA1_Channel2_3_IRQn, 0);
+    NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
+
+  } else if (_USARTx == USART2) {
+    NVIC_SetPriority(USART2_IRQn, 0);
+    NVIC_EnableIRQ(USART2_IRQn);
+  }
 }
 
 void UART_Comm::deinit() {
@@ -152,10 +180,6 @@ uint16_t UART_Comm::readDMA(uint8_t* buf, uint16_t bytesRequested) {
 
   uint16_t rxBufWritePos = DMA_RX_BUFFER_SIZE - LL_DMA_GetDataLength(DMA1, _dmaChannelRX);
 
-  if (_last_rxBufWritePos <= _rxBufReadPos && rxBufWritePos > _rxBufReadPos) {
-    //printf ("DMA ring buffer overlow\n");
-  }
-
   uint16_t bytesAvailable = (rxBufWritePos - _rxBufReadPos + DMA_RX_BUFFER_SIZE) % DMA_RX_BUFFER_SIZE;
   uint16_t bytesRead      = 0;
   if (bytesAvailable > 0) {
@@ -165,7 +189,7 @@ uint16_t UART_Comm::readDMA(uint8_t* buf, uint16_t bytesRequested) {
     }
     _rxBufReadPos = (_rxBufReadPos + bytesRead) % DMA_RX_BUFFER_SIZE;
   }
-  _last_rxBufWritePos = rxBufWritePos;
+
   return bytesRead;
 }
 

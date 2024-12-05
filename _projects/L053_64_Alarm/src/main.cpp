@@ -8,6 +8,7 @@
 #include "rtc.h"
 #include "beep.h"
 #include "gpio.h"
+#include "stm32l0xx_ll_usart.h"
 #include "systick.h"
 
 void testHDLC_TX();
@@ -16,12 +17,13 @@ void testHDLC_RX();
 void testMSLP_TX();
 void testMSLP_RX();
 
+
 void RunSession();
 void testRX();
 void testTX(int baudRate);
 void testDMA_TX(int baudRate);
 void testDMA_RX(int baudRate);
-
+void testRecvDMA();
 
 
 
@@ -108,9 +110,10 @@ int main(void) {
   // testDMA_TX(1200);
   // testTX(1200);
   // testDMA_RX(115200);
-
+  
   //run();
-  testMSLP_TX();
+  //testMSLP_TX();
+  testRecvDMA();
 
   while(1)
     ;

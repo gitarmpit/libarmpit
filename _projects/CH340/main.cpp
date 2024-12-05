@@ -40,17 +40,17 @@ typedef enum {
 static void testSend() {
 
 	UART uart;
-	if (!uart.Initialize("COM7", CBR_115200)) {
+	if (!uart.Initialize("COM3", CBR_1200)) {
 		exit(1);
 	}
 	uint8_t b = 0;
 
 	while (true)
 	{
-		//printf("sending %d\n", b);
+		printf("sending %d\n", b);
 		uart.Write(&b, 1);
 		++b;
-		//::Sleep(10);
+		::Sleep(1000);
 	}
 
 }
@@ -101,7 +101,7 @@ static void testRecv() {
 
 int main(int argc, char* argv[]) {
 	
-	testRecv();
+	testSend();
 
 	if (argc < 3) {
 		printf("Usage: <com port> <settime|gettime|setalarm|getalarm|playtune>\n");

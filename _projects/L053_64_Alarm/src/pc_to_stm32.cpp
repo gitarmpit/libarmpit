@@ -11,6 +11,37 @@
 #include "systick.h"
 #include "MSLP.h"
 
+void testRecvDMA() {
+  int baudRate = 1200;
+
+  // A9, AF4
+  GPIO_PIN tx = GPIO_GetPin("A9");
+  GPIO_Setup_OutAltPP(&tx, 4);
+
+  // A10
+  GPIO_PIN rx = GPIO_GetPin("A10");
+  GPIO_Setup_OutAltPP(&rx, 4);
+
+  UART_Comm uart(USART1);
+
+  uart.init(baudRate);
+  uart.startDMARX();
+
+  uint8_t buf[32];
+  while (1) {
+    // if (uart.readDMA(buf, 1)) {
+    //   printf ("recv: %d\n", buf[0]);
+    // }
+    
+    //if (LL_DMA_IsActiveFlag_TC3(DMA1)) {
+    //  LL_DMA_ClearFlag_TC3(DMA1);
+    //  printf ("TC\n");
+    //}
+
+    delay_ms(1);
+  }
+}
+
 void testMSLP_TX() {
   int baudRate = 1200;
 

@@ -3,7 +3,7 @@
 #include "ISerialDev.h"
 
 #include "stm32l0xx_ll_usart.h"
-#define DMA_RX_BUFFER_SIZE 32
+#define DMA_RX_BUFFER_SIZE 8
 
 class UART_Comm {
 public:
@@ -30,7 +30,6 @@ private:
   uint32_t       _dmaRequest;
   uint8_t        _rxbuf[DMA_RX_BUFFER_SIZE];
   uint16_t       _rxBufReadPos;
-  uint16_t       _last_rxBufWritePos;
 };
 
 // Serial TCP over UART

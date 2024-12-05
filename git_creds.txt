@@ -7,7 +7,7 @@ host=github.com
 protocol=https
 host=github.com
 username=gitarmpit
-password=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
+password=YOUR_PERSONAL_ACCESS_TOKEN
 
 
 set:
