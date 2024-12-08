@@ -28,7 +28,7 @@ UART_Comm::UART_Comm(USART_TypeDef* USARTx) : _USARTx(USARTx) {
   _rxBufReadPos = 0;
 }
 
-void UART_Comm::init(uint32_t baudRate) {
+void UART_Comm::init(uint32_t baudRate, bool initIRQ) {
 
   if (_USARTx == USART1) {
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1);
@@ -91,15 +91,15 @@ void UART_Comm::init(uint32_t baudRate) {
   LL_DMA_EnableIT_TE(DMA1, _dmaChannelRX);
   LL_USART_EnableDMAReq_RX(_USARTx);
 
-  if (_USARTx == USART1) {
-    // NVIC_SetPriority(USART1_IRQn, 0);
-    // NVIC_EnableIRQ(USART1_IRQn);
+  if (_USARTx == USART1 && initIRQ) {
+    NVIC_SetPriority(USART1_IRQn, 0);
+    NVIC_EnableIRQ(USART1_IRQn);
     NVIC_SetPriority(DMA1_Channel2_3_IRQn, 0);
     NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
-
-  } else if (_USARTx == USART2) {
-    NVIC_SetPriority(USART2_IRQn, 0);
-    NVIC_EnableIRQ(USART2_IRQn);
+    _isIRQ = true;
+  }
+  else {
+    _isIRQ = false;
   }
 }
 

@@ -36,8 +36,9 @@ PcSession::PcSession(USART_TypeDef* USARTx, int baudRate) : _uart(USARTx) {
   // A10
   GPIO_PIN rx = GPIO_GetPin("A10");
   GPIO_Setup_OutAltPP(&rx, 4);
-
-  _uart.init(baudRate);
+  
+  bool isIRQ = false;
+  _uart.init(baudRate, isIRQ);
   _uart.startDMARX();
 }
 

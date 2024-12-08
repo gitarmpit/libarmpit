@@ -40,7 +40,7 @@ typedef enum {
 static void testSend() {
 
 	UART uart;
-	if (!uart.Initialize("COM3", CBR_1200)) {
+	if (!uart.Initialize("COM7", CBR_1200)) {
 		exit(1);
 	}
 	uint8_t b = 0;

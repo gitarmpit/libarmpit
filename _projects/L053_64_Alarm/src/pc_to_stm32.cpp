@@ -24,7 +24,8 @@ void testRecvDMA() {
 
   UART_Comm uart(USART1);
 
-  uart.init(baudRate);
+  bool isIRQ = true;
+  uart.init(baudRate, isIRQ);
   uart.startDMARX();
 
   uint8_t buf[32];
@@ -55,7 +56,8 @@ void testMSLP_TX() {
 
   UART_Comm uart(USART1);
 
-  uart.init(baudRate);
+  bool isIRQ = false;
+  uart.init(baudRate, isIRQ);
   uart.startDMARX();
 
   const int ds = 16;
@@ -264,7 +266,8 @@ void testRX() {
   GPIO_Setup_OutAltPP(&rx, 4);
 
   UART_Comm uart(USART1);
-  uart.init(1200);
+  bool isIRQ = false;
+  uart.init(1200, isIRQ);
   uint8_t b;
   while(1) {
     if (uart.receiveByte(b, 5000)) {
@@ -283,7 +286,8 @@ void testTX(int baudRate) {
   GPIO_Setup_OutAltPP(&rx, 4);
 
   UART_Comm uart(USART1);
-  uart.init(baudRate);
+  bool isIRQ = false;
+  uart.init(baudRate, isIRQ);
   uint8_t b = 0x4f;
   while(1) {
     uart.sendByte(b);
@@ -303,7 +307,9 @@ void testDMA_TX(int baudRate) {
   GPIO_Setup_OutAltPP(&rx, 4);
 
   UART_Comm uart(USART1);
-  uart.init(baudRate);
+  bool isIRQ = false;
+  uart.init(baudRate, isIRQ);
+
   uint8_t buf[256];
   for (int i = 0; i < 256; ++i) {
     buf[i] = i;
@@ -326,7 +332,9 @@ void testDMA_RX(int baudRate) {
   GPIO_Setup_OutAltPP(&rx, 4);
 
   UART_Comm uart(USART1);
-  uart.init(baudRate);
+  bool isIRQ = false;
+  uart.init(baudRate, isIRQ);
+
   const uint8_t len = 8;
   uint8_t buf[len] = {0xff};
   uart.startDMARX();

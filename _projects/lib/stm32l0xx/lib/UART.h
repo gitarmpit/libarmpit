@@ -3,13 +3,15 @@
 #include "ISerialDev.h"
 
 #include "stm32l0xx_ll_usart.h"
+#include "cbuf.h"
+
 #define DMA_RX_BUFFER_SIZE 8
 
 class UART_Comm {
 public:
   UART_Comm (USART_TypeDef* USARTx);
 
-  void init(uint32_t baudRate);
+  void init(uint32_t baudRate, bool initIRQ);
 
   bool receiveByte(uint8_t& byte, uint32_t wait_cnt);
   bool receiveMsg(uint8_t* buffer, uint32_t nBytes, uint32_t wait_cnt);
@@ -30,6 +32,8 @@ private:
   uint32_t       _dmaRequest;
   uint8_t        _rxbuf[DMA_RX_BUFFER_SIZE];
   uint16_t       _rxBufReadPos;
+  cbuf           _cbuf;
+  bool           _isIRQ; // use UART/DMA IRQ or not 
 };
 
 // Serial TCP over UART
